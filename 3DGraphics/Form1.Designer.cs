@@ -51,7 +51,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(784, 759);
             Controls.Add(bOpenModelFile);
             Name = "MainWindow";
             Text = "Form1";

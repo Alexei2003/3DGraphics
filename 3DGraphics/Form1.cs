@@ -1,4 +1,5 @@
 using _3DGraphics.Classes;
+using static _3DGraphics.Classes.BaseGraphisStructs;
 
 namespace _3DGraphics
 {
@@ -19,7 +20,12 @@ namespace _3DGraphics
         {
             if (modelData != null)
             {
-
+                var g = e.Graphics;
+                foreach (var vertex in modelData.Value.Vertexs)
+                {
+                    var tmpVertex = new GeometricVertex(vertex.X* 100 + Width/2 -100, vertex.Y*100 + Height/2 - 100, vertex.Z * 100); //CoordinateTransformations.Transform(vertex);
+                    g.DrawLine(new Pen(Color.Black), new PointF(tmpVertex.X, tmpVertex.Y), new PointF(tmpVertex.X + 10, tmpVertex.Y + 10));
+                }
             }
         }
 
@@ -27,11 +33,6 @@ namespace _3DGraphics
         {
             var modelFilePath = opfdModelFile.FileName;
             modelData = ObjFileReader.Read(modelFilePath);
-
-            foreach(var item in modelData.Value.Vertexs)
-            {
-                CoordinateTransformations.ScaleVector(item,new BaseGraphisStructs.Vector(1,1,1));
-            }
         }
 
         private void bOpenModelFile_Click(object sender, EventArgs e)

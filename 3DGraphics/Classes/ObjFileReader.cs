@@ -6,7 +6,7 @@ namespace _3DGraphics.Classes
     {
         public struct FileReaderResult
         {
-            public Vector[] Vertexs { get; set; }
+            public GeometricVertex[] Vertexs { get; set; }
         }
 
         public static FileReaderResult Read(string str)
@@ -15,7 +15,7 @@ namespace _3DGraphics.Classes
 
             var result = new FileReaderResult();
 
-            var vertexList = new List<Vector>();
+            var vertexList = new List<GeometricVertex>();
 
             foreach (var line in fileStrs)
             {
@@ -25,7 +25,14 @@ namespace _3DGraphics.Classes
                 {
                     var tmpStr = line.Replace(".", ",");
                     var subStrings = tmpStr.Split(' ');
-                    vertexList.Add(new Vector(float.Parse(subStrings[1]), float.Parse(subStrings[2]), float.Parse(subStrings[3]), 1)); /// 4вертая координата не парсится
+                    if(subStrings.Length > 4) 
+                    {
+                        vertexList.Add(new GeometricVertex(float.Parse(subStrings[1]), float.Parse(subStrings[2]), float.Parse(subStrings[3]), float.Parse(subStrings[4])));
+                    }
+                    else
+                    {
+                        vertexList.Add(new GeometricVertex(float.Parse(subStrings[1]), float.Parse(subStrings[2]), float.Parse(subStrings[3])));
+                    }
                 }
             }
 
