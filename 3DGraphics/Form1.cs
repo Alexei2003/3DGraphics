@@ -33,6 +33,8 @@ namespace _3DGraphics
         {
             var modelFilePath = opfdModelFile.FileName;
             modelData = ObjFileReader.Read(modelFilePath);
+            Invalidate();
+            Update();
         }
 
         private void bOpenModelFile_Click(object sender, EventArgs e)
