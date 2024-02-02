@@ -6,7 +6,7 @@ namespace _3DGraphics.Classes
     {
         public struct FileReaderResult
         {
-            public Vertex[] VertexCoordinates {  get; set; }
+            public Vector[] Vertexs { get; set; }
         }
 
         public static FileReaderResult Read(string str)
@@ -15,21 +15,21 @@ namespace _3DGraphics.Classes
 
             var result = new FileReaderResult();
 
-            var vertexList = new List<Vertex>();
+            var vertexList = new List<Vector>();
 
             foreach (var line in fileStrs)
             {
                 // Координаты вершин
                 /// Дописать проверку
-                if (line.Length > 0 && line[0] == 'v' && line[0] == ' ')
+                if (line.Length > 0 && line[0] == 'v' && line[1] == ' ')
                 {
                     var tmpStr = line.Replace(".", ",");
                     var subStrings = tmpStr.Split(' ');
-                    vertexList.Add(new Vertex { X = float.Parse(subStrings[1]), Y = float.Parse(subStrings[2]), Z = float.Parse(subStrings[3]) });
+                    vertexList.Add(new Vector(float.Parse(subStrings[1]), float.Parse(subStrings[2]), float.Parse(subStrings[3]), 1)); /// 4вертая координата не парсится
                 }
             }
 
-            result.VertexCoordinates = vertexList.ToArray();
+            result.Vertexs = vertexList.ToArray();
 
             return result;
         }

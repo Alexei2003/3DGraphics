@@ -27,6 +27,11 @@ namespace _3DGraphics
         {
             var modelFilePath = opfdModelFile.FileName;
             modelData = ObjFileReader.Read(modelFilePath);
+
+            foreach(var item in modelData.Value.Vertexs)
+            {
+                CoordinateTransformations.ScaleVector(item,new BaseGraphisStructs.Vector(1,1,1));
+            }
         }
 
         private void bOpenModelFile_Click(object sender, EventArgs e)

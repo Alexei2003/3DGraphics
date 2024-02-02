@@ -17,3 +17,4 @@ D:\WPS\3DGraphics\3DGraphics\obj\Debug\net8.0-windows10.0.22621.0\refint\3DGraph
 D:\WPS\3DGraphics\3DGraphics\obj\Debug\net8.0-windows10.0.22621.0\3DGraphics.pdb
 D:\WPS\3DGraphics\3DGraphics\obj\Debug\net8.0-windows10.0.22621.0\3DGraphics.genruntimeconfig.cache
 D:\WPS\3DGraphics\3DGraphics\obj\Debug\net8.0-windows10.0.22621.0\ref\3DGraphics.dll
+D:\WPS\3DGraphics\3DGraphics\obj\Debug\net8.0-windows10.0.22621.0\3DGraphics.sourcelink.json
