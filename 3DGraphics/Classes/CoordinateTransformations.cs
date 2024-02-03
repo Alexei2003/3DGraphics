@@ -2,6 +2,7 @@
 
 namespace _3DGraphics.Classes
 {
+    /// Переписать полностью
     internal class CoordinateTransformations<T>(T param) where T : Vector, new()
     {
         /// Добавить проверку на размеры
