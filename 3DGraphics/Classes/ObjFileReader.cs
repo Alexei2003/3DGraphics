@@ -6,9 +6,9 @@ namespace _3DGraphics.Classes
     {
         public struct FileReaderResult
         {
-            public GeometricVertex[] GeometricVertexСoordinates { get; set; }
-            public TextureVertice[] TextureVertexСoordinates { get; set; }
-            public NormalVertice[] NormalVertexСoordinates { get; set; }
+            public GeometricVertex[] GeometricVertexCoordinates { get; set; }
+            public TextureVertice[] TextureVertexCoordinates { get; set; }
+            public NormalVertice[] NormalVertexCoordinates { get; set; }
             public int[][] GeometricVertexIndexs { get; set; }
             public int[][] TextureVertexIndexs { get; set; }
             public int[][] NormalVertexIndexs { get; set; }
@@ -110,9 +110,9 @@ namespace _3DGraphics.Classes
                 }
             }
 
-            result.GeometricVertexСoordinates = [.. geometricVertexsList];
-            result.TextureVertexСoordinates = [.. textureVerticesList];
-            result.NormalVertexСoordinates = [.. normalVerticesList];
+            result.GeometricVertexCoordinates = [.. geometricVertexsList];
+            result.TextureVertexCoordinates = [.. textureVerticesList];
+            result.NormalVertexCoordinates = [.. normalVerticesList];
             result.GeometricVertexIndexs = [.. geometricVertexIndexsList];
             result.TextureVertexIndexs = [.. textureVertexIndexsList];
             result.NormalVertexIndexs = [.. normalVertexIndexsList];

@@ -20,7 +20,7 @@ namespace _3DGraphics
             if (modelData != null)
             {
                 var bitmap = new Bitmap(Width, Height);
-                LinerDrawing.DrawLines(bitmap, modelData.Value.GeometricVertex—oordinates, modelData.Value.GeometricVertexIndexs);
+                LinerDrawing.DrawLines(bitmap, modelData.Value.GeometricVertexCoordinates, modelData.Value.GeometricVertexIndexs);
                 BackgroundImage = bitmap;
             }
         }
@@ -32,9 +32,9 @@ namespace _3DGraphics
 
             var tmp = modelData.Value;
 
-            for (var i = 0; i < tmp.GeometricVertex—oordinates.Length; i++)
+            for (var i = 0; i < tmp.GeometricVertexCoordinates.Length; i++)
             {
-                tmp.GeometricVertex—oordinates[i].Y = -tmp.GeometricVertex—oordinates[i].Y;
+                tmp.GeometricVertexCoordinates[i].Y = -tmp.GeometricVertexCoordinates[i].Y;
             }
 
             modelData = tmp;
