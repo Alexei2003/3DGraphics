@@ -7,8 +7,8 @@ namespace _3DGraphics.Classes
         public static void DrawLines(Bitmap bitmap, GeometricVertex[] GeometricVertexСoordinates, int[][] GeometricVertexIndexs)
         {
             const int xShift = 600 / 2 + 100;
-            const int yShift = 600 / 2 + 500;
-            const int scale = 5;
+            const int yShift = 600 / 2 + 300;
+            const int scale = 2;
             using var g = Graphics.FromImage(bitmap);
             foreach (var vertexIndex in GeometricVertexIndexs)
             {

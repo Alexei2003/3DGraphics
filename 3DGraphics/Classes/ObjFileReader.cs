@@ -71,17 +71,6 @@ namespace _3DGraphics.Classes
 
                 if (line.Length > 0 && line[0] == 'f' && line[1] == ' ')
                 {
-                    int[] indexs;
-                    switch (subStr.Length)
-                    {
-                        case 4:
-                            indexs = new int[3];
-                            break;
-                        case 5:
-                            indexs = new int[4];
-                            break;
-                    }
-
                     // Полигоны
                     var tmpList1 = new List<int>();
                     var tmpList2 = new List<int>();
