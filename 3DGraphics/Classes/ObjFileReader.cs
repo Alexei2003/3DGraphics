@@ -6,9 +6,9 @@ namespace _3DGraphics.Classes
     {
         public struct FileReaderResult
         {
-            public GeometricVertex[] GeometricVertexs { get; set; }
-            public TextureVertice[] TextureVertexs { get; set; }
-            public NormalVertice[] NormalVertexs { get; set; }
+            public GeometricVertex[] GeometricVertexСoordinates { get; set; }
+            public TextureVertice[] TextureVertexСoordinates { get; set; }
+            public NormalVertice[] NormalVertexСoordinates { get; set; }
             public int[][] GeometricVertexIndexs { get; set; }
             public int[][] TextureVertexIndexs { get; set; }
             public int[][] NormalVertexIndexs { get; set; }
@@ -82,6 +82,7 @@ namespace _3DGraphics.Classes
                             break;
                     }
 
+                    // Полигоны
                     var tmpList1 = new List<int>();
                     var tmpList2 = new List<int>();
                     var tmpList3 = new List<int>();
@@ -120,9 +121,9 @@ namespace _3DGraphics.Classes
                 }
             }
 
-            result.GeometricVertexs = [.. geometricVertexsList];
-            result.TextureVertexs = [.. textureVerticesList];
-            result.NormalVertexs = [.. normalVerticesList];
+            result.GeometricVertexСoordinates = [.. geometricVertexsList];
+            result.TextureVertexСoordinates = [.. textureVerticesList];
+            result.NormalVertexСoordinates = [.. normalVerticesList];
             result.GeometricVertexIndexs = [.. geometricVertexIndexsList];
             result.TextureVertexIndexs = [.. textureVertexIndexsList];
             result.NormalVertexIndexs = [.. normalVertexIndexsList];

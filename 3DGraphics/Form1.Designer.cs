@@ -53,6 +53,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(784, 759);
             Controls.Add(bOpenModelFile);
+            DoubleBuffered = true;
             Name = "MainWindow";
             Text = "Form1";
             Paint += MainWindow_Paint;
