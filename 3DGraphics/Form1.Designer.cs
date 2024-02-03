@@ -55,7 +55,7 @@
             Controls.Add(bOpenModelFile);
             DoubleBuffered = true;
             Name = "MainWindow";
-            Text = "Form1";
+            Text = "3DViewer";
             Paint += MainWindow_Paint;
             ResumeLayout(false);
         }
