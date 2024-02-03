@@ -2,7 +2,7 @@
 {
     internal class BaseGraphisStructs
     {
-        public class Vector
+        public abstract class Vector
         {
             public int length;
             public float this[int index]
@@ -12,12 +12,24 @@
             }
 
             protected float[] coordinates;
-            public Vector() : this(3) { }
 
-            public Vector(int length)
+
+            public Vector()
             {
-                coordinates = new float[length];
+                coordinates = [0, 0, 0];
                 this.length = coordinates.Length;
+            }
+
+            public Vector(float a, float b, float c)
+            {
+                coordinates = [a, b, c];
+                this.length = coordinates.Length;
+            }
+
+            public Vector(Vector vector)
+            {
+                coordinates = vector.coordinates;
+                this.length = vector.length;
             }
         }
 
@@ -39,14 +51,11 @@
                 set => coordinates[2] = value;
             }
 
-            public CoordinateVector():base(3){}
-            public CoordinateVector(int length) : base(length) { }
 
-            public CoordinateVector(float x, float y, float z)
-            {
-                coordinates = [x, y, z];
-                length = coordinates.Length;
-            }
+            public CoordinateVector() : base() { }
+
+            public CoordinateVector(float x, float y, float z) : base(x, y, z) { }
+            public CoordinateVector(CoordinateVector vector) : base(vector) { }
         }
 
         public class GeometricVertex : CoordinateVector
@@ -57,12 +66,11 @@
                 set => coordinates[3] = value;
             }
 
-            public GeometricVertex() : base(4) { }
 
-            public GeometricVertex(float x, float y, float z)
+            public GeometricVertex()
             {
-                coordinates = [x, y, z, 1];
-                length = coordinates.Length;
+                coordinates = [0, 0, 0, 0];
+                this.length = coordinates.Length;
             }
 
             public GeometricVertex(float x, float y, float z, float w)
@@ -70,9 +78,11 @@
                 coordinates = [x, y, z, w];
                 length = coordinates.Length;
             }
+
+            public GeometricVertex(GeometricVertex vector) : base(vector) { }
         }
 
-        public class TextureVertices : Vector
+        public class TextureVertice : Vector
         {
             public float U
             {
@@ -89,14 +99,14 @@
                 get => coordinates[2];
                 set => coordinates[2] = value;
             }
-            public TextureVertices(float u, float v, float w)
-            {
-                coordinates = [u, v, w];
-                length = coordinates.Length;
-            }
+
+
+            public TextureVertice() : base() { }
+            public TextureVertice(float u, float v, float w) : base(u, v, w) { }
+            public TextureVertice(TextureVertice vector) : base(vector) { }
         }
 
-        public class NormalVertices : Vector
+        public class NormalVertice : Vector
         {
             public float I
             {
@@ -113,11 +123,11 @@
                 get => coordinates[2];
                 set => coordinates[2] = value;
             }
-            public NormalVertices(float i, float j, float k)
-            {
-                coordinates = [i, j, k];
-                length = coordinates.Length;
-            }
+
+
+            public NormalVertice() : base() { }
+            public NormalVertice(float i, float j, float k) : base(i, j, k) { }
+            public NormalVertice(NormalVertice vector) : base(vector) { }
         }
     }
 }
