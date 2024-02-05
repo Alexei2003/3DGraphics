@@ -1,4 +1,5 @@
-﻿using static _3DGraphics.Classes.BaseGraphisStructs;
+﻿using System.Drawing.Imaging;
+using static _3DGraphics.Classes.BaseGraphisStructs;
 
 namespace _3DGraphics.Classes
 {
@@ -9,27 +10,34 @@ namespace _3DGraphics.Classes
             const int xShift = 600 / 2 + 100;
             const int yShift = 600 / 2 + 300;
             const int scale = 2;
-            using var g = Graphics.FromImage(bitmap);
-            foreach (var vertexIndex in GeometricVertexIndexs)
+
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
+            IntPtr ptr = bitmapData.Scan0;
+            int bytes = Math.Abs(bitmapData.Stride) * bitmap.Height;
+            byte[] rgbValues = new byte[bytes];
+            System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
+
+            Parallel.ForEach(GeometricVertexIndexs, vertexIndex =>
             {
                 var points = new Point[vertexIndex.Length];
                 for (var i = 0; i < vertexIndex.Length; i++)
                 {
                     ref var coordinate = ref GeometricVertexСoordinates[vertexIndex[i]];
-                    points[i] = new Point(Convert.ToInt32(coordinate.X * scale + xShift), Convert.ToInt32(coordinate.Y * scale + yShift));
+                    points[i] = new Point(Convert.ToInt32((coordinate.X * scale) + xShift), Convert.ToInt32((coordinate.Y * scale) + yShift));
                 }
 
                 for (var i = 0; i < vertexIndex.Length - 1; i++)
                 {
-                    DrawLine(bitmap, Color.Black, points[i], points[i + 1]);
+                    DrawLine(rgbValues, bitmapData.Stride, Color.Black, points[i], points[i + 1]);
                 }
-                DrawLine(bitmap, Color.Black, points[vertexIndex.Length - 1], points[0]);
-            }
+                DrawLine(rgbValues, bitmapData.Stride, Color.Black, points[vertexIndex.Length - 1], points[0]);
+            });
+
+            System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
+            bitmap.UnlockBits(bitmapData);
         }
 
-
-
-        private static void DrawLine(Bitmap bitmap, Color color, Point point1, Point point2)
+        private static void DrawLine(byte[] rgbValues, int stride, Color color, Point point1, Point point2)
         {
             int x1 = point1.X;
             int y1 = point1.Y;
@@ -41,24 +49,30 @@ namespace _3DGraphics.Classes
             int sx = (x1 < x2) ? 1 : -1;
             int sy = (y1 < y2) ? 1 : -1;
             int err = dx - dy;
+            int index;
+            int e2;
 
             while (true)
             {
-                bitmap.SetPixel(x1, y1, color);
+                index = (x1 * 4) + (y1 * stride);
+                Buffer.BlockCopy(BitConverter.GetBytes(color.ToArgb()), 0, rgbValues, index, 4);
 
                 if (x1 == x2 && y1 == y2)
                     break;
 
-                int e2 = 2 * err;
+                e2 = err << 1;
                 if (e2 > -dy)
                 {
                     err -= dy;
                     x1 += sx;
                 }
-                if (e2 < dx)
+                else
                 {
-                    err += dx;
-                    y1 += sy;
+                    if (e2 < dx)
+                    {
+                        err += dx;
+                        y1 += sy;
+                    }
                 }
             }
         }
