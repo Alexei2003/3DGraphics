@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("3DGraphics")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8941d914c1d37ecbe459a52d6315554efcf1f2a4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4ab8b09afd44219b32c4019ddedf1b8de3e4d5f7")]
 [assembly: System.Reflection.AssemblyProductAttribute("3DGraphics")]
 [assembly: System.Reflection.AssemblyTitleAttribute("3DGraphics")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
