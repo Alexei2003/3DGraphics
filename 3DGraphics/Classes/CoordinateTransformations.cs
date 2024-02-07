@@ -27,13 +27,13 @@ namespace _3DGraphics.Classes
 
             var matrix2 = new float[,]
             {
-                {    vector.X,    vector.X,    vector.X,           0},
-                {    vector.Y,    vector.Y,    vector.Y,           0},
-                {    vector.Z,    vector.Z,    vector.Z,           0},
+                {    vector.X,    vector.Y,    vector.Z,           0},
+                {    vector.X,    vector.Y,    vector.Z,           0},
+                {    vector.X,    vector.Y,    vector.Z,           0},
                 {           0,           0,           0,           1},
             };
 
-            var matrixResult = MultiplyMatrices(matrix1, matrix2);
+            var matrixResult = MultiplyMatrices(matrix2, matrix1);
 
             result.X = matrixResult[0, 0];
             result.Y = matrixResult[1, 1];
@@ -45,61 +45,112 @@ namespace _3DGraphics.Classes
 
         public static GeometricVertex TranslateVector(GeometricVertex vector, CoordinateVector translation)
         {
+            /*var matrix = new float[,]
+            {
+                            {             1,             0,             0, translation.X},
+                            {             0,             1,             0, translation.Y},
+                            {             0,             0,             1, translation.Z},
+                            {             0,             0,             0,             1},
+            };
 
+            return MultiplyVectorAndMatrixAsMatrices(vector, matrix);*/
 
-            return vector;
+            var result = new GeometricVertex
+            {
+                X = vector.X,
+                Y = vector.Y,
+                Z = vector.Z
+            };
+
+            return result;
         }
 
         public static GeometricVertex ScaleVector(GeometricVertex vector, CoordinateVector scale)
         {
-            var matrix = new float[,]
+            /*            var matrix = new float[,]
+                        {
+                            {     scale.X,           0,           0,           0},
+                            {           0,     scale.Y,           0,           0},
+                            {           0,           0,     scale.Z,           0},
+                            {           0,           0,           0,           1},
+                        };
+
+                        return MultiplyVectorAndMatrixAsMatrices(vector, matrix);*/
+
+            var result = new GeometricVertex
             {
-                {     scale.X,           0,           0,           0},
-                {           0,     scale.Y,           0,           0},
-                {           0,           0,     scale.Z,           0},
-                {           0,           0,           0,           1},
+                X = vector.X * scale.X,
+                Y = vector.Y * scale.Y,
+                Z = vector.Z * scale.Z
             };
 
-            return MultiplyVectorAndMatrixAsMatrices(vector, matrix);
+            return result;
         }
 
         public static GeometricVertex RotateVectorAroundX(GeometricVertex vector, double angle)
         {
-            var matrix = new float[,]
+            /*            var matrix = new float[,]
+                        {
+                                        {                         1,                         0,                         0,                         0},
+                                        {                         0,  ((float)Math.Cos(angle)), -((float)Math.Sin(angle)),                         0},
+                                        {                         0,  ((float)Math.Sin(angle)),  ((float)Math.Cos(angle)),                         0},
+                                        {                         0,                         0,                         0,                         1},
+                        };
+
+                        return MultiplyVectorAndMatrixAsMatrices(vector, matrix);*/
+
+            var result = new GeometricVertex
             {
-                {                         1,                         0,                         0,                         0},
-                {                         0,  ((float)Math.Cos(angle)), -((float)Math.Sin(angle)),                         0},
-                {                         0,  ((float)Math.Sin(angle)),  ((float)Math.Cos(angle)),                         0},
-                {                         0,                         0,                         0,                         1},
+                X = vector.X,
+                Y = vector.Y * (float)Math.Cos(angle) + vector.Z * (float)Math.Sin(angle),
+                Z = vector.Y * -(float)Math.Sin(angle) + vector.Z * (float)Math.Cos(angle)
             };
 
-            return MultiplyVectorAndMatrixAsMatrices(vector, matrix);
+            return result;
         }
 
         public static GeometricVertex RotateVectorAroundY(GeometricVertex vector, double angle)
         {
-            var matrix = new float[,]
+            /*            var matrix = new float[,]
+                        {
+                                        {  ((float)Math.Cos(angle)),                         0,  ((float)Math.Sin(angle)),                         0},
+                                        {                         0,                         1,                         0,                         0},
+                                        { -((float)Math.Sin(angle)),                         0,  ((float)Math.Cos(angle)),                         0},
+                                        {                         0,                         0,                         0,                         1},
+                        };
+
+                        return MultiplyVectorAndMatrixAsMatrices(vector, matrix);*/
+
+            var result = new GeometricVertex
             {
-                {  ((float)Math.Cos(angle)),                         0,  ((float)Math.Sin(angle)),                         0},
-                {                         0,                         1,                         0,                         0},
-                { -((float)Math.Sin(angle)),                         0,  ((float)Math.Cos(angle)),                         0},
-                {                         0,                         0,                         0,                         1},
+                X = vector.X * (float)Math.Cos(angle) + vector.Z * -(float)Math.Sin(angle),
+                Y = vector.Y,
+                Z = vector.X * (float)Math.Sin(angle) + vector.Z * (float)Math.Cos(angle)
             };
 
-            return MultiplyVectorAndMatrixAsMatrices(vector, matrix);
+            return result;
         }
 
         public static GeometricVertex RotateVectorAroundZ(GeometricVertex vector, double angle)
         {
-            var matrix = new float[,]
+            /*            var matrix = new float[,]
+                        {
+                                        {  ((float)Math.Cos(angle)), -((float)Math.Sin(angle)),                         0,                         0},
+                                        {  ((float)Math.Sin(angle)),  ((float)Math.Cos(angle)),                         0,                         0},
+                                        {                         0,                         0,                         1,                         0},
+                                        {                         0,                         0,                         0,                         1},
+                        };
+
+                        return MultiplyVectorAndMatrixAsMatrices(vector, matrix);*/
+
+            var result = new GeometricVertex
             {
-                {  ((float)Math.Cos(angle)), -((float)Math.Sin(angle)),                         0,                         0},
-                {  ((float)Math.Sin(angle)),  ((float)Math.Cos(angle)),                         0,                         0},
-                {                         0,                         0,                         1,                         0},
-                {                         0,                         0,                         0,                         1},
+                X = vector.X * (float)Math.Cos(angle) + vector.Y * (float)Math.Sin(angle),
+                Y = vector.X * -(float)Math.Sin(angle) + vector.Y * (float)Math.Cos(angle),
+                Z = vector.Z
             };
 
-            return MultiplyVectorAndMatrixAsMatrices(vector, matrix);
+            return result;
         }
     }
 }
