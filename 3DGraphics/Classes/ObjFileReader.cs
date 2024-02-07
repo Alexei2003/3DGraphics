@@ -2,8 +2,12 @@
 
 namespace _3DGraphics.Classes
 {
-    internal class ObjFileReader
+    internal static class ObjFileReader
     {
+        private const int VERTEXS_COUNT = 10000;
+        private const int VERTEX_INDEXS_COUNT = 10000;
+        private const int VERTEX_POINTS_COUNT = 3;
+
         public struct FileReaderResult
         {
             public GeometricVertex[] GeometricVertexCoordinates { get; set; }
@@ -20,28 +24,27 @@ namespace _3DGraphics.Classes
 
             var result = new FileReaderResult();
 
-            var geometricVertexsList = new List<GeometricVertex>();
-            var textureVerticesList = new List<TextureVertice>();
-            var normalVerticesList = new List<NormalVertice>();
-            var geometricVertexIndexsList = new List<int[]>();
-            var textureVertexIndexsList = new List<int[]>();
-            var normalVertexIndexsList = new List<int[]>();
+            var geometricVertexsList = new List<GeometricVertex>(VERTEXS_COUNT);
+            var textureVerticesList = new List<TextureVertice>(VERTEXS_COUNT);
+            var normalVerticesList = new List<NormalVertice>(VERTEXS_COUNT);
+            var geometricVertexIndexsList = new List<int[]>(VERTEX_INDEXS_COUNT);
+            var textureVertexIndexsList = new List<int[]>(VERTEX_INDEXS_COUNT);
+            var normalVertexIndexsList = new List<int[]>(VERTEX_INDEXS_COUNT);
 
             foreach (var line in fileStrs)
             {
-                var tmpStr = line.Replace(".", ",");
-                var subStr = tmpStr.Split(' ');
+                var tmpStr = line.Replace('.', ',');
+                var parametersStr = tmpStr.Split(' ');
                 // Координаты геометрических вершин
-                /// Дописать проверку
                 if (line.Length > 0 && line[0] == 'v' && line[1] == ' ')
                 {
-                    switch (subStr.Length)
+                    switch (parametersStr.Length)
                     {
                         case 4:
-                            geometricVertexsList.Add(new GeometricVertex(float.Parse(subStr[1]), float.Parse(subStr[2]), float.Parse(subStr[3]), 1));
+                            geometricVertexsList.Add(new GeometricVertex(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3]), 1));
                             break;
                         case 5:
-                            geometricVertexsList.Add(new GeometricVertex(float.Parse(subStr[1]), float.Parse(subStr[2]), float.Parse(subStr[3]), float.Parse(subStr[4])));
+                            geometricVertexsList.Add(new GeometricVertex(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3]), float.Parse(parametersStr[4])));
                             break;
                     }
                 }
@@ -49,16 +52,16 @@ namespace _3DGraphics.Classes
                 // Координаты текстурных вершин
                 if (line.Length > 0 && line[0] == 'v' && line[1] == 't')
                 {
-                    switch (subStr.Length)
+                    switch (parametersStr.Length)
                     {
                         case 2:
-                            textureVerticesList.Add(new TextureVertice(float.Parse(subStr[1]), 0, 0));
+                            textureVerticesList.Add(new TextureVertice(float.Parse(parametersStr[1]), 0, 0));
                             break;
                         case 3:
-                            textureVerticesList.Add(new TextureVertice(float.Parse(subStr[1]), float.Parse(subStr[2]), 0));
+                            textureVerticesList.Add(new TextureVertice(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), 0));
                             break;
                         case 4:
-                            textureVerticesList.Add(new TextureVertice(float.Parse(subStr[1]), float.Parse(subStr[2]), float.Parse(subStr[3])));
+                            textureVerticesList.Add(new TextureVertice(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
                             break;
                     }
                 }
@@ -66,46 +69,46 @@ namespace _3DGraphics.Classes
                 // Координаты текстурных вершин
                 if (line.Length > 0 && line[0] == 'v' && line[1] == 'n')
                 {
-                    textureVerticesList.Add(new TextureVertice(float.Parse(subStr[1]), float.Parse(subStr[2]), float.Parse(subStr[3])));
+                    textureVerticesList.Add(new TextureVertice(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
                 }
 
                 if (line.Length > 0 && line[0] == 'f' && line[1] == ' ')
                 {
                     // Полигоны
-                    var tmpList1 = new List<int>();
-                    var tmpList2 = new List<int>();
-                    var tmpList3 = new List<int>();
+                    var geometricVertexPointsList = new List<int>(VERTEX_POINTS_COUNT);
+                    var textureVertexPointsList = new List<int>(VERTEX_POINTS_COUNT);
+                    var normalVertexPointsList = new List<int>(VERTEX_POINTS_COUNT);
 
-                    for (var i = 1; i < subStr.Length; i++)
+                    for (var i = 1; i < parametersStr.Length; i++)
                     {
-                        var indexStr = subStr[i].Split('/');
+                        var indexStr = parametersStr[i].Split('/');
                         switch (indexStr.Length)
                         {
                             case 3:
-                                tmpList3.Add(Convert.ToInt32(indexStr[2]) - 1);
+                                normalVertexPointsList.Add(Convert.ToInt32(indexStr[2]) - 1);
                                 goto case 2;
                             case 2:
-                                if (indexStr[1] != "")
+                                if (indexStr[1]?.Length != 0)
                                 {
-                                    tmpList2.Add(Convert.ToInt32(indexStr[1]) - 1);
+                                    textureVertexPointsList.Add(Convert.ToInt32(indexStr[1]) - 1);
                                 }
                                 goto case 1;
                             case 1:
-                                tmpList1.Add(Convert.ToInt32(indexStr[0]) - 1);
+                                geometricVertexPointsList.Add(Convert.ToInt32(indexStr[0]) - 1);
                                 break;
                         }
                     }
-                    if (tmpList1.Count > 0)
+                    if (geometricVertexPointsList.Count > 0)
                     {
-                        geometricVertexIndexsList.Add([.. tmpList1]);
+                        geometricVertexIndexsList.Add([.. geometricVertexPointsList]);
                     }
-                    if (tmpList2.Count > 0)
+                    if (textureVertexPointsList.Count > 0)
                     {
-                        textureVertexIndexsList.Add([.. tmpList2]);
+                        textureVertexIndexsList.Add([.. textureVertexPointsList]);
                     }
-                    if (tmpList3.Count > 0)
+                    if (normalVertexPointsList.Count > 0)
                     {
-                        normalVertexIndexsList.Add([.. tmpList3]);
+                        normalVertexIndexsList.Add([.. normalVertexPointsList]);
                     }
                 }
             }

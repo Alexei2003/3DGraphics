@@ -1,6 +1,6 @@
 ﻿namespace _3DGraphics.Classes
 {
-    internal class BaseGraphisStructs
+    internal static class BaseGraphisStructs
     {
         public abstract class Vector
         {
@@ -58,7 +58,7 @@
             public CoordinateVector(CoordinateVector vector) : base(vector) { }
         }
 
-        public class GeometricVertex : CoordinateVector
+        public sealed class GeometricVertex : CoordinateVector
         {
             public float W
             {
@@ -82,7 +82,7 @@
             public GeometricVertex(GeometricVertex vector) : base(vector) { }
         }
 
-        public class TextureVertice : Vector
+        public sealed class TextureVertice : Vector
         {
             public float U
             {
@@ -106,7 +106,7 @@
             public TextureVertice(TextureVertice vector) : base(vector) { }
         }
 
-        public class NormalVertice : Vector
+        public sealed class NormalVertice : Vector
         {
             public float I
             {

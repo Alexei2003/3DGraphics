@@ -30,6 +30,8 @@
         {
             opfdModelFile = new OpenFileDialog();
             bOpenModelFile = new Button();
+            tbFPS = new TextBox();
+            bTest = new Button();
             SuspendLayout();
             // 
             // opfdModelFile
@@ -47,22 +49,51 @@
             bOpenModelFile.UseVisualStyleBackColor = true;
             bOpenModelFile.Click += bOpenModelFile_Click;
             // 
+            // tbFPS
+            // 
+            tbFPS.Font = new Font("Segoe UI", 40F);
+            tbFPS.Location = new Point(666, 12);
+            tbFPS.Name = "tbFPS";
+            tbFPS.ReadOnly = true;
+            tbFPS.Size = new Size(106, 86);
+            tbFPS.TabIndex = 1;
+            tbFPS.Text = "000";
+            tbFPS.TextAlign = HorizontalAlignment.Center;
+            // 
+            // bTest
+            // 
+            bTest.Location = new Point(101, 12);
+            bTest.Name = "bTest";
+            bTest.Size = new Size(83, 25);
+            bTest.TabIndex = 2;
+            bTest.Text = "button1";
+            bTest.UseVisualStyleBackColor = true;
+            bTest.Click += bTest_Click;
+            // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(784, 759);
+            Controls.Add(bTest);
+            Controls.Add(tbFPS);
             Controls.Add(bOpenModelFile);
             DoubleBuffered = true;
+            KeyPreview = true;
             Name = "MainWindow";
             Text = "3DViewer";
             Paint += MainWindow_Paint;
+            KeyDown += MainWindow_KeyDown;
+            Resize += MainWindow_Resize;
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
         private OpenFileDialog opfdModelFile;
         private Button bOpenModelFile;
+        private TextBox tbFPS;
+        private Button bTest;
     }
 }
