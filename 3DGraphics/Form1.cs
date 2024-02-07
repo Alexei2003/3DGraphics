@@ -5,7 +5,8 @@ namespace _3DGraphics
 {
     public partial class MainWindow : Form
     {
-        private ObjFileReader.FileReaderResult? modelData = null;
+        private ObjFileReader.FileReaderResult modelData;
+        private bool modelDataHasValue = false;
 
         public MainWindow()
         {
@@ -23,10 +24,10 @@ namespace _3DGraphics
 
         private void MainWindow_Paint(object sender, PaintEventArgs e)
         {
-            if (modelData.HasValue)
+            if (modelDataHasValue)
             {
                 var bitmap = new Bitmap(Width, Height);
-                LinerDrawing.DrawLines(bitmap, modelData.Value.GeometricVertexCoordinates, modelData.Value.GeometricVertexIndexs);
+                LinerDrawing.DrawLines(bitmap, modelData.GeometricVertexCoordinates, modelData.GeometricVertexIndexs);
                 BackgroundImage = bitmap;
 
                 // «апускаем секундомер, если он еще не запущен
@@ -54,14 +55,16 @@ namespace _3DGraphics
             var modelFilePath = opfdModelFile.FileName;
             modelData = ObjFileReader.Read(modelFilePath);
 
-            var tmp = modelData.Value;
+            var tmp = modelData.GeometricVertexCoordinates;
 
-            for (var i = 0; i < tmp.GeometricVertexCoordinates.Length; i++)
+            for (var i = 0; i < tmp.Length; i++)
             {
-                tmp.GeometricVertexCoordinates[i].Y = -tmp.GeometricVertexCoordinates[i].Y;
+                tmp[i].Y = -tmp[i].Y;
             }
 
-            modelData = tmp;
+            modelData.GeometricVertexCoordinates = tmp;
+
+            modelDataHasValue = true;
 
             Invalidate();
             Update();
@@ -79,7 +82,7 @@ namespace _3DGraphics
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (modelData.HasValue)
+            if (modelDataHasValue)
             {
                 double shiftAxis = 3.14 / 10;
                 float scale = 1.1f;
@@ -92,39 +95,25 @@ namespace _3DGraphics
                 switch (e.KeyCode)
                 {
                     case Keys.X:
-                        Parallel.For(0, modelData.Value.GeometricVertexCoordinates.Length, i =>
-                        {
-                            modelData.Value.GeometricVertexCoordinates[i] = CoordinateTransformations.RotateVectorAroundX(modelData.Value.GeometricVertexCoordinates[i], shiftAxis);
-                        });
+                        modelData.GeometricVertexCoordinates = CoordinateTransformations.RotateVectorsAroundX(modelData.GeometricVertexCoordinates,shiftAxis);
                         break;
                     case Keys.Y:
-                        Parallel.For(0, modelData.Value.GeometricVertexCoordinates.Length, i =>
-                        {
-                            modelData.Value.GeometricVertexCoordinates[i] = CoordinateTransformations.RotateVectorAroundY(modelData.Value.GeometricVertexCoordinates[i], shiftAxis);
-                        });
+                        modelData.GeometricVertexCoordinates = CoordinateTransformations.RotateVectorsAroundY(modelData.GeometricVertexCoordinates, shiftAxis);
                         break;
                     case Keys.Z:
-                        Parallel.For(0, modelData.Value.GeometricVertexCoordinates.Length, i =>
-                        {
-                            modelData.Value.GeometricVertexCoordinates[i] = CoordinateTransformations.RotateVectorAroundZ(modelData.Value.GeometricVertexCoordinates[i], shiftAxis);
-                        });
+                        modelData.GeometricVertexCoordinates = CoordinateTransformations.RotateVectorsAroundZ(modelData.GeometricVertexCoordinates, shiftAxis);
                         break;
                     case Keys.Oemplus:
                     case Keys.Add:
-                        Parallel.For(0, modelData.Value.GeometricVertexCoordinates.Length, i =>
-                        {
-                            modelData.Value.GeometricVertexCoordinates[i] = CoordinateTransformations.ScaleVector(modelData.Value.GeometricVertexCoordinates[i], new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
-                        });
+                        modelData.GeometricVertexCoordinates = CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale,scale,scale));
                         break;
                     case Keys.OemMinus:
                     case Keys.Subtract:
                         scale = 1 / scale;
-                        Parallel.For(0, modelData.Value.GeometricVertexCoordinates.Length, i =>
-                        {
-                            modelData.Value.GeometricVertexCoordinates[i] = CoordinateTransformations.ScaleVector(modelData.Value.GeometricVertexCoordinates[i], new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
-                        });
+                        modelData.GeometricVertexCoordinates = CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
                         break;
                 }
+
                 Invalidate();
                 Update();
             }
