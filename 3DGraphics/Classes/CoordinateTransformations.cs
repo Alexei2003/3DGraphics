@@ -46,7 +46,7 @@ namespace _3DGraphics.Classes
 
         public static GeometricVertex[] TranslateVectors(GeometricVertex[] vectors, CoordinateVector translation)
         {
-            var result = new GeometricVertex[vectors.Length];
+/*            var result = new GeometricVertex[vectors.Length];
 
             Parallel.For(0, vectors.Length, i =>
             {
@@ -56,84 +56,73 @@ namespace _3DGraphics.Classes
                     Y = vectors[i].Y,
                     Z = vectors[i].Z
                 };
-            });
+            });*/
 
-            return result;
+            return vectors;
         }
 
         public static GeometricVertex[] ScaleVectors(GeometricVertex[] vectors, CoordinateVector scale)
         {
-            var result = new GeometricVertex[vectors.Length];
-
             Parallel.For(0, vectors.Length, i =>
             {
-                result[i] = new GeometricVertex
-                {
-                    X = vectors[i].X * scale.X,
-                    Y = vectors[i].Y * scale.Y,
-                    Z = vectors[i].Z * scale.Z
-                };
+                vectors[i].X *= scale.X;
+                vectors[i].Y *= scale.Y;
+                vectors[i].Z *= scale.Z;
             });
 
-            return result;
+            return vectors;
         }
 
         public static GeometricVertex[] RotateVectorsAroundX(GeometricVertex[] vectors, double angle)
         {
-            var result = new GeometricVertex[vectors.Length];
             var cos = (float)Math.Cos(angle);
             var sin = (float)Math.Sin(angle);
 
             Parallel.For(0, vectors.Length, i =>
             {
-                result[i] = new GeometricVertex
-                {
-                    X = vectors[i].X,
-                    Y = vectors[i].Y * cos + vectors[i].Z * sin,
-                    Z = vectors[i].Y * -sin + vectors[i].Z * cos
-                };
+                var y = vectors[i].Y;
+                var z = vectors[i].Z;
+
+                vectors[i].Y = y * cos + vectors[i].Z * sin;
+                vectors[i].Z = y * -sin + z * cos;
             });
 
-            return result;
+            return vectors;
 
         }
 
         public static GeometricVertex[] RotateVectorsAroundY(GeometricVertex[] vectors, double angle)
         {
-            var result = new GeometricVertex[vectors.Length];
             var cos = (float)Math.Cos(angle);
             var sin = (float)Math.Sin(angle);
 
             Parallel.For(0, vectors.Length, i =>
             {
-                result[i] = new GeometricVertex
-                {
-                    X = vectors[i].X * cos + vectors[i].Z * -sin,
-                    Y = vectors[i].Y,
-                    Z = vectors[i].X * sin + vectors[i].Z * cos
-                };
+                var x = vectors[i].X;
+                var z = vectors[i].Z;
+
+                vectors[i].X = x * cos + vectors[i].Z * -sin;
+                vectors[i].Z = x * sin + z * cos;
             });
 
-            return result;
+            return vectors;
         }
 
         public static GeometricVertex[] RotateVectorsAroundZ(GeometricVertex[] vectors, double angle)
         {
-            var result = new GeometricVertex[vectors.Length];
             var cos = (float)Math.Cos(angle);
             var sin = (float)Math.Sin(angle);
 
             Parallel.For(0, vectors.Length, i =>
             {
-                result[i] = new GeometricVertex
-                {
-                    X = vectors[i].X * cos + vectors[i].Y * sin,
-                    Y = vectors[i].X * -sin + vectors[i].Y * cos,
-                    Z = vectors[i].Z
-                };
+                var x = vectors[i].X;
+                var y = vectors[i].Y;
+
+                vectors[i].X = x * cos + vectors[i].Y * sin;
+                vectors[i].Y = x * -sin + y * cos;
             });
 
-            return result;
+            return vectors;
         }
     }
 }
