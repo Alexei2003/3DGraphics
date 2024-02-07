@@ -17,7 +17,7 @@ namespace _3DGraphics
 
         private void MainWindow_Paint(object sender, PaintEventArgs e)
         {
-            if (modelData != null)
+            if (modelData.HasValue)
             {
                 var bitmap = new Bitmap(Width, Height);
                 LinerDrawing.DrawLines(bitmap, modelData.Value.GeometricVertexCoordinates, modelData.Value.GeometricVertexIndexs);
@@ -30,7 +30,7 @@ namespace _3DGraphics
             var modelFilePath = opfdModelFile.FileName;
             modelData = ObjFileReader.Read(modelFilePath);
 
-            var tmp = modelData.Value;
+            var tmp =  modelData.Value;
 
             for (var i = 0; i < tmp.GeometricVertexCoordinates.Length; i++)
             {

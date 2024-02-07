@@ -37,7 +37,7 @@ namespace _3DGraphics.Classes
             bitmap.UnlockBits(bitmapData);
         }
 
-        private static void DrawLine(byte[] rgbValues, int stride, Color color, Point point1, Point point2)
+        /*private static void DrawLine(byte[] rgbValues, int stride, Color color, Point point1, Point point2)
         {
             int x1 = point1.X;
             int y1 = point1.Y;
@@ -74,6 +74,30 @@ namespace _3DGraphics.Classes
                         y1 += sy;
                     }
                 }
+            }
+        }*/
+
+        private static void DrawLine(byte[] rgbValues, int stride, Color color, Point point1, Point point2)
+        {
+            int dx = point2.X - point1.X;
+            int dy = point2.Y - point1.Y;
+            int steps = Math.Max(Math.Abs(dx), Math.Abs(dy));
+
+            float Xincrement = dx / (float)steps;
+            float Yincrement = dy / (float)steps;
+
+            float X = point1.X;
+            float Y = point1.Y;
+            int colorArgb = color.ToArgb();
+            byte[] colorBytes = BitConverter.GetBytes(colorArgb);
+
+            for (int i = 0; i <= steps; i++)
+            {
+                int index = ((int)Math.Round(X) * 4) + ((int)Math.Round(Y) * stride);
+                Buffer.BlockCopy(colorBytes, 0, rgbValues, index, 4);
+
+                X += Xincrement;
+                Y += Yincrement;
             }
         }
     }
