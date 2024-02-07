@@ -22,8 +22,6 @@ namespace _3DGraphics.Classes
         {
             var fileStrs = File.ReadAllLines(str);
 
-            var result = new FileReaderResult();
-
             var geometricVertexsList = new List<GeometricVertex>(VERTEXS_COUNT);
             var textureVerticesList = new List<TextureVertice>(VERTEXS_COUNT);
             var normalVerticesList = new List<NormalVertice>(VERTEXS_COUNT);
@@ -113,12 +111,15 @@ namespace _3DGraphics.Classes
                 }
             }
 
-            result.GeometricVertexCoordinates = [.. geometricVertexsList];
-            result.TextureVertexCoordinates = [.. textureVerticesList];
-            result.NormalVertexCoordinates = [.. normalVerticesList];
-            result.GeometricVertexIndexs = [.. geometricVertexIndexsList];
-            result.TextureVertexIndexs = [.. textureVertexIndexsList];
-            result.NormalVertexIndexs = [.. normalVertexIndexsList];
+            var result = new FileReaderResult
+            {
+                GeometricVertexCoordinates = [.. geometricVertexsList],
+                TextureVertexCoordinates = [.. textureVerticesList],
+                NormalVertexCoordinates = [.. normalVerticesList],
+                GeometricVertexIndexs = [.. geometricVertexIndexsList],
+                TextureVertexIndexs = [.. textureVertexIndexsList],
+                NormalVertexIndexs = [.. normalVertexIndexsList]
+            };
 
             return result;
         }

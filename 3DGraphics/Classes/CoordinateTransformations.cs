@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using static _3DGraphics.Classes.BaseGraphisStructs;
+﻿using static _3DGraphics.Classes.BaseGraphisStructs;
 
 namespace _3DGraphics.Classes
 {
@@ -46,17 +45,17 @@ namespace _3DGraphics.Classes
 
         public static GeometricVertex[] TranslateVectors(GeometricVertex[] vectors, CoordinateVector translation)
         {
-/*            var result = new GeometricVertex[vectors.Length];
+            /*            var result = new GeometricVertex[vectors.Length];
 
-            Parallel.For(0, vectors.Length, i =>
-            {
-                result[i] = new GeometricVertex
-                {
-                    X = vectors[i].X,
-                    Y = vectors[i].Y,
-                    Z = vectors[i].Z
-                };
-            });*/
+                        Parallel.For(0, vectors.Length, i =>
+                        {
+                            result[i] = new GeometricVertex
+                            {
+                                X = vectors[i].X,
+                                Y = vectors[i].Y,
+                                Z = vectors[i].Z
+                            };
+                        });*/
 
             return vectors;
         }

@@ -55,14 +55,10 @@ namespace _3DGraphics
             var modelFilePath = opfdModelFile.FileName;
             modelData = ObjFileReader.Read(modelFilePath);
 
-            var tmp = modelData.GeometricVertexCoordinates;
-
-            for (var i = 0; i < tmp.Length; i++)
+            Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
             {
-                tmp[i].Y = -tmp[i].Y;
-            }
-
-            modelData.GeometricVertexCoordinates = tmp;
+                modelData.GeometricVertexCoordinates[i].Y = -modelData.GeometricVertexCoordinates[i].Y;
+            });
 
             modelDataHasValue = true;
 
@@ -95,7 +91,7 @@ namespace _3DGraphics
                 switch (e.KeyCode)
                 {
                     case Keys.X:
-                        modelData.GeometricVertexCoordinates = CoordinateTransformations.RotateVectorsAroundX(modelData.GeometricVertexCoordinates,shiftAxis);
+                        modelData.GeometricVertexCoordinates = CoordinateTransformations.RotateVectorsAroundX(modelData.GeometricVertexCoordinates, shiftAxis);
                         break;
                     case Keys.Y:
                         modelData.GeometricVertexCoordinates = CoordinateTransformations.RotateVectorsAroundY(modelData.GeometricVertexCoordinates, shiftAxis);
@@ -105,7 +101,7 @@ namespace _3DGraphics
                         break;
                     case Keys.Oemplus:
                     case Keys.Add:
-                        modelData.GeometricVertexCoordinates = CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale,scale,scale));
+                        modelData.GeometricVertexCoordinates = CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
                         break;
                     case Keys.OemMinus:
                     case Keys.Subtract:
