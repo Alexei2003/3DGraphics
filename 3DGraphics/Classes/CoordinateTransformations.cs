@@ -27,10 +27,10 @@ namespace _3DGraphics.Classes
 
             var matrix2 = new float[,]
             {
-                            {    vector.X,    vector.X,    vector.X,           0},
-                            {    vector.Y,    vector.Y,    vector.Y,           0},
-                            {    vector.Z,    vector.Z,    vector.Z,           0},
-                            {           0,           0,           0,           1},
+                {    vector.X,    vector.X,    vector.X,           0},
+                {    vector.Y,    vector.Y,    vector.Y,           0},
+                {    vector.Z,    vector.Z,    vector.Z,           0},
+                {           0,           0,           0,           1},
             };
 
             var matrixResult = MultiplyMatrices(matrix1, matrix2);
