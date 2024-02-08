@@ -7,9 +7,8 @@ namespace _3DGraphics.Classes
     {
         public static void DrawLines(Bitmap bitmap, GeometricVertex[] GeometricVertexСoordinates, int[][] GeometricVertexIndexs)
         {
-            const int xShift = 600 / 2 + 100;
-            const int yShift = 600 / 2 + 300;
             const int scale = 2;
+            
             int widthZone = bitmap.Width;
             int heightZone = bitmap.Height;
 
@@ -19,20 +18,23 @@ namespace _3DGraphics.Classes
             byte[] rgbValues = new byte[bytes];
             System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
 
+            int colorArgb = Color.Black.ToArgb();
+            byte[] colorBytes = BitConverter.GetBytes(colorArgb);
+
             Parallel.ForEach(GeometricVertexIndexs, vertexIndex =>
             {
                 var points = new Point[vertexIndex.Length];
                 for (var i = 0; i < vertexIndex.Length; i++)
                 {
                     ref var coordinate = ref GeometricVertexСoordinates[vertexIndex[i]];
-                    points[i] = new Point(Convert.ToInt32((coordinate.X * scale) + xShift), Convert.ToInt32((coordinate.Y * scale) + yShift));
+                    points[i] = new Point(Convert.ToInt32(coordinate.X * scale), Convert.ToInt32(coordinate.Y * scale));
                 }
 
                 for (var i = 0; i < vertexIndex.Length - 1; i++)
                 {
-                    DrawLine(rgbValues, bitmapData.Stride, Color.Black, points[i], points[i + 1], widthZone, heightZone);
+                    DrawLine(rgbValues, bitmapData.Stride, colorBytes, points[i], points[i + 1], widthZone, heightZone);
                 }
-                DrawLine(rgbValues, bitmapData.Stride, Color.Black, points[vertexIndex.Length - 1], points[0], widthZone, heightZone);
+                DrawLine(rgbValues, bitmapData.Stride, colorBytes, points[vertexIndex.Length - 1], points[0], widthZone, heightZone);
             });
 
             System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
@@ -79,7 +81,7 @@ namespace _3DGraphics.Classes
             }
         }*/
 
-        private static void DrawLine(byte[] rgbValues, int stride, Color color, Point point1, Point point2, int widthZone, int hightZone)
+        private static void DrawLine(byte[] rgbValues, int stride, byte[] colorBytes, Point point1, Point point2, int widthZone, int hightZone)
         {
             int dx = point2.X - point1.X;
             int dy = point2.Y - point1.Y;
@@ -90,8 +92,6 @@ namespace _3DGraphics.Classes
 
             float X = point1.X;
             float Y = point1.Y;
-            int colorArgb = color.ToArgb();
-            byte[] colorBytes = BitConverter.GetBytes(colorArgb);
             int index;
 
             for (int i = 0; i <= steps; i++)

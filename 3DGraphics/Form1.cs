@@ -55,12 +55,9 @@ namespace _3DGraphics
             var modelFilePath = opfdModelFile.FileName;
             modelData = ObjFileReader.Read(modelFilePath);
 
-            modelData.GeometricVertexCoordinates = CoordinateTransformations.RotateVectorsAroundX(modelData.GeometricVertexCoordinates, 3.14);
+            CoordinateTransformations.RotateVectorsAroundX(modelData.GeometricVertexCoordinates, 3.14);
 
             modelDataHasValue = true;
-
-            Invalidate();
-            Update();
         }
 
         private void bOpenModelFile_Click(object sender, EventArgs e)
@@ -79,6 +76,7 @@ namespace _3DGraphics
             {
                 double shiftAxis = 3.14 / 10;
                 float scale = 1.1f;
+                float translate = 5;
 
                 if ((Control.ModifierKeys & Keys.Shift) != 0)
                 {
@@ -88,27 +86,42 @@ namespace _3DGraphics
                 switch (e.KeyCode)
                 {
                     case Keys.X:
-                        modelData.GeometricVertexCoordinates = CoordinateTransformations.RotateVectorsAroundX(modelData.GeometricVertexCoordinates, shiftAxis);
+                        CoordinateTransformations.RotateVectorsAroundX(modelData.GeometricVertexCoordinates, shiftAxis);
                         break;
                     case Keys.Y:
-                        modelData.GeometricVertexCoordinates = CoordinateTransformations.RotateVectorsAroundY(modelData.GeometricVertexCoordinates, shiftAxis);
+                        CoordinateTransformations.RotateVectorsAroundY(modelData.GeometricVertexCoordinates, shiftAxis);
                         break;
                     case Keys.Z:
-                        modelData.GeometricVertexCoordinates = CoordinateTransformations.RotateVectorsAroundZ(modelData.GeometricVertexCoordinates, shiftAxis);
+                        CoordinateTransformations.RotateVectorsAroundZ(modelData.GeometricVertexCoordinates, shiftAxis);
                         break;
                     case Keys.Oemplus:
                     case Keys.Add:
-                        modelData.GeometricVertexCoordinates = CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
+                        CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
                         break;
                     case Keys.OemMinus:
                     case Keys.Subtract:
                         scale = 1 / scale;
-                        modelData.GeometricVertexCoordinates = CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
+                        CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
+                        break;/*
+                    case Keys.Q:
+                        CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(0, 0, translate));
                         break;
+                    case Keys.E:
+                        CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(0, 0, -translate));
+                        break;
+                    case Keys.W:
+                        CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(0, -translate, 0));
+                        break;
+                    case Keys.S:
+                        CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(0, translate, 0));
+                        break;
+                    case Keys.A:
+                        CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(-translate, 0, 0));
+                        break;
+                    case Keys.D:
+                        CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(translate, 0, 0));
+                        break;*/
                 }
-
-                Invalidate();
-                Update();
             }
         }
     }
