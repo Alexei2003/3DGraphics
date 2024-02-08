@@ -47,9 +47,9 @@ namespace _3DGraphics.Classes
         {
             Parallel.For(0, vectors.Length, i =>
             {
-                vectors[i].X += translation.X;
-                vectors[i].Y += translation.Y;
-                vectors[i].Z += translation.Z;
+                vectors[i].TranslateX += translation.X;
+                vectors[i].TranslateY += translation.Y;
+                vectors[i].TranslateZ += translation.Z;
             });
         }
 

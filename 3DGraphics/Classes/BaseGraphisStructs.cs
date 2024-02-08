@@ -65,17 +65,32 @@
                 get => coordinates[3];
                 set => coordinates[3] = value;
             }
+            public float TranslateX
+            {
+                get => coordinates[4];
+                set => coordinates[4] = value;
+            }
+            public float TranslateY
+            {
+                get => coordinates[5];
+                set => coordinates[5] = value;
+            }
+            public float TranslateZ
+            {
+                get => coordinates[6];
+                set => coordinates[6] = value;
+            }
 
 
             public GeometricVertex()
             {
-                coordinates = [0, 0, 0, 0];
+                coordinates = [0, 0, 0, 0, 0, 0, 0];
                 this.length = coordinates.Length;
             }
 
             public GeometricVertex(float x, float y, float z, float w)
             {
-                coordinates = [x, y, z, w];
+                coordinates = [x, y, z, w, 0, 0, 0];
                 length = coordinates.Length;
             }
 

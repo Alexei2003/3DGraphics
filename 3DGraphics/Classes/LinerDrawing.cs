@@ -27,7 +27,7 @@ namespace _3DGraphics.Classes
                 for (var i = 0; i < vertexIndex.Length; i++)
                 {
                     ref var coordinate = ref GeometricVertexСoordinates[vertexIndex[i]];
-                    points[i] = new Point(Convert.ToInt32(coordinate.X * scale), Convert.ToInt32(coordinate.Y * scale));
+                    points[i] = new Point(Convert.ToInt32((coordinate.X + coordinate.TranslateX) * scale), Convert.ToInt32((coordinate.Y + coordinate.TranslateY) * scale));
                 }
 
                 for (var i = 0; i < vertexIndex.Length - 1; i++)

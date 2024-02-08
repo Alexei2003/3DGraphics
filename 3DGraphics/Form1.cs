@@ -102,7 +102,7 @@ namespace _3DGraphics
                     case Keys.Subtract:
                         scale = 1 / scale;
                         CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
-                        break;/*
+                        break;
                     case Keys.Q:
                         CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(0, 0, translate));
                         break;
@@ -120,7 +120,7 @@ namespace _3DGraphics
                         break;
                     case Keys.D:
                         CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(translate, 0, 0));
-                        break;*/
+                        break;
                 }
             }
         }
