@@ -55,10 +55,7 @@ namespace _3DGraphics
             var modelFilePath = opfdModelFile.FileName;
             modelData = ObjFileReader.Read(modelFilePath);
 
-            Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
-            {
-                modelData.GeometricVertexCoordinates[i].Y = -modelData.GeometricVertexCoordinates[i].Y;
-            });
+            modelData.GeometricVertexCoordinates = CoordinateTransformations.RotateVectorsAroundX(modelData.GeometricVertexCoordinates, 3.14);
 
             modelDataHasValue = true;
 
