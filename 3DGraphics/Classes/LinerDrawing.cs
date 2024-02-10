@@ -8,7 +8,7 @@ namespace _3DGraphics.Classes
         public static void DrawLines(Bitmap bitmap, GeometricVertex[] GeometricVertexСoordinates, int[][] GeometricVertexIndexs)
         {
             const int scale = 2;
-            
+
             int widthZone = bitmap.Width;
             int heightZone = bitmap.Height;
 
@@ -30,9 +30,9 @@ namespace _3DGraphics.Classes
                     points[i] = new Point(Convert.ToInt32((coordinate.X + coordinate.TranslateX) * scale), Convert.ToInt32((coordinate.Y + coordinate.TranslateY) * scale));
                 }
 
-                for (var i = 0; i < vertexIndex.Length - 1; i++)
+                for (var i = 0; i < vertexIndex.Length - 1;)
                 {
-                    DrawLine(rgbValues, bitmapData.Stride, colorBytes, points[i], points[i + 1], widthZone, heightZone);
+                    DrawLine(rgbValues, bitmapData.Stride, colorBytes, points[i], points[i++], widthZone, heightZone);
                 }
                 DrawLine(rgbValues, bitmapData.Stride, colorBytes, points[vertexIndex.Length - 1], points[0], widthZone, heightZone);
             });

@@ -17,6 +17,7 @@ namespace _3DGraphics
             opfdModelFile.RestoreDirectory = true;
 
             tbFPS.Location = new Point(Width - tbFPS.Width - 20, tbFPS.Location.Y);
+            stopwatch.Start();
         }
 
         private readonly Stopwatch stopwatch = new();
@@ -30,21 +31,17 @@ namespace _3DGraphics
                 LinerDrawing.DrawLines(bitmap, modelData.GeometricVertexCoordinates, modelData.GeometricVertexIndexs);
                 BackgroundImage = bitmap;
 
-                // Запускаем секундомер, если он еще не запущен
-                if (!stopwatch.IsRunning)
-                {
-                    stopwatch.Start();
-                }
-
-                frameCount++;
-
                 // Если прошла секунда или более, обновляем счетчик кадров
                 if (stopwatch.ElapsedMilliseconds >= 1000)
                 {
                     tbFPS.Text = frameCount.ToString();
-                    tbFPS.Update();
                     frameCount = 0;
                     stopwatch.Restart();
+                    tbFPS.Update();
+                }
+                else
+                {
+                    frameCount++;
                 }
             }
         }
@@ -76,7 +73,7 @@ namespace _3DGraphics
             {
                 double shiftAxis = 3.14 / 10;
                 float scale = 1.1f;
-                float translate = 5;
+                const float translate = 5;
 
                 if ((Control.ModifierKeys & Keys.Shift) != 0)
                 {

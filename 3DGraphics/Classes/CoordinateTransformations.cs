@@ -60,7 +60,7 @@ namespace _3DGraphics.Classes
                 vectors[i].X *= scale.X;
                 vectors[i].Y *= scale.Y;
                 vectors[i].Z *= scale.Z;
-            });       
+            });
         }
 
         public static void RotateVectorsAroundX(GeometricVertex[] vectors, double angle)
