@@ -7,28 +7,28 @@
             public int length;
             public float this[int index]
             {
-                get { return coordinates[index]; }
-                set { coordinates[index] = value; }
+                get { return Coordinates[index]; }
+                set { Coordinates[index] = value; }
             }
 
-            protected float[] coordinates;
+            public float[] Coordinates { get; set; }
 
 
             public Vector()
             {
-                coordinates = [0, 0, 0];
-                this.length = coordinates.Length;
+                Coordinates = [0, 0, 0];
+                this.length = Coordinates.Length;
             }
 
             public Vector(float a, float b, float c)
             {
-                coordinates = [a, b, c];
-                this.length = coordinates.Length;
+                Coordinates = [a, b, c];
+                this.length = Coordinates.Length;
             }
 
             public Vector(Vector vector)
             {
-                coordinates = vector.coordinates;
+                Coordinates = vector.Coordinates;
                 this.length = vector.length;
             }
         }
@@ -37,18 +37,18 @@
         {
             public float X
             {
-                get => coordinates[0];
-                set => coordinates[0] = value;
+                get => Coordinates[0];
+                set => Coordinates[0] = value;
             }
             public float Y
             {
-                get => coordinates[1];
-                set => coordinates[1] = value;
+                get => Coordinates[1];
+                set => Coordinates[1] = value;
             }
             public float Z
             {
-                get => coordinates[2];
-                set => coordinates[2] = value;
+                get => Coordinates[2];
+                set => Coordinates[2] = value;
             }
 
 
@@ -62,36 +62,36 @@
         {
             public float W
             {
-                get => coordinates[3];
-                set => coordinates[3] = value;
+                get => Coordinates[3];
+                set => Coordinates[3] = value;
             }
             public float TranslateX
             {
-                get => coordinates[4];
-                set => coordinates[4] = value;
+                get => Coordinates[4];
+                set => Coordinates[4] = value;
             }
             public float TranslateY
             {
-                get => coordinates[5];
-                set => coordinates[5] = value;
+                get => Coordinates[5];
+                set => Coordinates[5] = value;
             }
             public float TranslateZ
             {
-                get => coordinates[6];
-                set => coordinates[6] = value;
+                get => Coordinates[6];
+                set => Coordinates[6] = value;
             }
 
 
             public GeometricVertex()
             {
-                coordinates = [0, 0, 0, 0, 0, 0, 0];
-                this.length = coordinates.Length;
+                Coordinates = [0, 0, 0, 0, 0, 0, 0];
+                this.length = Coordinates.Length;
             }
 
             public GeometricVertex(float x, float y, float z, float w)
             {
-                coordinates = [x, y, z, w, 0, 0, 0];
-                length = coordinates.Length;
+                Coordinates = [x, y, z, w, 0, 0, 0];
+                length = Coordinates.Length;
             }
 
             public GeometricVertex(GeometricVertex vector) : base(vector) { }
@@ -101,18 +101,18 @@
         {
             public float U
             {
-                get => coordinates[0];
-                set => coordinates[0] = value;
+                get => Coordinates[0];
+                set => Coordinates[0] = value;
             }
             public float V
             {
-                get => coordinates[1];
-                set => coordinates[1] = value;
+                get => Coordinates[1];
+                set => Coordinates[1] = value;
             }
             public float W
             {
-                get => coordinates[2];
-                set => coordinates[2] = value;
+                get => Coordinates[2];
+                set => Coordinates[2] = value;
             }
 
 
@@ -125,18 +125,18 @@
         {
             public float I
             {
-                get => coordinates[0];
-                set => coordinates[0] = value;
+                get => Coordinates[0];
+                set => Coordinates[0] = value;
             }
             public float J
             {
-                get => coordinates[1];
-                set => coordinates[1] = value;
+                get => Coordinates[1];
+                set => Coordinates[1] = value;
             }
             public float K
             {
-                get => coordinates[2];
-                set => coordinates[2] = value;
+                get => Coordinates[2];
+                set => Coordinates[2] = value;
             }
 
 

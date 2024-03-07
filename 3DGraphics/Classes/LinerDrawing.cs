@@ -40,75 +40,34 @@ namespace _3DGraphics.Classes
             bitmap.UnlockBits(bitmapData);
         }
 
-        /*private static void DrawLine(byte[] rgbValues, int stride, Color color, Point point1, Point point2)
-        {
-            int x1 = point1.X;
-            int y1 = point1.Y;
-            int x2 = point2.X;
-            int y2 = point2.Y;
-
-            int dx = Math.Abs(x2 - x1);
-            int dy = Math.Abs(y2 - y1);
-            int sx = (x1 < x2) ? 1 : -1;
-            int sy = (y1 < y2) ? 1 : -1;
-            int err = dx - dy;
-            int index;
-            int e2;
-
-            while (true)
-            {
-                index = (x1 * 4) + (y1 * stride);
-                Buffer.BlockCopy(BitConverter.GetBytes(color.ToArgb()), 0, rgbValues, index, 4);
-
-                if (x1 == x2 && y1 == y2)
-                    break;
-
-                e2 = err << 1;
-                if (e2 > -dy)
-                {
-                    err -= dy;
-                    x1 += sx;
-                }
-                else
-                {
-                    if (e2 < dx)
-                    {
-                        err += dx;
-                        y1 += sy;
-                    }
-                }
-            }
-        }*/
-
-        private static void DrawLine(byte[] rgbValues, int stride, byte[] colorBytes, Point point1, Point point2, int widthZone, int hightZone)
+        private static void DrawLine(byte[] rgbValues, int stride, byte[] colorBytes, Point point1, Point point2, int widthZone, int heightZone)
         {
             int dx = point2.X - point1.X;
             int dy = point2.Y - point1.Y;
             int steps = Math.Max(Math.Abs(dx), Math.Abs(dy));
 
-            float Xincrement = dx / (float)steps;
-            float Yincrement = dy / (float)steps;
+            float XIncrement = dx / (float)steps;
+            float YIncrement = dy / (float)steps;
 
             float X = point1.X;
             float Y = point1.Y;
             int index;
 
-            for (int i = 0; i <= steps; i++)
+            for (var i = 0; i <= steps; i++)
             {
-                if (X > widthZone - 1 || X < 0 || Y > hightZone - 1 || Y < 0)
+                if (X > widthZone - 1 || X < 0 || Y > heightZone - 1 || Y < 0)
                 {
-                    X += Xincrement;
-                    Y += Yincrement;
+                    X += XIncrement;
+                    Y += YIncrement;
                     continue;
                 }
 
                 index = ((int)Math.Round(X) * 4) + ((int)Math.Round(Y) * stride);
                 Buffer.BlockCopy(colorBytes, 0, rgbValues, index, 4);
 
-                X += Xincrement;
-                Y += Yincrement;
+                X += XIncrement;
+                Y += YIncrement;
             }
         }
     }
 }
-

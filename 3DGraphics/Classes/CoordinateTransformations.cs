@@ -1,49 +1,19 @@
-﻿using static _3DGraphics.Classes.BaseGraphisStructs;
+﻿using _3DGraphics.Classes.AVX;
+using static _3DGraphics.Classes.BaseGraphisStructs;
 
 namespace _3DGraphics.Classes
 {
-    internal static class CoordinateTransformations
+    internal class CoordinateTransformations
     {
-        private const int MAX_SIZE_MATRIX = 4;
+        private readonly AVXBase avx;
+        private readonly int maxThreads = Environment.ProcessorCount;
 
-        private static float[,] MultiplyMatrices(float[,] matrix1, float[,] matrix2)
+        public CoordinateTransformations()
         {
-            var result = new float[MAX_SIZE_MATRIX, MAX_SIZE_MATRIX];
-
-            for (var i = 0; i < MAX_SIZE_MATRIX; i++)
-            {
-                for (var j = 0; j < MAX_SIZE_MATRIX; j++)
-                {
-                    result[i, j] = matrix1[i, 0] * matrix2[0, j] + matrix1[i, 1] * matrix2[1, j] + matrix1[i, 2] * matrix2[2, j] + matrix1[i, 3] * matrix2[3, j];
-                }
-            }
-
-            return result;
+            avx = new AVX512();
         }
 
-        private static GeometricVertex MultiplyVectorAndMatrixAsMatrices(GeometricVertex vector, float[,] matrix1)
-        {
-            var result = new GeometricVertex();
-
-            var matrix2 = new float[,]
-            {
-                {    vector.X,    vector.Y,    vector.Z,           0},
-                {    vector.X,    vector.Y,    vector.Z,           0},
-                {    vector.X,    vector.Y,    vector.Z,           0},
-                {           0,           0,           0,           1},
-            };
-
-            var matrixResult = MultiplyMatrices(matrix2, matrix1);
-
-            result.X = matrixResult[0, 0];
-            result.Y = matrixResult[1, 1];
-            result.Z = matrixResult[2, 2];
-            result.W = vector.W;
-
-            return result;
-        }
-
-        public static void TranslateVectors(GeometricVertex[] vectors, CoordinateVector translation)
+        public void TranslateVectors(GeometricVertex[] vectors, CoordinateVector translation)
         {
             Parallel.For(0, vectors.Length, i =>
             {
@@ -53,17 +23,28 @@ namespace _3DGraphics.Classes
             });
         }
 
-        public static void ScaleVectors(GeometricVertex[] vectors, CoordinateVector scale)
+        public void ScaleVectors(GeometricVertex[] vectors, CoordinateVector scale)
         {
+            /*            Parallel.For(0, vectors.Length, i =>
+                        {
+                            vectors[i].X *= scale.X;
+                            vectors[i].Y *= scale.Y;
+                            vectors[i].Z *= scale.Z;
+                        });*/
+
+
+
+            var matrix = new float[16] { scale.X, 0, 0, 0, scale.Y, 0, 0, 0, scale.Z, 0, 0, 0, 0, 0, 0, 0 };
+
             Parallel.For(0, vectors.Length, i =>
-            {
-                vectors[i].X *= scale.X;
-                vectors[i].Y *= scale.Y;
-                vectors[i].Z *= scale.Z;
-            });
+             {
+                 var tmpVector = new float[3] { vectors[i].X, vectors[i].Y, vectors[i].Z };
+
+                 avx.MultiplyVectoMatriWithAVX(tmpVector, matrix).CopyTo(vectors[i].Coordinates, 0);
+             });
         }
 
-        public static void RotateVectorsAroundX(GeometricVertex[] vectors, double angle)
+        public void RotateVectorsAroundX(GeometricVertex[] vectors, double angle)
         {
             var cos = (float)Math.Cos(angle);
             var sin = (float)Math.Sin(angle);
@@ -77,7 +58,7 @@ namespace _3DGraphics.Classes
             });
         }
 
-        public static void RotateVectorsAroundY(GeometricVertex[] vectors, double angle)
+        public void RotateVectorsAroundY(GeometricVertex[] vectors, double angle)
         {
             var cos = (float)Math.Cos(angle);
             var sin = (float)Math.Sin(angle);
@@ -91,7 +72,7 @@ namespace _3DGraphics.Classes
             });
         }
 
-        public static void RotateVectorsAroundZ(GeometricVertex[] vectors, double angle)
+        public void RotateVectorsAroundZ(GeometricVertex[] vectors, double angle)
         {
             var cos = (float)Math.Cos(angle);
             var sin = (float)Math.Sin(angle);
