@@ -9,6 +9,10 @@ namespace _3DGraphics.Classes
 {
     internal class Camera
     {
+        public double angleX = 0; 
+
+        public readonly double angle90 = Math.PI/180*80;
+
         public BaseGraphisStructs.CoordinateVector Eye = new(0, 0, 1);
         public BaseGraphisStructs.CoordinateVector Up = new(0, 1, 0);
         public BaseGraphisStructs.CoordinateVector Target = new(0, 0, 0);
@@ -24,6 +28,15 @@ namespace _3DGraphics.Classes
 
         public void RotateAroundX(double angle)
         {
+            var saveAngleX = angleX;
+            angleX += angle;
+
+            if (angleX > angle90 || angleX < -angle90)
+            {
+                angleX = saveAngleX;
+                return;
+            }
+
             var cos = (float)Math.Cos(angle);
             var sin = (float)Math.Sin(angle);
 

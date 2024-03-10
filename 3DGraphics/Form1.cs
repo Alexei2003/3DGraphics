@@ -70,7 +70,7 @@ namespace _3DGraphics
         {
             var modelFilePath = opfdModelFile.FileName;
             modelData = ObjFileReader.Read(modelFilePath);
-            modelData.CoordinateTransformationlateVector = new CoordinateVector(300, 300, 0);
+            modelData.CoordinateTransformationlateVector = new CoordinateVector(300, 500, 0);
             camera = new Camera(Width, Height);
             CreateModelDataPaint();
         }
@@ -99,7 +99,7 @@ namespace _3DGraphics
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            double shiftAxis = 3.14 / 10;
+            double shiftAxis = Math.PI / 100;
             float scale = 1.1f;
             const float translate = 5;
 
