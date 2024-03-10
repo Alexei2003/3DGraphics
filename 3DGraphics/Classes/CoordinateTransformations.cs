@@ -22,60 +22,11 @@ namespace _3DGraphics.Classes
             });
         }
 
-        public static void RotateVectorsAroundX(CoordinateVector eye, double angle)
+        public static GeometricVertex[] GetViewVectors(GeometricVertex[] vectors, Camera camera)
         {
-            var cos = (float)Math.Cos(angle);
-            var sin = (float)Math.Sin(angle);
-
-            var matrixVectY = new Vector3(0, cos, sin);
-            var matrixVectZ = new Vector3(0, -sin, cos);
-
-
-            var tmpVectY = eye.Coordinates * matrixVectY;
-            var tmpVectZ = eye.Coordinates * matrixVectZ;
-
-            eye.Y = tmpVectY.Y + tmpVectY.Z;
-            eye.Z = tmpVectZ.Y + tmpVectZ.Z;
-        }
-
-        public static void RotateVectorsAroundY(CoordinateVector eye, double angle)
-        {
-            var cos = (float)Math.Cos(angle);
-            var sin = (float)Math.Sin(angle);
-
-            var matrixVectX = new Vector3(cos, 0, -sin);
-            var matrixVectZ = new Vector3(sin, 0, cos);
-
-            var tmpVectX = eye.Coordinates * matrixVectX;
-            var tmpVectZ = eye.Coordinates * matrixVectZ;
-
-            eye.X = tmpVectX.X + tmpVectX.Z;
-            eye.Z = tmpVectZ.X + tmpVectZ.Z;
-        }
-
-        public static void RotateVectorsAroundZ(CoordinateVector eye, double angle)
-        {
-            var cos = (float)Math.Cos(angle);
-            var sin = (float)Math.Sin(angle);
-
-            var matrixVectX = new Vector3(cos, sin, 0);
-            var matrixVectY = new Vector3(-sin, cos, 0);
-
-            var tmpVectX = eye.Coordinates * matrixVectX;
-            var tmpVectY = eye.Coordinates * matrixVectY;
-
-            eye.X = tmpVectX.X + tmpVectX.Y;
-            eye.Y = tmpVectY.X + tmpVectY.Y;
-        }
-
-        public static GeometricVertex[] GetViewVectors(GeometricVertex[] vectors, CoordinateVector eye)
-        {
-            var target = new CoordinateVector(0, 0, 0);
-            var up = new CoordinateVector(0, -1, 0);
-
-            var zAxis = Vector3.Normalize(eye.Coordinates - target.Coordinates);
-            var xAxis = Vector3.Normalize(Vector3.Cross(up.Coordinates, zAxis));
-            var yAxis = up.Coordinates;
+            var zAxis = Vector3.Normalize(camera.Eye.Coordinates - camera.Target.Coordinates);
+            var xAxis = Vector3.Normalize(Vector3.Cross(camera.Up.Coordinates, zAxis));
+            var yAxis = camera.Up.Coordinates;
 
             var matrixVectX = new Vector3(xAxis.X, yAxis.X, zAxis.X);
             var matrixVectY = new Vector3(xAxis.Y, yAxis.Y, zAxis.Y);
@@ -96,17 +47,11 @@ namespace _3DGraphics.Classes
             return result;
         }
 
-        public static void GetProjectionVectors(GeometricVertex[] vectors)
+        public static void GetProjectionVectors(GeometricVertex[] vectors, Camera camera)
         {
-            float aspect = 600 / 600;
-            float fov = 70.0f * ((float)Math.PI / 180.0f);
-            float zFar = 10f;
-            float zNear = 0.1f;
-
-
-            var matr = new Matrix4x4(1 / (aspect * (float)Math.Tan(fov / 2)), 0, 0, 0,
-                                 0, 1 / ((float)Math.Tan(fov / 2)), 0, 0,
-                                 0, 0, zFar / (zNear - zFar), (zNear * zFar) / (zNear - zFar),
+            var matr = new Matrix4x4(1 / (camera.Aaspect * (float)Math.Tan(camera.Fov / 2)), 0, 0, 0,
+                                 0, 1 / ((float)Math.Tan(camera.Fov / 2)), 0, 0,
+                                 0, 0, camera.ZFar / (camera.ZNear - camera.ZFar), (camera.ZNear * camera.ZFar) / (camera.ZNear - camera.ZFar),
                                  0, 0, -1, 0);
 
             Parallel.For(0, vectors.Length, i =>

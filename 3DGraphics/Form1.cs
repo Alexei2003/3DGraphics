@@ -8,7 +8,7 @@ namespace _3DGraphics
         private ObjFileReader.ModelData modelData = null;
         private ObjFileReader.ModelData modelDataPaint = null;
         private readonly System.Threading.Timer timer;
-        private CoordinateVector eye;
+        private Camera camera;
 
         public MainWindow()
         {
@@ -20,7 +20,7 @@ namespace _3DGraphics
 
             tbFPS.Location = new Point(Width - tbFPS.Width - 20, tbFPS.Location.Y);
 
-            eye = new CoordinateVector(0, 0, 1);
+            camera = new Camera(Width,Height);
 
             var timerCallback = new TimerCallback(UpdateFPS);
             timer = new System.Threading.Timer(timerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
@@ -71,6 +71,7 @@ namespace _3DGraphics
             var modelFilePath = opfdModelFile.FileName;
             modelData = ObjFileReader.Read(modelFilePath);
             modelData.CoordinateTransformationlateVector = new CoordinateVector(300, 300, 0);
+            camera = new Camera(Width, Height);
             CreateModelDataPaint();
         }
 
@@ -89,8 +90,8 @@ namespace _3DGraphics
             if (modelData != null)
             {
                 var tmpModelData =new ObjFileReader.ModelData(modelData);
-                tmpModelData.GeometricVertexCoordinates = CoordinateTransformations.GetViewVectors(tmpModelData.GeometricVertexCoordinates, eye);
-                CoordinateTransformations.GetProjectionVectors(tmpModelData.GeometricVertexCoordinates);
+                tmpModelData.GeometricVertexCoordinates = CoordinateTransformations.GetViewVectors(tmpModelData.GeometricVertexCoordinates, camera);
+                CoordinateTransformations.GetProjectionVectors(tmpModelData.GeometricVertexCoordinates,camera);
                 CoordinateTransformations.GetViewWindowVectors(tmpModelData.GeometricVertexCoordinates);
                 modelDataPaint = tmpModelData;
             }
@@ -110,41 +111,41 @@ namespace _3DGraphics
             switch (e.KeyCode)
             {
                 case Keys.X:
-                    CoordinateTransformations.RotateVectorsAroundX(eye, shiftAxis);
+                    camera.RotateAroundX(shiftAxis);
                     break;
                 case Keys.Y:
-                    CoordinateTransformations.RotateVectorsAroundY(eye, shiftAxis);
+                    camera.RotateAroundY(shiftAxis);
                     break;
                 case Keys.Z:
-                    CoordinateTransformations.RotateVectorsAroundZ(eye, shiftAxis);
+                    camera.RotateAroundZ(shiftAxis);
                     break;
-                    /*                    case Keys.Oemplus:
-                                        case Keys.Add:
-                                            CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
-                                            break;
-                                        case Keys.OemMinus:
-                                        case Keys.Subtract:
-                                            scale = 1 / scale;
-                                            CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
-                                            break;*/
-                    /*                    case Keys.Q:
-                                            CoordinateTransformations.TranslateVectors(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, 0, translate));
-                                            break;
-                                        case Keys.E:
-                                            CoordinateTransformations.TranslateVectors(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, 0, -translate));
-                                            break;
-                                        case Keys.W:
-                                            CoordinateTransformations.TranslateVectors(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, -translate, 0));
-                                            break;
-                                        case Keys.S:
-                                            CoordinateTransformations.TranslateVectors(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, translate, 0));
-                                            break;
-                                        case Keys.A:
-                                            CoordinateTransformations.TranslateVectors(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(-translate, 0, 0));
-                                            break;
-                                        case Keys.D:
-                                            CoordinateTransformations.TranslateVectors(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(translate, 0, 0));
-                                            break;*/
+                case Keys.Oemplus:
+                case Keys.Add:
+                    CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
+                    break;
+                case Keys.OemMinus:
+                case Keys.Subtract:
+                    scale = 1 / scale;
+                    CoordinateTransformations.ScaleVectors(modelData.GeometricVertexCoordinates, new BaseGraphisStructs.CoordinateVector(scale, scale, scale));
+                    break;
+                case Keys.Q:
+                    CoordinateTransformations.TranslateVectors(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, 0, translate));
+                    break;
+                case Keys.E:
+                    CoordinateTransformations.TranslateVectors(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, 0, -translate));
+                    break;
+                case Keys.W:
+                    CoordinateTransformations.TranslateVectors(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, -translate, 0));
+                    break;
+                case Keys.S:
+                    CoordinateTransformations.TranslateVectors(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, translate, 0));
+                    break;
+                case Keys.A:
+                    CoordinateTransformations.TranslateVectors(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(-translate, 0, 0));
+                    break;
+                case Keys.D:
+                    CoordinateTransformations.TranslateVectors(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(translate, 0, 0));
+                    break;
             }
             CreateModelDataPaint();
         }
