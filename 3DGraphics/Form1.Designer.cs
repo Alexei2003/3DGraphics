@@ -63,7 +63,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(784, 759);
+            ClientSize = new Size(584, 559);
             Controls.Add(tbFPS);
             Controls.Add(bOpenModelFile);
             DoubleBuffered = true;

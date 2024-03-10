@@ -8,17 +8,34 @@ namespace _3DGraphics.Classes
         private const int VERTEX_INDEXS_COUNT = 10000;
         private const int VERTEX_POINTS_COUNT = 3;
 
-        public struct FileReaderResult
+        public class ModelData
         {
             public GeometricVertex[] GeometricVertexCoordinates { get; set; }
+            public CoordinateVector CoordinateTransformationlateVector { get; set; }
             public TextureVertice[] TextureVertexCoordinates { get; set; }
             public NormalVertice[] NormalVertexCoordinates { get; set; }
             public int[][] GeometricVertexIndexs { get; set; }
             public int[][] TextureVertexIndexs { get; set; }
             public int[][] NormalVertexIndexs { get; set; }
+
+            public ModelData()
+            {
+
+            }
+
+            public ModelData(ModelData modelData)
+            {
+                GeometricVertexCoordinates = (GeometricVertex[])modelData.GeometricVertexCoordinates.Clone();
+                CoordinateTransformationlateVector = new CoordinateVector(modelData.CoordinateTransformationlateVector.Coordinates);
+                TextureVertexCoordinates = (TextureVertice[])modelData.TextureVertexCoordinates.Clone();
+                NormalVertexCoordinates = (NormalVertice[])modelData.NormalVertexCoordinates.Clone();
+                GeometricVertexIndexs = (int[][])modelData.GeometricVertexIndexs.Clone();
+                TextureVertexIndexs = (int[][])modelData.TextureVertexIndexs.Clone();
+                NormalVertexIndexs = (int[][])modelData.NormalVertexIndexs.Clone();
+            }
         }
 
-        public static FileReaderResult Read(string str)
+        public static ModelData Read(string str)
         {
             var fileStrs = File.ReadAllLines(str);
 
@@ -111,9 +128,10 @@ namespace _3DGraphics.Classes
                 }
             }
 
-            var result = new FileReaderResult
+            var result = new ModelData
             {
                 GeometricVertexCoordinates = [.. geometricVertexsList],
+                CoordinateTransformationlateVector = new CoordinateVector(0, 0, 0),
                 TextureVertexCoordinates = [.. textureVerticesList],
                 NormalVertexCoordinates = [.. normalVerticesList],
                 GeometricVertexIndexs = [.. geometricVertexIndexsList],

@@ -5,9 +5,8 @@ namespace _3DGraphics.Classes
 {
     internal static class LinerDrawing
     {
-        public static void DrawLines(Bitmap bitmap, GeometricVertex[] GeometricVertexСoordinates, int[][] GeometricVertexIndexs)
+        public static void DrawLines(Bitmap bitmap, GeometricVertex[] GeometricVertexСoordinates, int[][] GeometricVertexIndexs, CoordinateVector coordinateTransformationlateVector)
         {
-            const int scale = 2;
             int widthZone = bitmap.Width;
             int heightZone = bitmap.Height;
 
@@ -26,7 +25,7 @@ namespace _3DGraphics.Classes
                 for (var i = 0; i < vertexIndex.Length; i++)
                 {
                     ref var coordinate = ref GeometricVertexСoordinates[vertexIndex[i]];
-                    points[i] = new Point(Convert.ToInt32((coordinate.X + coordinate.TranslateX) * scale), Convert.ToInt32((coordinate.Y + coordinate.TranslateY) * scale));
+                    points[i] = new Point(Convert.ToInt32(coordinate.X + coordinateTransformationlateVector.X), Convert.ToInt32(coordinate.Y + coordinateTransformationlateVector.Y));
                 }
 
                 for (var i = 0; i < vertexIndex.Length - 1;)
