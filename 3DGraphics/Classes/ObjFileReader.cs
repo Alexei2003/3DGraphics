@@ -1,4 +1,5 @@
 ﻿using static _3DGraphics.Classes.BaseGraphisStructs;
+using static _3DGraphics.Classes.ObjFileReader;
 
 namespace _3DGraphics.Classes
 {
@@ -25,13 +26,36 @@ namespace _3DGraphics.Classes
 
             public ModelData(ModelData modelData)
             {
-                GeometricVertexCoordinates = (GeometricVertex[])modelData.GeometricVertexCoordinates.Clone();
-                CoordinateTransformationlateVector = new CoordinateVector(modelData.CoordinateTransformationlateVector.Coordinates);
-                TextureVertexCoordinates = (TextureVertice[])modelData.TextureVertexCoordinates.Clone();
-                NormalVertexCoordinates = (NormalVertice[])modelData.NormalVertexCoordinates.Clone();
+                GeometricVertexCoordinates = new GeometricVertex[modelData.GeometricVertexCoordinates.Length];
+                TextureVertexCoordinates = new TextureVertice[modelData.TextureVertexCoordinates.Length];
+                NormalVertexCoordinates = new NormalVertice[modelData.NormalVertexCoordinates.Length];
+
+                SetCopyValue(modelData);
+
                 GeometricVertexIndexs = (int[][])modelData.GeometricVertexIndexs.Clone();
                 TextureVertexIndexs = (int[][])modelData.TextureVertexIndexs.Clone();
                 NormalVertexIndexs = (int[][])modelData.NormalVertexIndexs.Clone();
+            }
+
+            public void SetCopyValue(ModelData modelData)
+            {
+                Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
+                {
+                    GeometricVertexCoordinates[i] = new GeometricVertex(modelData.GeometricVertexCoordinates[i].Coordinates, modelData.GeometricVertexCoordinates[i].W);
+
+                });
+
+                CoordinateTransformationlateVector = new CoordinateVector(modelData.CoordinateTransformationlateVector.Coordinates);
+
+                Parallel.For(0, modelData.TextureVertexCoordinates.Length, i =>
+                {
+                    TextureVertexCoordinates[i] = new TextureVertice(modelData.TextureVertexCoordinates[i].Coordinates);
+                });
+
+                Parallel.For(0, modelData.NormalVertexCoordinates.Length, i =>
+                {
+                    NormalVertexCoordinates[i] = new NormalVertice(modelData.NormalVertexCoordinates[i].Coordinates);
+                });
             }
         }
 
