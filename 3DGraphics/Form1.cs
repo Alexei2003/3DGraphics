@@ -82,7 +82,7 @@ namespace _3DGraphics
             CreateModelDataPaint();
         }
 
-        private float GetAverangeY(GeometricVertex[] vectors)
+        private static float GetAverangeY(GeometricVertex[] vectors)
         {
             return vectors.Max(v => v.Y) / 2;
         }
@@ -102,10 +102,10 @@ namespace _3DGraphics
         private void CreateModelDataPaint()
         {
             tmpModelData.SetCopyValue(modelData);
-            CoordinateTransformations.GetViewVectors(modelDataPaint.GeometricVertexCoordinates, camera);
-            CoordinateTransformations.GetProjectionVectors(modelDataPaint.GeometricVertexCoordinates, camera);
-            CoordinateTransformations.GetViewWindowVectors(modelDataPaint.GeometricVertexCoordinates, camera);
-            modelDataPaint = (tmpModelData);
+            CoordinateTransformations.GetViewVectors(tmpModelData.GeometricVertexCoordinates, camera);
+            CoordinateTransformations.GetProjectionVectors(tmpModelData.GeometricVertexCoordinates, camera);
+            CoordinateTransformations.GetViewWindowVectors(tmpModelData.GeometricVertexCoordinates, camera);
+            modelDataPaint.SetCopyValue(tmpModelData);
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)

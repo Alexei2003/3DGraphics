@@ -103,19 +103,16 @@ namespace _3DGraphics.Classes
         public static void GetProjectionVectors(GeometricVertex[] vectors, Camera camera)
         {
             var matr = new Matrix4x4(
-                1 / (camera.Aaspect * (float)Math.Tan(camera.FovRadian / 2)), 0, 0, 0,
-                0, 1 / ((float)Math.Tan(camera.FovRadian / 2)), 0, 0,
-                0, 0, camera.ZFar / (camera.ZNear - camera.ZFar), (camera.ZNear * camera.ZFar) / (camera.ZNear - camera.ZFar),
-                0, 0, -1, 0
+                2f/camera.Width,               0, 0                               , 0,
+                0             , 2f/camera.Height, 0                               , 0,
+                0             , 0              , 1f / (camera.ZNear - camera.ZFar), camera.ZNear / (camera.ZNear - camera.ZFar),
+                0             , 0              , 0                               , 1
             );
 
             Parallel.For(0, vectors.Length, i =>
             {
                 var vect = new Vector4(vectors[i].X, vectors[i].Y, vectors[i].Z, 1);
                 vect = Vector4.Transform(vect, matr);
-                /*                vectors[i].X = vect.X / vect.W;
-                                vectors[i].Y = vect.Y / vect.W;
-                                vectors[i].Z = vect.Z / vect.W;*/
                 vectors[i].X = vect.X;
                 vectors[i].Y = vect.Y;
                 vectors[i].Z = vect.Z;
@@ -125,8 +122,8 @@ namespace _3DGraphics.Classes
 
         public static void GetViewWindowVectors(GeometricVertex[] vectors, Camera camera)
         {
-            int width = 10;
-            int height = 10;
+            int width = camera.Width;
+            int height = camera.Height;
 
             var matr = new Matrix4x4(width / 2, 0, 0, width / 2,
                                  0, -(height / 2), 0, height / 2,

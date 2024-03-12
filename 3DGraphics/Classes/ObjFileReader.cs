@@ -30,19 +30,9 @@ namespace _3DGraphics.Classes
                 TextureVertexCoordinates = new TextureVertice[modelData.TextureVertexCoordinates.Length];
                 NormalVertexCoordinates = new NormalVertice[modelData.NormalVertexCoordinates.Length];
 
-                SetCopyValue(modelData);
-
-                GeometricVertexIndexs = (int[][])modelData.GeometricVertexIndexs.Clone();
-                TextureVertexIndexs = (int[][])modelData.TextureVertexIndexs.Clone();
-                NormalVertexIndexs = (int[][])modelData.NormalVertexIndexs.Clone();
-            }
-
-            public void SetCopyValue(ModelData modelData)
-            {
                 Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
                 {
                     GeometricVertexCoordinates[i] = new GeometricVertex(modelData.GeometricVertexCoordinates[i].Coordinates, modelData.GeometricVertexCoordinates[i].W);
-
                 });
 
                 CoordinateTransformationlateVector = new CoordinateVector(modelData.CoordinateTransformationlateVector.Coordinates);
@@ -55,6 +45,30 @@ namespace _3DGraphics.Classes
                 Parallel.For(0, modelData.NormalVertexCoordinates.Length, i =>
                 {
                     NormalVertexCoordinates[i] = new NormalVertice(modelData.NormalVertexCoordinates[i].Coordinates);
+                });
+
+                GeometricVertexIndexs = (int[][])modelData.GeometricVertexIndexs.Clone();
+                TextureVertexIndexs = (int[][])modelData.TextureVertexIndexs.Clone();
+                NormalVertexIndexs = (int[][])modelData.NormalVertexIndexs.Clone();
+            }
+
+            public void SetCopyValue(ModelData modelData)
+            {
+                Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
+                {
+                    GeometricVertexCoordinates[i].Coordinates = modelData.GeometricVertexCoordinates[i].Coordinates;
+                });
+
+                CoordinateTransformationlateVector.Coordinates = modelData.CoordinateTransformationlateVector.Coordinates;
+
+                Parallel.For(0, modelData.TextureVertexCoordinates.Length, i =>
+                {
+                    TextureVertexCoordinates[i].Coordinates = modelData.TextureVertexCoordinates[i].Coordinates;
+                });
+
+                Parallel.For(0, modelData.NormalVertexCoordinates.Length, i =>
+                {
+                    NormalVertexCoordinates[i].Coordinates = modelData.NormalVertexCoordinates[i].Coordinates;
                 });
             }
         }

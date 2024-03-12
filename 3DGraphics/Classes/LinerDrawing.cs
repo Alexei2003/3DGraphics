@@ -1,23 +1,24 @@
 ﻿using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 
 namespace _3DGraphics.Classes
 {
     internal static class LinerDrawing
     {
-        public static void DrawLines(Bitmap bitmap, GeometricVertex[] GeometricVertexСoordinates, int[][] GeometricVertexIndexs, CoordinateVector coordinateTransformationlateVector)
+        public static unsafe void DrawLines(Bitmap bitmap, GeometricVertex[] GeometricVertexСoordinates, int[][] GeometricVertexIndexs, CoordinateVector coordinateTransformationlateVector)
         {
-            int widthZone = bitmap.Width;
-            int heightZone = bitmap.Height;
+            var widthZone = bitmap.Width;
+            var heightZone = bitmap.Height;
 
-            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
-            IntPtr ptr = bitmapData.Scan0;
-            int bytes = Math.Abs(bitmapData.Stride) * bitmap.Height;
-            byte[] rgbValues = new byte[bytes];
-            System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
+            var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
+            var ptr = bitmapData.Scan0;
+            var bytes = Math.Abs(bitmapData.Stride) * bitmap.Height;
 
-            int colorArgb = Color.Black.ToArgb();
-            byte[] colorBytes = BitConverter.GetBytes(colorArgb);
+            var rgbBitmap = (int*)ptr;
+
+            // Цвет в байтах
+            var colorInt = Color.Black.ToArgb();
 
             Parallel.ForEach(GeometricVertexIndexs, vertexIndex =>
             {
@@ -30,16 +31,14 @@ namespace _3DGraphics.Classes
 
                 for (var i = 0; i < vertexIndex.Length - 1;)
                 {
-                    DrawLine(rgbValues, bitmapData.Stride, colorBytes, points[i], points[++i], widthZone, heightZone);
+                    DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[i], points[++i], widthZone, heightZone);
                 }
-                DrawLine(rgbValues, bitmapData.Stride, colorBytes, points[vertexIndex.Length - 1], points[0], widthZone, heightZone);
+                DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[vertexIndex.Length - 1], points[0], widthZone, heightZone);
             });
-
-            System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
             bitmap.UnlockBits(bitmapData);
         }
 
-        private static void DrawLine(byte[] rgbValues, int stride, byte[] colorBytes, Point point1, Point point2, int widthZone, int heightZone)
+        private static unsafe void DrawLine(int* rgbBitmap, int stride, int colorInt, Point point1, Point point2, int widthZone, int heightZone)
         {
             int dx = point2.X - point1.X;
             int dy = point2.Y - point1.Y;
@@ -52,6 +51,8 @@ namespace _3DGraphics.Classes
             float Y = point1.Y;
             int index;
 
+            var strideInt = stride / 4;
+
             for (var i = 0; i <= steps; i++)
             {
                 if (X > widthZone - 1 || X < 0 || Y > heightZone - 1 || Y < 0)
@@ -61,8 +62,8 @@ namespace _3DGraphics.Classes
                     continue;
                 }
 
-                index = ((int)Math.Round(X) * 4) + ((int)Math.Round(Y) * stride);
-                Buffer.BlockCopy(colorBytes, 0, rgbValues, index, 4);
+                index = ((int)Math.Round(X)) + ((int)Math.Round(Y) * strideInt);
+                rgbBitmap[index] = colorInt;
 
                 X += XIncrement;
                 Y += YIncrement;
