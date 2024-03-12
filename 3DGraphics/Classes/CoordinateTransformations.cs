@@ -77,30 +77,31 @@ namespace _3DGraphics.Classes
             });
         }
 
-        public static void GetViewVectors(GeometricVertex[] vectors, Camera camera)
+        public static void GetViewVectors(GeometricVertex[] GeometricVertexCoordinates, Camera camera)
         {
             var zAxis = Vector3.Normalize(camera.Eye.Coordinates - camera.Target.Coordinates);
             var xAxis = Vector3.Normalize(Vector3.Cross(camera.Up.Coordinates, zAxis));
             var yAxis = camera.Up.Coordinates;
 
 
-            var matr = new Matrix4x4(xAxis.X, xAxis.Y, xAxis.Z, -Vector3.Dot(xAxis, camera.Eye.Coordinates),
+            var matr = new Matrix4x4(
+                     xAxis.X, xAxis.Y, xAxis.Z, -Vector3.Dot(xAxis, camera.Eye.Coordinates),
                      yAxis.X, yAxis.Y, yAxis.Z, -Vector3.Dot(yAxis, camera.Eye.Coordinates),
                      zAxis.X, zAxis.Y, zAxis.Z, -Vector3.Dot(zAxis, camera.Eye.Coordinates),
                      0, 0, 0, 1);
 
-            Parallel.For(0, vectors.Length, i =>
+            Parallel.For(0, GeometricVertexCoordinates.Length, i =>
             {
-                var vect = new Vector4(vectors[i].X, vectors[i].Y, vectors[i].Z, 0);
+                var vect = new Vector4(GeometricVertexCoordinates[i].X, GeometricVertexCoordinates[i].Y, GeometricVertexCoordinates[i].Z, 0);
                 vect = Vector4.Transform(vect, matr);
-                vectors[i].X = vect.X;
-                vectors[i].Y = vect.Y;
-                vectors[i].Z = vect.Z;
+                GeometricVertexCoordinates[i].X = vect.X;
+                GeometricVertexCoordinates[i].Y = vect.Y;
+                GeometricVertexCoordinates[i].Z = vect.Z;
             });
         }
 
 
-        public static void GetProjectionVectors(GeometricVertex[] vectors, Camera camera)
+        public static void GetProjectionVectors(GeometricVertex[] GeometricVertexCoordinates, Camera camera)
         {
             var matr = new Matrix4x4(
                 2f/camera.Width,               0, 0                               , 0,
@@ -109,18 +110,18 @@ namespace _3DGraphics.Classes
                 0             , 0              , 0                               , 1
             );
 
-            Parallel.For(0, vectors.Length, i =>
+            Parallel.For(0, GeometricVertexCoordinates.Length, i =>
             {
-                var vect = new Vector4(vectors[i].X, vectors[i].Y, vectors[i].Z, 1);
+                var vect = new Vector4(GeometricVertexCoordinates[i].X, GeometricVertexCoordinates[i].Y, GeometricVertexCoordinates[i].Z, 1);
                 vect = Vector4.Transform(vect, matr);
-                vectors[i].X = vect.X;
-                vectors[i].Y = vect.Y;
-                vectors[i].Z = vect.Z;
+                GeometricVertexCoordinates[i].X = vect.X;
+                GeometricVertexCoordinates[i].Y = vect.Y;
+                GeometricVertexCoordinates[i].Z = vect.Z;
             });
         }
 
 
-        public static void GetViewWindowVectors(GeometricVertex[] vectors, Camera camera)
+        public static void GetViewWindowVectors(GeometricVertex[] GeometricVertexCoordinates, Camera camera)
         {
             int width = camera.Width;
             int height = camera.Height;
@@ -130,13 +131,13 @@ namespace _3DGraphics.Classes
                                  0, 0, 1, 0,
                                  0, 0, 0, 1);
 
-            Parallel.For(0, vectors.Length, i =>
+            Parallel.For(0, GeometricVertexCoordinates.Length, i =>
             {
-                var vect = new Vector4(vectors[i].X, vectors[i].Y, vectors[i].Z, 0);
+                var vect = new Vector4(GeometricVertexCoordinates[i].X, GeometricVertexCoordinates[i].Y, GeometricVertexCoordinates[i].Z, 0);
                 vect = Vector4.Transform(vect, matr);
-                vectors[i].X = vect.X;
-                vectors[i].Y = vect.Y;
-                vectors[i].Z = vect.Z;
+                GeometricVertexCoordinates[i].X = vect.X;
+                GeometricVertexCoordinates[i].Y = vect.Y;
+                GeometricVertexCoordinates[i].Z = vect.Z;
             });
         }
     }

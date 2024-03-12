@@ -73,10 +73,9 @@ namespace _3DGraphics
         {
             var modelFilePath = opfdModelFile.FileName;
             modelData = Read(modelFilePath);
-            modelData.CoordinateTransformationlateVector = new CoordinateVector(300, 300, 0);
 
             CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new CoordinateVector(0, -GetAverangeY(modelData.GeometricVertexCoordinates), 0));
-            camera = new Camera(Width, Height);
+            GetCenterWindow();
             tmpModelData = new ModelData(modelData);
             modelDataPaint = new ModelData(modelData);
             CreateModelDataPaint();
@@ -85,6 +84,14 @@ namespace _3DGraphics
         private static float GetAverangeY(GeometricVertex[] vectors)
         {
             return vectors.Max(v => v.Y) / 2;
+        }
+        private void GetCenterWindow()
+        {
+            if (modelData != null)
+            {
+                modelData.CoordinateTransformationlateVector.X = Width / 2;
+                modelData.CoordinateTransformationlateVector.Y = Height / 2;
+            }
         }
 
         private void bOpenModelFile_Click(object sender, EventArgs e)
@@ -95,6 +102,10 @@ namespace _3DGraphics
         private void MainWindow_Resize(object sender, EventArgs e)
         {
             tbFPS.Location = new Point(Width - tbFPS.Width - 20, tbFPS.Location.Y);
+
+            camera.Width = Width;
+            camera.Height = Height;
+            GetCenterWindow();
         }
 
         private ModelData tmpModelData;

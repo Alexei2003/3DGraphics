@@ -21,7 +21,7 @@ namespace _3DGraphics.Classes
 
             public ModelData()
             {
-
+                
             }
 
             public ModelData(ModelData modelData)
