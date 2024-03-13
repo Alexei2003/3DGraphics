@@ -6,22 +6,34 @@
 
         public readonly double angle90 = Math.PI / 180 * 80;
 
-        public BaseGraphisStructs.CoordinateVector Eye { get; set; } = new(0, 0, 1);
+        public BaseGraphisStructs.CoordinateVector Eye { get; set; } = new(0, 0, 10);
         public BaseGraphisStructs.CoordinateVector Up { get; set; } = new(0, 1, 0);
         public BaseGraphisStructs.CoordinateVector Target { get; set; } = new(0, 0, 0);
-        public float Aaspect { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public float Aspect { get; set; }
+
+        public Size Size
+        {
+            get
+            {
+                return size;
+            }
+            set
+            {
+                size = value;
+                Aspect = (float)size.Width / size.Height;
+            }
+        }
+        private Size size;
+
         public float FovAngle
         {
             get
             {
-                return FovRadian / (float)Math.PI * 180.0f;    
+                return FovRadian / (float)Math.PI * 180.0f;
             }
-
-            set 
+            set
             {
-                if(value > 0 && value < 180) 
+                if (value > 0 && value < 180)
                 {
                     FovRadian = value * (float)Math.PI / 180.0f;
                 }
@@ -31,13 +43,16 @@
         public float FovRadian { get; set; } = 70.0f * ((float)Math.PI / 180.0f);
 
         public float ZFar { get; set; } = 10f;
-        public float ZNear { get; set; } = 0.1f;
+        public float ZNear { get; set; } = 1f;
+
+        public Camera(Size size)
+        {
+            Size = size;
+        }
 
         public Camera(int width, int height)
         {
-            Aaspect = width / height;
-            Width = width;
-            Height = height;
+            Size = new(width, height);
         }
 
         public void IncFovAngle(float angle)

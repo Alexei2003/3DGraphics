@@ -51,7 +51,7 @@
             // tbFPS
             // 
             tbFPS.Font = new Font("Segoe UI", 40F);
-            tbFPS.Location = new Point(666, 12);
+            tbFPS.Location = new Point(476, 12);
             tbFPS.Name = "tbFPS";
             tbFPS.ReadOnly = true;
             tbFPS.Size = new Size(106, 86);
@@ -70,6 +70,7 @@
             KeyPreview = true;
             Name = "MainWindow";
             Text = "3DViewer";
+            Activated += MainWindow_Activated;
             Paint += MainWindow_Paint;
             KeyDown += MainWindow_KeyDown;
             Resize += MainWindow_Resize;

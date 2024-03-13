@@ -75,6 +75,7 @@ namespace _3DGraphics
             modelData = Read(modelFilePath);
 
             CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new CoordinateVector(0, -GetAverangeY(modelData.GeometricVertexCoordinates), 0));
+            maxCoordinate = GetMaxCoordinate(modelData.GeometricVertexCoordinates);
             GetCenterWindow();
             tmpModelData = new ModelData(modelData);
             modelDataPaint = new ModelData(modelData);
@@ -84,6 +85,35 @@ namespace _3DGraphics
         private static float GetAverangeY(GeometricVertex[] vectors)
         {
             return vectors.Max(v => v.Y) / 2;
+        }
+
+        private static float GetMaxCoordinate(GeometricVertex[] vectors)
+        {
+            var x = vectors.Max(v => v.X);
+            var y = vectors.Max(x => x.Y);
+            var z = vectors.Max(x => x.Z);
+            if (x > y)
+            {
+                if (x > z)
+                {
+                    return x * 2;
+                }
+                else
+                {
+                    return z * 2;
+                }
+            }
+            else
+            {
+                if (y > z)
+                {
+                    return y * 2;
+                }
+                else
+                {
+                    return z * 2;
+                }
+            }
         }
         private void GetCenterWindow()
         {
@@ -103,20 +133,26 @@ namespace _3DGraphics
         {
             tbFPS.Location = new Point(Width - tbFPS.Width - 20, tbFPS.Location.Y);
 
-            camera.Width = Width;
-            camera.Height = Height;
+            camera.Size = Size;
             GetCenterWindow();
+            CreateModelDataPaint();
+            ControlUpdate();
         }
 
         private ModelData tmpModelData;
 
+        private float maxCoordinate = 0;
+
         private void CreateModelDataPaint()
         {
-            tmpModelData.SetCopyValue(modelData);
-            CoordinateTransformations.GetViewVectors(tmpModelData.GeometricVertexCoordinates, camera);
-            CoordinateTransformations.GetProjectionVectors(tmpModelData.GeometricVertexCoordinates, camera);
-            CoordinateTransformations.GetViewWindowVectors(tmpModelData.GeometricVertexCoordinates, camera);
-            modelDataPaint.SetCopyValue(tmpModelData);
+            if (modelData != null)
+            {
+                tmpModelData.SetCopyValue(modelData);
+                CoordinateTransformations.GetViewVectors(tmpModelData.GeometricVertexCoordinates, camera);
+                CoordinateTransformations.GetProjectionVectors(tmpModelData.GeometricVertexCoordinates, camera, maxCoordinate);
+                CoordinateTransformations.GetViewWindowVectors(tmpModelData.GeometricVertexCoordinates, camera);
+                modelDataPaint.SetCopyValue(tmpModelData);
+            }
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -172,6 +208,17 @@ namespace _3DGraphics
                 }
                 CreateModelDataPaint();
             }
+        }
+
+        private void ControlUpdate()
+        {
+            bOpenModelFile.Update();
+            tbFPS.Update();
+        }
+
+        private void MainWindow_Activated(object sender, EventArgs e)
+        {
+            ControlUpdate();
         }
     }
 }
