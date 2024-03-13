@@ -6,7 +6,7 @@ namespace _3DGraphics.Classes
     {
         public abstract class Vector
         {
-            public Vector3 Coordinates 
+            public Vector3 Coordinates
             {
                 get => coordinates;
                 set => coordinates = value;
@@ -14,14 +14,14 @@ namespace _3DGraphics.Classes
 
             protected Vector3 coordinates;
 
-            public  Vector()
+            public Vector()
             {
                 coordinates = new Vector3();
             }
 
             public Vector(float a, float b, float c)
             {
-                coordinates = new Vector3(a,b,c);
+                coordinates = new Vector3(a, b, c);
             }
 
             public Vector(Vector3 vector)
@@ -30,7 +30,7 @@ namespace _3DGraphics.Classes
             }
         }
 
-        public class CoordinateVector : Vector 
+        public class CoordinateVector : Vector
         {
             public float X
             {
@@ -52,21 +52,21 @@ namespace _3DGraphics.Classes
 
             public CoordinateVector(float x, float y, float z) : base(x, y, z) { }
 
-            public CoordinateVector(Vector3 vector) :base(vector) { }
+            public CoordinateVector(Vector3 vector) : base(vector) { }
         }
 
         public sealed class GeometricVertex : CoordinateVector
         {
             public float W { get; set; }
 
-            public GeometricVertex():base() { }
+            public GeometricVertex() : base() { }
 
-            public GeometricVertex(float x, float y, float z, float w): base(x,y,z)
+            public GeometricVertex(float x, float y, float z, float w) : base(x, y, z)
             {
                 W = w;
             }
 
-            public GeometricVertex(Vector3 vector, float w) : base(vector) 
+            public GeometricVertex(Vector3 vector, float w) : base(vector)
             {
                 W = w;
             }
@@ -90,7 +90,7 @@ namespace _3DGraphics.Classes
                 set => coordinates[2] = value;
             }
 
-            public TextureVertice() :base() { }
+            public TextureVertice() : base() { }
 
             public TextureVertice(float u, float v, float w) : base(u, v, w) { }
 

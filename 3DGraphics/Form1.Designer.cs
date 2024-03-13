@@ -30,8 +30,11 @@
         {
             opfdModelFile = new OpenFileDialog();
             bOpenModelFile = new Button();
-            tbFPS = new TextBox();
             bAutoRotateY = new Button();
+            pInfo = new Panel();
+            rtbInfo = new RichTextBox();
+            bShowInfo = new Button();
+            pInfo.SuspendLayout();
             SuspendLayout();
             // 
             // opfdModelFile
@@ -49,17 +52,6 @@
             bOpenModelFile.UseVisualStyleBackColor = true;
             bOpenModelFile.Click += bOpenModelFile_Click;
             // 
-            // tbFPS
-            // 
-            tbFPS.Font = new Font("Segoe UI", 40F);
-            tbFPS.Location = new Point(476, 12);
-            tbFPS.Name = "tbFPS";
-            tbFPS.ReadOnly = true;
-            tbFPS.Size = new Size(106, 86);
-            tbFPS.TabIndex = 1;
-            tbFPS.Text = "000";
-            tbFPS.TextAlign = HorizontalAlignment.Center;
-            // 
             // bAutoRotateY
             // 
             bAutoRotateY.Location = new Point(12, 74);
@@ -70,13 +62,41 @@
             bAutoRotateY.UseVisualStyleBackColor = true;
             bAutoRotateY.Click += bAutoRotateY_Click;
             // 
+            // pInfo
+            // 
+            pInfo.Controls.Add(rtbInfo);
+            pInfo.Location = new Point(432, 74);
+            pInfo.Name = "pInfo";
+            pInfo.Size = new Size(140, 249);
+            pInfo.TabIndex = 3;
+            // 
+            // rtbInfo
+            // 
+            rtbInfo.Location = new Point(3, 3);
+            rtbInfo.Name = "rtbInfo";
+            rtbInfo.ReadOnly = true;
+            rtbInfo.Size = new Size(134, 243);
+            rtbInfo.TabIndex = 0;
+            rtbInfo.Text = "F1\nF2\nF3\nF4\nF5\nF6\nF7";
+            // 
+            // bShowInfo
+            // 
+            bShowInfo.Location = new Point(489, 12);
+            bShowInfo.Name = "bShowInfo";
+            bShowInfo.Size = new Size(83, 56);
+            bShowInfo.TabIndex = 4;
+            bShowInfo.Text = "Показать информацию";
+            bShowInfo.UseVisualStyleBackColor = true;
+            bShowInfo.Click += bShowInfo_Click;
+            // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(584, 559);
+            Controls.Add(bShowInfo);
+            Controls.Add(pInfo);
             Controls.Add(bAutoRotateY);
-            Controls.Add(tbFPS);
             Controls.Add(bOpenModelFile);
             DoubleBuffered = true;
             KeyPreview = true;
@@ -86,15 +106,17 @@
             Paint += MainWindow_Paint;
             KeyDown += MainWindow_KeyDown;
             Resize += MainWindow_Resize;
+            pInfo.ResumeLayout(false);
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
 
         private OpenFileDialog opfdModelFile;
         private Button bOpenModelFile;
-        private TextBox tbFPS;
         private Button bAutoRotateY;
+        private Panel pInfo;
+        private RichTextBox rtbInfo;
+        private Button bShowInfo;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using static _3DGraphics.Classes.BaseGraphisStructs;
-using static _3DGraphics.Classes.ObjFileReader;
 
 namespace _3DGraphics.Classes
 {
@@ -20,7 +19,7 @@ namespace _3DGraphics.Classes
 
             public ModelData()
             {
-                
+
             }
 
             public ModelData(ModelData modelData)

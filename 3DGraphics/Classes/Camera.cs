@@ -1,14 +1,12 @@
-﻿using System.Numerics;
-
-namespace _3DGraphics.Classes
+﻿namespace _3DGraphics.Classes
 {
     internal class Camera
     {
         public BaseGraphisStructs.CoordinateVector Scale = new(1, 1, 1);
-        public BaseGraphisStructs.CoordinateVector AngelsRotate = new(0,0,0);
-        public BaseGraphisStructs.CoordinateVector Translate = new (0,0,0);
+        public BaseGraphisStructs.CoordinateVector AngelsRotate = new(0, 0, 0);
+        public BaseGraphisStructs.CoordinateVector Translate = new(0, 0, 0);
 
-        public BaseGraphisStructs.CoordinateVector Eye { get; set; } = new(0, 0, 100);
+        public BaseGraphisStructs.CoordinateVector Eye { get; set; } = new (0, 0, 100);
         public BaseGraphisStructs.CoordinateVector Up { get; set; } = new(0, 1, 0);
         public BaseGraphisStructs.CoordinateVector Target { get; set; } = new(0, 0, 0);
         public float Aspect { get; set; }
@@ -35,7 +33,7 @@ namespace _3DGraphics.Classes
             }
             set
             {
-                if (value > 0 && value < 180)
+                if (value > 30 && value < 120)
                 {
                     FovRadian = value * (float)Math.PI / 180.0f;
                 }
@@ -60,6 +58,14 @@ namespace _3DGraphics.Classes
         public void IncFovAngle(float angle)
         {
             FovAngle += angle;
+        }
+
+        public void IncEyeZ(int Z)
+        {
+            if (Eye.Z + Z > 20)
+            {
+                Eye.Z += Z;
+            }
         }
     }
 }

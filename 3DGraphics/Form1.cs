@@ -1,4 +1,5 @@
 using _3DGraphics.Classes;
+using System.Windows.Forms;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 using static _3DGraphics.Classes.ObjFileReader;
 
@@ -10,7 +11,7 @@ namespace _3DGraphics
         private ObjFileReader.ModelData modelDataPaint = null;
         private readonly System.Threading.Timer timerFPS;
         private System.Threading.Timer timerRotateY = null;
-        private Camera camera;
+        private Camera camera = null;
 
         private readonly object lockModelData = new();
 
@@ -22,7 +23,7 @@ namespace _3DGraphics
             opfdModelFile.FilterIndex = 0;
             opfdModelFile.RestoreDirectory = true;
 
-            tbFPS.Location = new Point(Width - tbFPS.Width - 20, tbFPS.Location.Y);
+            ControlResize();
 
             camera = new Camera(Width, Height);
 
@@ -45,22 +46,33 @@ namespace _3DGraphics
 
         private void UpdateFPS(object state)
         {
-            if (tbFPS.InvokeRequired)
+            var strInfo = "" +
+                    $"FPS = {frameCount}\n" +
+                    $"Aspect = {camera.Aspect}\n" +
+                    $"Width = {camera.Size.Width}\n" +
+                    $"Height = {camera.Size.Height}\n" +
+                    $"Fov = {camera.FovAngle}\n" +
+                    $"Scale = {camera.Scale.X}\n" +
+                    $"ZCamera = {camera.Eye.Z}\n" +
+                    $"ZTarget = {camera.Translate.Z}\n";
+
+            lock (lockFrameCount)
             {
-                tbFPS.Invoke((MethodInvoker)delegate
+                frameCount = 0;
+            }
+
+            if (rtbInfo.InvokeRequired)
+            {
+                rtbInfo.Invoke((MethodInvoker)delegate
                 {
-                    tbFPS.Text = frameCount.ToString();
-                    tbFPS.Update();
+                    rtbInfo.Text = strInfo;
+                    rtbInfo.Update();
                 });
             }
             else
             {
-                tbFPS.Text = frameCount.ToString();
-                tbFPS.Update();
-            }
-            lock (lockFrameCount)
-            {
-                frameCount = 0;
+                rtbInfo.Text = strInfo;
+                rtbInfo.Update();
             }
         }
 
@@ -109,7 +121,7 @@ namespace _3DGraphics
 
         private void MainWindow_Resize(object sender, EventArgs e)
         {
-            tbFPS.Location = new Point(Width - tbFPS.Width - 20, tbFPS.Location.Y);
+            ControlResize();
 
             camera.Size = Size;
             CreateModelDataPaint();
@@ -132,7 +144,8 @@ namespace _3DGraphics
                 var angelRotate = (float)Math.PI / 100;
                 var cahngeAngelFov = 1f;
                 var scale = new CoordinateVector(1.1f, 1.1f, 1.1f);
-                var translate = 10;
+                var translate = 1;
+                var near = 25;
 
 
                 if ((Control.ModifierKeys & Keys.Shift) != 0)
@@ -160,10 +173,10 @@ namespace _3DGraphics
                             camera.Scale.Coordinates /= scale.Coordinates;
                             break;
                         case Keys.Up:
-                            camera.Eye.Z -= 10;
+                            camera.IncEyeZ(-near);
                             break;
                         case Keys.Down:
-                            camera.Eye.Z += 10;
+                            camera.IncEyeZ(near);
                             break;
                         case Keys.Add:
                             camera.IncFovAngle(cahngeAngelFov);
@@ -198,8 +211,15 @@ namespace _3DGraphics
         private void ControlUpdate()
         {
             bOpenModelFile.Update();
-            tbFPS.Update();
             bAutoRotateY.Update();
+            pInfo.Update();
+            bShowInfo.Update();
+        }
+
+        private void ControlResize()
+        {
+            pInfo.Location = new Point(Width - pInfo.Width - 20, pInfo.Location.Y);
+            bShowInfo.Location = new Point(Width - bShowInfo.Width - 20, bShowInfo.Location.Y);
         }
 
         private void MainWindow_Activated(object sender, EventArgs e)
@@ -219,6 +239,11 @@ namespace _3DGraphics
                 timerRotateY.Dispose();
                 timerRotateY = null;
             }
+        }
+
+        private void bShowInfo_Click(object sender, EventArgs e)
+        {
+            pInfo.Visible = !pInfo.Visible;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 
 namespace _3DGraphics.Classes
@@ -8,8 +7,15 @@ namespace _3DGraphics.Classes
     {
         public static unsafe void DrawLines(Bitmap bitmap, GeometricVertex[] GeometricVertexСoordinates, int[][] GeometricVertexIndexs)
         {
-            var widthZone = bitmap.Width;
-            var heightZone = bitmap.Height;
+            var widthZoneIndex = bitmap.Width - 1;
+            var heightZoneIndex = bitmap.Height - 1;
+
+            var widthMaxReder = bitmap.Width*2;
+            var heightMaxReder = bitmap.Height*2;
+
+            var widthMinReder = -bitmap.Width;
+            var heightMinReder = -bitmap.Height;
+
 
             var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
             var ptr = bitmapData.Scan0;
@@ -26,14 +32,22 @@ namespace _3DGraphics.Classes
                 for (var i = 0; i < vertexIndex.Length; i++)
                 {
                     ref var coordinate = ref GeometricVertexСoordinates[vertexIndex[i]];
+                    if (coordinate.X > widthMaxReder || widthMinReder > coordinate.X || coordinate.Y > heightMaxReder || heightMinReder > coordinate.Y)
+                    {
+                        points = null;
+                        break;
+                    }
                     points[i] = new Point(Convert.ToInt32(coordinate.X), Convert.ToInt32(coordinate.Y));
                 }
 
-                for (var i = 0; i < vertexIndex.Length - 1;)
+                if (points != null)
                 {
-                    DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[i], points[++i], widthZone, heightZone);
+                    for (var i = 0; i < vertexIndex.Length - 1;)
+                    {
+                        DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[i], points[++i], widthZoneIndex, heightZoneIndex);
+                    }
+                    DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[vertexIndex.Length - 1], points[0], widthZoneIndex, heightZoneIndex);
                 }
-                DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[vertexIndex.Length - 1], points[0], widthZone, heightZone);
             });
             bitmap.UnlockBits(bitmapData);
         }
@@ -55,7 +69,7 @@ namespace _3DGraphics.Classes
 
             for (var i = 0; i <= steps; i++)
             {
-                if (X > widthZone - 1 || X < 0 || Y > heightZone - 1 || Y < 0)
+                if (X > widthZone || X < 0 || Y > heightZone || Y < 0)
                 {
                     X += XIncrement;
                     Y += YIncrement;
