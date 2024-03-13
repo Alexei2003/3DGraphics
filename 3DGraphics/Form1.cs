@@ -1,6 +1,4 @@
 using _3DGraphics.Classes;
-using System.Numerics;
-using System.Threading;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 using static _3DGraphics.Classes.ObjFileReader;
 
@@ -13,6 +11,8 @@ namespace _3DGraphics
         private readonly System.Threading.Timer timerFPS;
         private System.Threading.Timer timerRotateY = null;
         private Camera camera;
+
+        private readonly object lockModelData = new();
 
         public MainWindow()
         {
@@ -28,18 +28,16 @@ namespace _3DGraphics
 
             var timerCallback = new TimerCallback(UpdateFPS);
             timerFPS = new System.Threading.Timer(timerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
-
-
         }
 
         private void AutoRotateY(object state)
         {
             if (modelData != null)
             {
-                lock (modelData)
+                lock (lockModelData)
                 {
-                    const double shiftAxis = Math.PI / 180;
-                    CoordinateTransformations.RotateAroundY(modelData.GeometricVertexCoordinates, shiftAxis);
+                    const float shiftAxis = (float)Math.PI / 100;
+                    camera.AngelsRotate.Y += shiftAxis;
                     CreateModelDataPaint();
                 }
             }
@@ -75,7 +73,7 @@ namespace _3DGraphics
             {
                 var bitmap = new Bitmap(Width, Height);
 
-                LinerDrawing.DrawLines(bitmap, modelDataPaint.GeometricVertexCoordinates, modelDataPaint.GeometricVertexIndexs, modelDataPaint.CoordinateTransformationlateVector);
+                LinerDrawing.DrawLines(bitmap, modelDataPaint.GeometricVertexCoordinates, modelDataPaint.GeometricVertexIndexs);
 
                 BackgroundImage = bitmap;
 
@@ -89,70 +87,18 @@ namespace _3DGraphics
 
         private void opfdModelFile_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            var modelFilePath = opfdModelFile.FileName;
-            modelData = Read(modelFilePath);
-
-            CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new CoordinateVector(-GetAverangeX(modelData.GeometricVertexCoordinates), -GetAverangeY(modelData.GeometricVertexCoordinates), -GetAverangeZ(modelData.GeometricVertexCoordinates)));
-            maxCoordinate = GetMaxCoordinate(modelData.GeometricVertexCoordinates);
-            for (var i = 0; i < modelData.GeometricVertexCoordinates.Length; i++)
+            lock (lockModelData)
             {
-                modelData.GeometricVertexCoordinates[i].Coordinates = Vector3.Divide(modelData.GeometricVertexCoordinates[i].Coordinates, maxCoordinate);
-            }
-            GetCenterWindow();
-            tmpModelData = new ModelData(modelData);
-            modelDataPaint = new ModelData(modelData);
-            CreateModelDataPaint();
-        }
+                var modelFilePath = opfdModelFile.FileName;
+                modelData = Read(modelFilePath);
 
-        private static float GetAverangeX(GeometricVertex[] vectors)
-        {
-            return (vectors.Min(v => v.X) + vectors.Max(v => v.X)) / 2;
-        }
+                CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new CoordinateVector(
+                    -(modelData.GeometricVertexCoordinates.Max(v => v.X) + modelData.GeometricVertexCoordinates.Min(v => v.X)) / 2,
+                    -(modelData.GeometricVertexCoordinates.Max(v => v.Y) + modelData.GeometricVertexCoordinates.Min(v => v.Y)) / 2,
+                    -(modelData.GeometricVertexCoordinates.Max(v => v.Z) + modelData.GeometricVertexCoordinates.Min(v => v.Z)) / 2));
 
-        private static float GetAverangeY(GeometricVertex[] vectors)
-        {
-            return (vectors.Min(v => v.Y) + vectors.Max(v => v.Y)) / 2;
-        }
-
-        private static float GetAverangeZ(GeometricVertex[] vectors)
-        {
-            return (vectors.Min(v => v.Z) + vectors.Max(v => v.Z)) / 2;
-        }
-
-        private static float GetMaxCoordinate(GeometricVertex[] vectors)
-        {
-            var x = vectors.Max(v => v.X);
-            var y = vectors.Max(x => x.Y);
-            var z = vectors.Max(x => x.Z);
-            if (x > y)
-            {
-                if (x > z)
-                {
-                    return x * 2;
-                }
-                else
-                {
-                    return z * 2;
-                }
-            }
-            else
-            {
-                if (y > z)
-                {
-                    return y * 2;
-                }
-                else
-                {
-                    return z * 2;
-                }
-            }
-        }
-        private void GetCenterWindow()
-        {
-            if (modelData != null)
-            {
-                modelData.CoordinateTransformationlateVector.X = Width / 2;
-                modelData.CoordinateTransformationlateVector.Y = Height / 2;
+                modelDataPaint = new ModelData(modelData);
+                CreateModelDataPaint();
             }
         }
 
@@ -166,23 +112,15 @@ namespace _3DGraphics
             tbFPS.Location = new Point(Width - tbFPS.Width - 20, tbFPS.Location.Y);
 
             camera.Size = Size;
-            GetCenterWindow();
             CreateModelDataPaint();
             ControlUpdate();
         }
-
-        private ModelData tmpModelData;
-
-        private float maxCoordinate = 0;
 
         private void CreateModelDataPaint()
         {
             if (modelData != null)
             {
                 modelDataPaint.SetCopyValue(modelData);
-                /*                CoordinateTransformations.GetViewVectors(tmpModelData.GeometricVertexCoordinates, camera);
-                                CoordinateTransformations.GetProjectionVectors(tmpModelData.GeometricVertexCoordinates, camera);
-                                CoordinateTransformations.GetViewWindowVectors(tmpModelData.GeometricVertexCoordinates, camera);*/
                 CoordinateTransformations.GetFinalVectors(modelDataPaint.GeometricVertexCoordinates, camera);
             }
         }
@@ -191,53 +129,65 @@ namespace _3DGraphics
         {
             if (modelData != null)
             {
-                double shiftAxis = Math.PI / 100;
-                const float scale = 1f;
-                const float translate = 5;
+                var angelRotate = (float)Math.PI / 100;
+                var cahngeAngelFov = 1f;
+                var scale = new CoordinateVector(1.1f, 1.1f, 1.1f);
+                var translate = 10;
+
 
                 if ((Control.ModifierKeys & Keys.Shift) != 0)
                 {
-                    shiftAxis = -shiftAxis;
+                    angelRotate = -angelRotate;
                 }
 
-                lock (modelData)
+                lock (lockModelData)
                 {
                     switch (e.KeyCode)
                     {
                         case Keys.X:
-                            CoordinateTransformations.RotateAroundX(modelData.GeometricVertexCoordinates, shiftAxis);
+                            camera.AngelsRotate.X += angelRotate;
                             break;
                         case Keys.Y:
-                            CoordinateTransformations.RotateAroundY(modelData.GeometricVertexCoordinates, shiftAxis);
+                            camera.AngelsRotate.Y += angelRotate;
                             break;
                         case Keys.Z:
-                            CoordinateTransformations.RotateAroundZ(modelData.GeometricVertexCoordinates, shiftAxis);
+                            camera.AngelsRotate.Z += angelRotate;
                             break;
                         case Keys.Oemplus:
-                        case Keys.Add:
-                            camera.IncFovAngle(scale);
+                            camera.Scale.Coordinates *= scale.Coordinates;
                             break;
                         case Keys.OemMinus:
+                            camera.Scale.Coordinates /= scale.Coordinates;
+                            break;
+                        case Keys.Up:
+                            camera.Eye.Z -= 10;
+                            break;
+                        case Keys.Down:
+                            camera.Eye.Z += 10;
+                            break;
+                        case Keys.Add:
+                            camera.IncFovAngle(cahngeAngelFov);
+                            break;
                         case Keys.Subtract:
-                            camera.IncFovAngle(-scale);
+                            camera.IncFovAngle(-cahngeAngelFov);
                             break;
                         case Keys.Q:
-                            CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, 0, translate));
+                            camera.Translate.Z -= translate;
                             break;
                         case Keys.E:
-                            CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, 0, -translate));
+                            camera.Translate.Z += translate;
                             break;
                         case Keys.W:
-                            CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, -translate, 0));
+                            camera.Translate.Y += translate;
                             break;
                         case Keys.S:
-                            CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, translate, 0));
+                            camera.Translate.Y -= translate;
                             break;
                         case Keys.A:
-                            CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(-translate, 0, 0));
+                            camera.Translate.X -= translate;
                             break;
                         case Keys.D:
-                            CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(translate, 0, 0));
+                            camera.Translate.X += translate;
                             break;
                     }
                     CreateModelDataPaint();
@@ -249,6 +199,7 @@ namespace _3DGraphics
         {
             bOpenModelFile.Update();
             tbFPS.Update();
+            bAutoRotateY.Update();
         }
 
         private void MainWindow_Activated(object sender, EventArgs e)
@@ -261,7 +212,7 @@ namespace _3DGraphics
             if (timerRotateY == null)
             {
                 var timerCallback = new TimerCallback(AutoRotateY);
-                timerRotateY = new System.Threading.Timer(timerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+                timerRotateY = new System.Threading.Timer(timerCallback, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
             }
             else
             {

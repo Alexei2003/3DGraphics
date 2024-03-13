@@ -5,12 +5,6 @@ namespace _3DGraphics.Classes
 {
     internal static class CoordinateTransformations
     {
-        public static void TranslateCoordinate(CoordinateVector vector, CoordinateVector translation)
-        {
-            var matrixVect = new Vector3(translation.X, translation.Y, translation.Z);
-
-            vector.Coordinates += matrixVect;
-        }
         public static void TranslateVectors(GeometricVertex[] vectors, CoordinateVector translation)
         {
             var matrixVect = new Vector3(translation.X, translation.Y, translation.Z);
@@ -21,157 +15,44 @@ namespace _3DGraphics.Classes
             });
         }
 
-        public static void RotateAroundX(GeometricVertex[] vectors, double angle)
-        {
-            var cos = (float)Math.Cos(angle);
-            var sin = (float)Math.Sin(angle);
-
-            var matrixVectY = new Vector3(0, cos, sin);
-            var matrixVectZ = new Vector3(0, -sin, cos);
-
-            Parallel.For(0, vectors.Length, i =>
-            {
-                var tmpVectY = vectors[i].Coordinates * matrixVectY;
-                var tmpVectZ = vectors[i].Coordinates * matrixVectZ;
-
-                vectors[i].Y = tmpVectY.Y + tmpVectY.Z;
-                vectors[i].Z = tmpVectZ.Y + tmpVectZ.Z;
-            });
-        }
-
-        public static void RotateAroundY(GeometricVertex[] vectors, double angle)
-        {
-            var cos = (float)Math.Cos(angle);
-            var sin = (float)Math.Sin(angle);
-
-            var matrixVectX = new Vector3(cos, 0, -sin);
-            var matrixVectZ = new Vector3(sin, 0, cos);
-
-            Parallel.For(0, vectors.Length, i =>
-            {
-                var tmpVectX = vectors[i].Coordinates * matrixVectX;
-                var tmpVectZ = vectors[i].Coordinates * matrixVectZ;
-
-                vectors[i].X = tmpVectX.X + tmpVectX.Z;
-                vectors[i].Z = tmpVectZ.X + tmpVectZ.Z;
-            });
-        }
-
-        public static void RotateAroundZ(GeometricVertex[] vectors, double angle)
-        {
-            var cos = (float)Math.Cos(angle);
-            var sin = (float)Math.Sin(angle);
-
-            var matrixVectX = new Vector3(cos, sin, 0);
-            var matrixVectY = new Vector3(-sin, cos, 0);
-
-            Parallel.For(0, vectors.Length, i =>
-            {
-                var tmpVectX = vectors[i].Coordinates * matrixVectX;
-                var tmpVectY = vectors[i].Coordinates * matrixVectY;
-
-                vectors[i].X = tmpVectX.X + tmpVectX.Y;
-                vectors[i].Y = tmpVectY.X + tmpVectY.Y;
-            });
-        }
-
-        public static void GetViewVectors(GeometricVertex[] GeometricVertexCoordinates, Camera camera)
-        {
-            var zAxis = Vector3.Normalize(camera.Eye.Coordinates - camera.Target.Coordinates);
-            var xAxis = Vector3.Normalize(Vector3.Cross(camera.Up.Coordinates, zAxis));
-            var yAxis = camera.Up.Coordinates;
-
-            var matr = new Matrix4x4(
-                     xAxis.X, xAxis.Y, xAxis.Z, -Vector3.Dot(xAxis, camera.Eye.Coordinates),
-                     yAxis.X, yAxis.Y, yAxis.Z, -Vector3.Dot(yAxis, camera.Eye.Coordinates),
-                     zAxis.X, zAxis.Y, zAxis.Z, -Vector3.Dot(zAxis, camera.Eye.Coordinates),
-                     0, 0, 0, 1);
-
-            Parallel.For(0, GeometricVertexCoordinates.Length, i =>
-            {
-                var vect = new Vector4(GeometricVertexCoordinates[i].X, GeometricVertexCoordinates[i].Y, GeometricVertexCoordinates[i].Z, 1);
-                vect = Vector4.Transform(vect, matr);
-                GeometricVertexCoordinates[i].X = vect.X;
-                GeometricVertexCoordinates[i].Y = vect.Y;
-                GeometricVertexCoordinates[i].Z = vect.Z;
-            });
-        }
-
-        public static void GetProjectionVectors(GeometricVertex[] GeometricVertexCoordinates, Camera camera)
-        {
-            var matr = new Matrix4x4(
-                1 / (camera.Aspect * (float)Math.Tan(camera.FovRadian / 2)), 0, 0, 0,
-                0, 1 / (float)Math.Tan(camera.FovRadian / 2), 0, 0,
-                0, 0, camera.ZFar / (camera.ZNear - camera.ZFar), (camera.ZNear * camera.ZFar) / (camera.ZNear - camera.ZFar),
-                0, 0, -1, 0
-            );
-
-            Parallel.For(0, GeometricVertexCoordinates.Length, i =>
-            {
-                var vect = new Vector4(GeometricVertexCoordinates[i].X, GeometricVertexCoordinates[i].Y, GeometricVertexCoordinates[i].Z, 1);
-                vect = Vector4.Transform(vect, matr);
-                GeometricVertexCoordinates[i].X = vect.X;
-                GeometricVertexCoordinates[i].Y = vect.Y;
-                GeometricVertexCoordinates[i].Z = vect.Z;
-            });
-        }
-
-        public static void GetViewWindowVectors(GeometricVertex[] GeometricVertexCoordinates, Camera camera)
-        {
-            int width = camera.Size.Width / 1;
-            int height = camera.Size.Height / 1;
-
-            var matr = new Matrix4x4(width / 2, 0, 0, width / 2,
-                                 0, -(height / 2), 0, height / 2,
-                                 0, 0, 1, 0,
-                                 0, 0, 0, 1);
-
-            Parallel.For(0, GeometricVertexCoordinates.Length, i =>
-            {
-                var vect = new Vector4(GeometricVertexCoordinates[i].X, GeometricVertexCoordinates[i].Y, GeometricVertexCoordinates[i].Z, 1);
-                vect = Vector4.Transform(vect, matr);
-                GeometricVertexCoordinates[i].X = vect.X;
-                GeometricVertexCoordinates[i].Y = vect.Y;
-                GeometricVertexCoordinates[i].Z = vect.Z;
-            });
-        }
-
         public static void GetFinalVectors(GeometricVertex[] GeometricVertexCoordinates, Camera camera)
         {
-            var zAxis = Vector3.Normalize(camera.Eye.Coordinates - camera.Target.Coordinates);
-            var xAxis = Vector3.Normalize(Vector3.Cross(camera.Up.Coordinates, zAxis));
-            var yAxis = camera.Up.Coordinates;
+            // Создаем матрицу масштабирования
+            var scaleMatrix = Matrix4x4.CreateScale(camera.Scale.Coordinates);
 
-            var matr = new Matrix4x4(
-                xAxis.X, xAxis.Y, xAxis.Z, -Vector3.Dot(xAxis, camera.Eye.Coordinates),
-                yAxis.X, yAxis.Y, yAxis.Z, -Vector3.Dot(yAxis, camera.Eye.Coordinates),
-                zAxis.X, zAxis.Y, zAxis.Z, -Vector3.Dot(zAxis, camera.Eye.Coordinates),
-                0, 0, 0, 1);
+            // Создаем матрицу поворота
+            var rotationMatrix = Matrix4x4.CreateFromYawPitchRoll(camera.AngelsRotate.Y, camera.AngelsRotate.X, camera.AngelsRotate.Z);
 
-            matr *= new Matrix4x4(
-                1 / (camera.Aspect * (float)Math.Tan(camera.FovRadian / 2)), 0, 0, 0,
-                0, 1 / (float)Math.Tan(camera.FovRadian / 2), 0, 0,
-                0, 0, camera.ZFar / (camera.ZNear - camera.ZFar), (camera.ZNear * camera.ZFar) / (camera.ZNear - camera.ZFar),
-                0, 0, -1, 0);
+            // Создаем матрицу переноса
+            var translationMatrix = Matrix4x4.CreateTranslation(camera.Translate.Coordinates);
 
+            // Собираем мировую матрицу
+            var worldMatrix = scaleMatrix * rotationMatrix * translationMatrix;
+            //var worldMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
-            int width = camera.Size.Width;
-            int height = camera.Size.Height;
+            // Создание матрицы просмотра (View Matrix)
+            var viewMatrix = Matrix4x4.CreateLookAt(camera.Eye.Coordinates, camera.Target.Coordinates, camera.Up.Coordinates);
 
-            matr *= new Matrix4x4(
-                width / 2, 0, 0, width / 2,
-                0, -(height / 2), 0, height / 2,
-                0, 0, 1, 0,
-                0, 0, 0, 1);
+            // Создание матрицы проекции (Projection Matrix)
+            var projectionMatrix = Matrix4x4.CreatePerspectiveFieldOfView(camera.FovRadian, camera.Aspect, camera.ZNear, camera.ZFar);
 
+            // Создание матрицы вида экрана (Viewport Matrix)
+            var viewportMatrix = Matrix4x4.CreateViewport(0, 0, camera.Size.Width, camera.Size.Height, camera.ZNear, camera.ZFar);
+
+            // Комбинирование матриц
+            var finalMatrix = worldMatrix * viewMatrix * projectionMatrix * viewportMatrix;
+
+            // Преобразование координат вершин
             Parallel.For(0, GeometricVertexCoordinates.Length, i =>
             {
-                var vect = new Vector4(GeometricVertexCoordinates[i].X, GeometricVertexCoordinates[i].Y, GeometricVertexCoordinates[i].Z, 1);
-                vect = Vector4.Transform(vect, matr);
+                var vect = new Vector4(GeometricVertexCoordinates[i].Coordinates, 1);
+                vect = Vector4.Transform(vect, finalMatrix);
+                vect = Vector4.Divide(vect, vect.W);
                 GeometricVertexCoordinates[i].X = vect.X;
                 GeometricVertexCoordinates[i].Y = vect.Y;
                 GeometricVertexCoordinates[i].Z = vect.Z;
             });
         }
+
     }
 }

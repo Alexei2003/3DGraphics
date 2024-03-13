@@ -12,7 +12,6 @@ namespace _3DGraphics.Classes
         public class ModelData
         {
             public GeometricVertex[] GeometricVertexCoordinates { get; set; }
-            public CoordinateVector CoordinateTransformationlateVector { get; set; }
             public TextureVertice[] TextureVertexCoordinates { get; set; }
             public NormalVertice[] NormalVertexCoordinates { get; set; }
             public int[][] GeometricVertexIndexs { get; set; }
@@ -35,8 +34,6 @@ namespace _3DGraphics.Classes
                     GeometricVertexCoordinates[i] = new GeometricVertex(modelData.GeometricVertexCoordinates[i].Coordinates, modelData.GeometricVertexCoordinates[i].W);
                 });
 
-                CoordinateTransformationlateVector = new CoordinateVector(modelData.CoordinateTransformationlateVector.Coordinates);
-
                 Parallel.For(0, modelData.TextureVertexCoordinates.Length, i =>
                 {
                     TextureVertexCoordinates[i] = new TextureVertice(modelData.TextureVertexCoordinates[i].Coordinates);
@@ -58,8 +55,6 @@ namespace _3DGraphics.Classes
                 {
                     GeometricVertexCoordinates[i].Coordinates = modelData.GeometricVertexCoordinates[i].Coordinates;
                 });
-
-                CoordinateTransformationlateVector.Coordinates = modelData.CoordinateTransformationlateVector.Coordinates;
 
                 Parallel.For(0, modelData.TextureVertexCoordinates.Length, i =>
                 {
@@ -169,7 +164,6 @@ namespace _3DGraphics.Classes
             var result = new ModelData
             {
                 GeometricVertexCoordinates = [.. geometricVertexsList],
-                CoordinateTransformationlateVector = new CoordinateVector(0, 0, 0),
                 TextureVertexCoordinates = [.. textureVerticesList],
                 NormalVertexCoordinates = [.. normalVerticesList],
                 GeometricVertexIndexs = [.. geometricVertexIndexsList],
