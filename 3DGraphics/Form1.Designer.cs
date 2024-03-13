@@ -31,6 +31,7 @@
             opfdModelFile = new OpenFileDialog();
             bOpenModelFile = new Button();
             tbFPS = new TextBox();
+            bAutoRotateY = new Button();
             SuspendLayout();
             // 
             // opfdModelFile
@@ -59,11 +60,22 @@
             tbFPS.Text = "000";
             tbFPS.TextAlign = HorizontalAlignment.Center;
             // 
+            // bAutoRotateY
+            // 
+            bAutoRotateY.Location = new Point(12, 74);
+            bAutoRotateY.Name = "bAutoRotateY";
+            bAutoRotateY.Size = new Size(83, 56);
+            bAutoRotateY.TabIndex = 2;
+            bAutoRotateY.Text = "Вращать по Y";
+            bAutoRotateY.UseVisualStyleBackColor = true;
+            bAutoRotateY.Click += bAutoRotateY_Click;
+            // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(584, 559);
+            Controls.Add(bAutoRotateY);
             Controls.Add(tbFPS);
             Controls.Add(bOpenModelFile);
             DoubleBuffered = true;
@@ -83,5 +95,6 @@
         private OpenFileDialog opfdModelFile;
         private Button bOpenModelFile;
         private TextBox tbFPS;
+        private Button bAutoRotateY;
     }
 }

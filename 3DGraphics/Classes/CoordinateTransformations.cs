@@ -97,7 +97,7 @@ namespace _3DGraphics.Classes
             });
         }
 
-        public static void GetProjectionVectors(GeometricVertex[] GeometricVertexCoordinates, Camera camera, float maxCoordinate)
+        public static void GetProjectionVectors(GeometricVertex[] GeometricVertexCoordinates, Camera camera)
         {
             var matr = new Matrix4x4(
                 1 / (camera.Aspect * (float)Math.Tan(camera.FovRadian / 2)), 0, 0, 0,
@@ -110,7 +110,6 @@ namespace _3DGraphics.Classes
             {
                 var vect = new Vector4(GeometricVertexCoordinates[i].X, GeometricVertexCoordinates[i].Y, GeometricVertexCoordinates[i].Z, 1);
                 vect = Vector4.Transform(vect, matr);
-                vect = Vector4.Divide(vect, maxCoordinate);
                 GeometricVertexCoordinates[i].X = vect.X;
                 GeometricVertexCoordinates[i].Y = vect.Y;
                 GeometricVertexCoordinates[i].Z = vect.Z;
@@ -126,6 +125,44 @@ namespace _3DGraphics.Classes
                                  0, -(height / 2), 0, height / 2,
                                  0, 0, 1, 0,
                                  0, 0, 0, 1);
+
+            Parallel.For(0, GeometricVertexCoordinates.Length, i =>
+            {
+                var vect = new Vector4(GeometricVertexCoordinates[i].X, GeometricVertexCoordinates[i].Y, GeometricVertexCoordinates[i].Z, 1);
+                vect = Vector4.Transform(vect, matr);
+                GeometricVertexCoordinates[i].X = vect.X;
+                GeometricVertexCoordinates[i].Y = vect.Y;
+                GeometricVertexCoordinates[i].Z = vect.Z;
+            });
+        }
+
+        public static void GetFinalVectors(GeometricVertex[] GeometricVertexCoordinates, Camera camera)
+        {
+            var zAxis = Vector3.Normalize(camera.Eye.Coordinates - camera.Target.Coordinates);
+            var xAxis = Vector3.Normalize(Vector3.Cross(camera.Up.Coordinates, zAxis));
+            var yAxis = camera.Up.Coordinates;
+
+            var matr = new Matrix4x4(
+                xAxis.X, xAxis.Y, xAxis.Z, -Vector3.Dot(xAxis, camera.Eye.Coordinates),
+                yAxis.X, yAxis.Y, yAxis.Z, -Vector3.Dot(yAxis, camera.Eye.Coordinates),
+                zAxis.X, zAxis.Y, zAxis.Z, -Vector3.Dot(zAxis, camera.Eye.Coordinates),
+                0, 0, 0, 1);
+
+            matr *= new Matrix4x4(
+                1 / (camera.Aspect * (float)Math.Tan(camera.FovRadian / 2)), 0, 0, 0,
+                0, 1 / (float)Math.Tan(camera.FovRadian / 2), 0, 0,
+                0, 0, camera.ZFar / (camera.ZNear - camera.ZFar), (camera.ZNear * camera.ZFar) / (camera.ZNear - camera.ZFar),
+                0, 0, -1, 0);
+
+
+            int width = camera.Size.Width;
+            int height = camera.Size.Height;
+
+            matr *= new Matrix4x4(
+                width / 2, 0, 0, width / 2,
+                0, -(height / 2), 0, height / 2,
+                0, 0, 1, 0,
+                0, 0, 0, 1);
 
             Parallel.For(0, GeometricVertexCoordinates.Length, i =>
             {

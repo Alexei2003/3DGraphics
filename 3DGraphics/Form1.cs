@@ -1,4 +1,6 @@
 using _3DGraphics.Classes;
+using System.Numerics;
+using System.Threading;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 using static _3DGraphics.Classes.ObjFileReader;
 
@@ -8,7 +10,8 @@ namespace _3DGraphics
     {
         private ObjFileReader.ModelData modelData = null;
         private ObjFileReader.ModelData modelDataPaint = null;
-        private readonly System.Threading.Timer timer;
+        private readonly System.Threading.Timer timerFPS;
+        private System.Threading.Timer timerRotateY = null;
         private Camera camera;
 
         public MainWindow()
@@ -24,7 +27,22 @@ namespace _3DGraphics
             camera = new Camera(Width, Height);
 
             var timerCallback = new TimerCallback(UpdateFPS);
-            timer = new System.Threading.Timer(timerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+            timerFPS = new System.Threading.Timer(timerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+
+
+        }
+
+        private void AutoRotateY(object state)
+        {
+            if (modelData != null)
+            {
+                lock (modelData)
+                {
+                    const double shiftAxis = Math.PI / 180;
+                    CoordinateTransformations.RotateAroundY(modelData.GeometricVertexCoordinates, shiftAxis);
+                    CreateModelDataPaint();
+                }
+            }
         }
 
         private void UpdateFPS(object state)
@@ -74,17 +92,31 @@ namespace _3DGraphics
             var modelFilePath = opfdModelFile.FileName;
             modelData = Read(modelFilePath);
 
-            CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new CoordinateVector(0, -GetAverangeY(modelData.GeometricVertexCoordinates), 0));
+            CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new CoordinateVector(-GetAverangeX(modelData.GeometricVertexCoordinates), -GetAverangeY(modelData.GeometricVertexCoordinates), -GetAverangeZ(modelData.GeometricVertexCoordinates)));
             maxCoordinate = GetMaxCoordinate(modelData.GeometricVertexCoordinates);
+            for (var i = 0; i < modelData.GeometricVertexCoordinates.Length; i++)
+            {
+                modelData.GeometricVertexCoordinates[i].Coordinates = Vector3.Divide(modelData.GeometricVertexCoordinates[i].Coordinates, maxCoordinate);
+            }
             GetCenterWindow();
             tmpModelData = new ModelData(modelData);
             modelDataPaint = new ModelData(modelData);
             CreateModelDataPaint();
         }
 
+        private static float GetAverangeX(GeometricVertex[] vectors)
+        {
+            return (vectors.Min(v => v.X) + vectors.Max(v => v.X)) / 2;
+        }
+
         private static float GetAverangeY(GeometricVertex[] vectors)
         {
-            return vectors.Max(v => v.Y) / 2;
+            return (vectors.Min(v => v.Y) + vectors.Max(v => v.Y)) / 2;
+        }
+
+        private static float GetAverangeZ(GeometricVertex[] vectors)
+        {
+            return (vectors.Min(v => v.Z) + vectors.Max(v => v.Z)) / 2;
         }
 
         private static float GetMaxCoordinate(GeometricVertex[] vectors)
@@ -147,11 +179,11 @@ namespace _3DGraphics
         {
             if (modelData != null)
             {
-                tmpModelData.SetCopyValue(modelData);
-                CoordinateTransformations.GetViewVectors(tmpModelData.GeometricVertexCoordinates, camera);
-                CoordinateTransformations.GetProjectionVectors(tmpModelData.GeometricVertexCoordinates, camera, maxCoordinate);
-                CoordinateTransformations.GetViewWindowVectors(tmpModelData.GeometricVertexCoordinates, camera);
-                modelDataPaint.SetCopyValue(tmpModelData);
+                modelDataPaint.SetCopyValue(modelData);
+                /*                CoordinateTransformations.GetViewVectors(tmpModelData.GeometricVertexCoordinates, camera);
+                                CoordinateTransformations.GetProjectionVectors(tmpModelData.GeometricVertexCoordinates, camera);
+                                CoordinateTransformations.GetViewWindowVectors(tmpModelData.GeometricVertexCoordinates, camera);*/
+                CoordinateTransformations.GetFinalVectors(modelDataPaint.GeometricVertexCoordinates, camera);
             }
         }
 
@@ -168,45 +200,48 @@ namespace _3DGraphics
                     shiftAxis = -shiftAxis;
                 }
 
-                switch (e.KeyCode)
+                lock (modelData)
                 {
-                    case Keys.X:
-                        CoordinateTransformations.RotateAroundX(modelData.GeometricVertexCoordinates, shiftAxis);
-                        break;
-                    case Keys.Y:
-                        CoordinateTransformations.RotateAroundY(modelData.GeometricVertexCoordinates, shiftAxis);
-                        break;
-                    case Keys.Z:
-                        CoordinateTransformations.RotateAroundZ(modelData.GeometricVertexCoordinates, shiftAxis);
-                        break;
-                    case Keys.Oemplus:
-                    case Keys.Add:
-                        camera.IncFovAngle(scale);
-                        break;
-                    case Keys.OemMinus:
-                    case Keys.Subtract:
-                        camera.IncFovAngle(-scale);
-                        break;
-                    case Keys.Q:
-                        CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, 0, translate));
-                        break;
-                    case Keys.E:
-                        CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, 0, -translate));
-                        break;
-                    case Keys.W:
-                        CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, -translate, 0));
-                        break;
-                    case Keys.S:
-                        CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, translate, 0));
-                        break;
-                    case Keys.A:
-                        CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(-translate, 0, 0));
-                        break;
-                    case Keys.D:
-                        CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(translate, 0, 0));
-                        break;
+                    switch (e.KeyCode)
+                    {
+                        case Keys.X:
+                            CoordinateTransformations.RotateAroundX(modelData.GeometricVertexCoordinates, shiftAxis);
+                            break;
+                        case Keys.Y:
+                            CoordinateTransformations.RotateAroundY(modelData.GeometricVertexCoordinates, shiftAxis);
+                            break;
+                        case Keys.Z:
+                            CoordinateTransformations.RotateAroundZ(modelData.GeometricVertexCoordinates, shiftAxis);
+                            break;
+                        case Keys.Oemplus:
+                        case Keys.Add:
+                            camera.IncFovAngle(scale);
+                            break;
+                        case Keys.OemMinus:
+                        case Keys.Subtract:
+                            camera.IncFovAngle(-scale);
+                            break;
+                        case Keys.Q:
+                            CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, 0, translate));
+                            break;
+                        case Keys.E:
+                            CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, 0, -translate));
+                            break;
+                        case Keys.W:
+                            CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, -translate, 0));
+                            break;
+                        case Keys.S:
+                            CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(0, translate, 0));
+                            break;
+                        case Keys.A:
+                            CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(-translate, 0, 0));
+                            break;
+                        case Keys.D:
+                            CoordinateTransformations.TranslateCoordinate(modelData.CoordinateTransformationlateVector, new BaseGraphisStructs.CoordinateVector(translate, 0, 0));
+                            break;
+                    }
+                    CreateModelDataPaint();
                 }
-                CreateModelDataPaint();
             }
         }
 
@@ -219,6 +254,20 @@ namespace _3DGraphics
         private void MainWindow_Activated(object sender, EventArgs e)
         {
             ControlUpdate();
+        }
+
+        private void bAutoRotateY_Click(object sender, EventArgs e)
+        {
+            if (timerRotateY == null)
+            {
+                var timerCallback = new TimerCallback(AutoRotateY);
+                timerRotateY = new System.Threading.Timer(timerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+            }
+            else
+            {
+                timerRotateY.Dispose();
+                timerRotateY = null;
+            }
         }
     }
 }
