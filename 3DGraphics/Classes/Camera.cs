@@ -1,15 +1,17 @@
-﻿namespace _3DGraphics.Classes
+﻿using System.Numerics;
+
+namespace _3DGraphics.Classes
 {
     internal class Camera
     {
-        public BaseGraphisStructs.CoordinateVector Scale = new(1, 1, 1);
-        public BaseGraphisStructs.CoordinateVector AngelsRotate = new(0, 0, 0);
-        public BaseGraphisStructs.CoordinateVector Translate = new(0, 0, 0);
+        public Vector3 Scale = new(1, 1, 1);
+        public Vector3 AngelsRotate = new(0, 0, 0);
+        public Vector3 Translate = new(0, 0, 0);
 
-        public BaseGraphisStructs.CoordinateVector Eye { get; set; } = new (0, 0, 100);
-        public BaseGraphisStructs.CoordinateVector Up { get; set; } = new(0, 1, 0);
-        public BaseGraphisStructs.CoordinateVector Target { get; set; } = new(0, 0, 0);
-        public float Aspect { get; set; }
+        public Vector3 Eye = new(0, 0, 100);
+        public Vector3 Up = new(0, 1, 0);
+        public Vector3 Target = new(0, 0, 0);
+        public float Aspect;
 
         public Size Size
         {

@@ -7,31 +7,28 @@ namespace _3DGraphics.Classes
     {
         public static void TranslateVectors(GeometricVertex[] vectors, CoordinateVector translation)
         {
-            var matrixVect = new Vector3(translation.X, translation.Y, translation.Z);
-
             Parallel.For(0, vectors.Length, i =>
             {
-                vectors[i].Coordinates += matrixVect;
+                vectors[i].Coordinates += translation.Coordinates;
             });
         }
 
         public static void GetFinalVectors(GeometricVertex[] GeometricVertexCoordinates, Camera camera)
         {
             // Создаем матрицу масштабирования
-            var scaleMatrix = Matrix4x4.CreateScale(camera.Scale.Coordinates);
+            var scaleMatrix = Matrix4x4.CreateScale(camera.Scale);
 
             // Создаем матрицу поворота
             var rotationMatrix = Matrix4x4.CreateFromYawPitchRoll(camera.AngelsRotate.Y, camera.AngelsRotate.X, camera.AngelsRotate.Z);
 
             // Создаем матрицу переноса
-            var translationMatrix = Matrix4x4.CreateTranslation(camera.Translate.Coordinates);
+            var translationMatrix = Matrix4x4.CreateTranslation(camera.Translate);
 
             // Собираем мировую матрицу
             var worldMatrix = scaleMatrix * rotationMatrix * translationMatrix;
-            //var worldMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
             // Создание матрицы просмотра (View Matrix)
-            var viewMatrix = Matrix4x4.CreateLookAt(camera.Eye.Coordinates, camera.Target.Coordinates, camera.Up.Coordinates);
+            var viewMatrix = Matrix4x4.CreateLookAt(camera.Eye, camera.Target, camera.Up);
 
             // Создание матрицы проекции (Projection Matrix)
             var projectionMatrix = Matrix4x4.CreatePerspectiveFieldOfView(camera.FovRadian, camera.Aspect, camera.ZNear, camera.ZFar);
@@ -45,14 +42,9 @@ namespace _3DGraphics.Classes
             // Преобразование координат вершин
             Parallel.For(0, GeometricVertexCoordinates.Length, i =>
             {
-                var vect = new Vector4(GeometricVertexCoordinates[i].Coordinates, 1);
-                vect = Vector4.Transform(vect, finalMatrix);
-                vect = Vector4.Divide(vect, vect.W);
-                GeometricVertexCoordinates[i].X = vect.X;
-                GeometricVertexCoordinates[i].Y = vect.Y;
-                GeometricVertexCoordinates[i].Z = vect.Z;
+                GeometricVertexCoordinates[i].Coordinates = Vector4.Transform(GeometricVertexCoordinates[i].Coordinates, finalMatrix);
+                GeometricVertexCoordinates[i].Coordinates = Vector4.Divide(GeometricVertexCoordinates[i].Coordinates, GeometricVertexCoordinates[i].W);
             });
         }
-
     }
 }

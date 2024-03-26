@@ -30,7 +30,7 @@ namespace _3DGraphics.Classes
 
                 Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
                 {
-                    GeometricVertexCoordinates[i] = new GeometricVertex(modelData.GeometricVertexCoordinates[i].Coordinates, modelData.GeometricVertexCoordinates[i].W);
+                    GeometricVertexCoordinates[i] = new GeometricVertex(modelData.GeometricVertexCoordinates[i].Coordinates);
                 });
 
                 Parallel.For(0, modelData.TextureVertexCoordinates.Length, i =>

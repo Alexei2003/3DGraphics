@@ -1,6 +1,5 @@
 using _3DGraphics.Classes;
-using System.Windows.Forms;
-using Windows.Gaming.Input.ForceFeedback;
+using System.Numerics;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 using static _3DGraphics.Classes.ObjFileReader;
 
@@ -16,8 +15,8 @@ namespace _3DGraphics
         private const int WIDTH = 600;
         private const int HEIGHT = 600;
 
-        private Dictionary<string, Size> controlsSize = new();
-        private float baseTextSize = 10f;
+        private readonly Dictionary<string, Size> controlsSize = [];
+        private readonly float baseTextSize = 10f;
 
         public MainWindow()
         {
@@ -79,7 +78,7 @@ namespace _3DGraphics
 
         private void MainWindow_Paint(object sender, PaintEventArgs e)
         {
-            AutoRotateY();
+            //AutoRotate();
 
             var bitmap = new Bitmap(Width, Height);
 
@@ -91,7 +90,7 @@ namespace _3DGraphics
 
             if (modelDataPaint != null)
             {
-                LinerDrawing.DrawLines(bitmap, modelDataPaint.GeometricVertexCoordinates, modelDataPaint.GeometricVertexIndexs);
+                DrawingModel.Draw(bitmap, modelDataPaint.GeometricVertexCoordinates, modelDataPaint.GeometricVertexIndexs);
 
                 lock (lockFrameCount)
                 {
@@ -130,8 +129,6 @@ namespace _3DGraphics
             ControlUpdate();
         }
 
-        private readonly object lockModelData = new();
-
         private void CreateModelDataPaint()
         {
             if (modelData != null)
@@ -147,7 +144,7 @@ namespace _3DGraphics
             {
                 var angelRotate = (float)Math.PI / 100;
                 var cahngeAngelFov = 1f;
-                var scale = new CoordinateVector(1.1f, 1.1f, 1.1f);
+                var scale = new Vector3(1.1f, 1.1f, 1.1f);
                 var translate = 1;
                 var near = 25;
 
@@ -169,10 +166,10 @@ namespace _3DGraphics
                         camera.AngelsRotate.Z += angelRotate;
                         break;
                     case Keys.Oemplus:
-                        camera.Scale.Coordinates *= scale.Coordinates;
+                        camera.Scale *= scale;
                         break;
                     case Keys.OemMinus:
-                        camera.Scale.Coordinates /= scale.Coordinates;
+                        camera.Scale /= scale;
                         break;
                     case Keys.Up:
                         camera.IncEyeZ(-near);
@@ -240,8 +237,8 @@ namespace _3DGraphics
             pInfo.Size = new Size(Convert.ToInt32(controlsSize["pInfo"].Width * size), Convert.ToInt32(controlsSize["pInfo"].Height * size));
 
             bShowInfo.Location = new Point(Width - bShowInfo.Width - 20, bShowInfo.Location.Y);
-            pInfo.Location = new Point(Width - pInfo.Width - 20, Convert.ToInt32(bShowInfo.Location.Y + bShowInfo.Size.Height + 10* size));
-            
+            pInfo.Location = new Point(Width - pInfo.Width - 20, Convert.ToInt32(bShowInfo.Location.Y + bShowInfo.Size.Height + 10 * size));
+
             bOpenModelFile.Font = tmpFont;
             bShowInfo.Font = tmpFont;
             rtbInfo.Font = tmpFont;
@@ -257,12 +254,16 @@ namespace _3DGraphics
             pInfo.Visible = !pInfo.Visible;
         }
 
-        private void AutoRotateY()
+        Random rand = new();
+        private void AutoRotate()
         {
             if (modelData != null)
             {
-                const float shiftAxis = (float)Math.PI / 100;
-                camera.AngelsRotate.Y += shiftAxis;
+                const int COUNT_RAND = 10;
+                const float SHIFT_AXIS = (float)Math.PI / 1000;
+                camera.AngelsRotate.X += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
+                camera.AngelsRotate.Y += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
+                camera.AngelsRotate.Z += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
                 CreateModelDataPaint();
             }
         }
