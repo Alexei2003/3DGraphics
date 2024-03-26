@@ -142,28 +142,43 @@ namespace _3DGraphics
         {
             if (modelData != null)
             {
-                var angelRotate = (float)Math.PI / 100;
-                var cahngeAngelFov = 1f;
+                const float angelRotate = (float)Math.PI / 100;
+                const float cahngeAngelFov = 1f;
                 var scale = new Vector3(1.1f, 1.1f, 1.1f);
-                var translate = 1;
-                var near = 25;
-
-
-                if ((Control.ModifierKeys & Keys.Shift) != 0)
-                {
-                    angelRotate = -angelRotate;
-                }
+                const int translate = 1;
+                const int near = 25;
 
                 switch (e.KeyCode)
                 {
                     case Keys.X:
-                        camera.AngelsRotate.X += angelRotate;
+                        if ((Control.ModifierKeys & Keys.Shift) != 0)
+                        {
+                            camera.AngelsRotate.X -= angelRotate;
+                        }
+                        else
+                        {
+                            camera.AngelsRotate.X += angelRotate;
+                        }
                         break;
                     case Keys.Y:
-                        camera.AngelsRotate.Y += angelRotate;
+                        if ((Control.ModifierKeys & Keys.Shift) != 0)
+                        {
+                            camera.AngelsRotate.Y -= angelRotate;
+                        }
+                        else
+                        {
+                            camera.AngelsRotate.Y += angelRotate;
+                        }
                         break;
                     case Keys.Z:
-                        camera.AngelsRotate.Z += angelRotate;
+                        if ((Control.ModifierKeys & Keys.Shift) != 0)
+                        {
+                            camera.AngelsRotate.Z -= angelRotate;
+                        }
+                        else
+                        {
+                            camera.AngelsRotate.Z += angelRotate;
+                        }
                         break;
                     case Keys.Oemplus:
                         camera.Scale *= scale;
@@ -201,6 +216,8 @@ namespace _3DGraphics
                     case Keys.D:
                         camera.Translate.X += translate;
                         break;
+                    default:
+                        return;
                 }
                 CreateModelDataPaint();
             }
@@ -254,7 +271,7 @@ namespace _3DGraphics
             pInfo.Visible = !pInfo.Visible;
         }
 
-        Random rand = new();
+        private readonly Random rand = new();
         private void AutoRotate()
         {
             if (modelData != null)
