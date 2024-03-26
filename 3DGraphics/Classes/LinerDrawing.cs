@@ -1,4 +1,5 @@
 ﻿using System.Drawing.Imaging;
+using WinRT;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 
 namespace _3DGraphics.Classes
@@ -7,11 +8,11 @@ namespace _3DGraphics.Classes
     {
         public static unsafe void DrawLines(Bitmap bitmap, GeometricVertex[] GeometricVertexСoordinates, int[][] GeometricVertexIndexs)
         {
-            var widthZoneIndex = bitmap.Width - 1;
-            var heightZoneIndex = bitmap.Height - 1;
+            var widthZone = bitmap.Width - 1;
+            var heightZone = bitmap.Height - 1;
 
-            var widthMaxReder = bitmap.Width*2;
-            var heightMaxReder = bitmap.Height*2;
+            var widthMaxReder = bitmap.Width * 2;
+            var heightMaxReder = bitmap.Height * 2;
 
             var widthMinReder = -bitmap.Width;
             var heightMinReder = -bitmap.Height;
@@ -19,12 +20,11 @@ namespace _3DGraphics.Classes
 
             var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
             var ptr = bitmapData.Scan0;
-            var bytes = Math.Abs(bitmapData.Stride) * bitmap.Height;
 
             var rgbBitmap = (int*)ptr;
 
-            // Цвет в байтах
-            var colorInt = Color.Black.ToArgb();
+            // Цвет в int
+            var colorInt = Color.White.ToArgb();
 
             Parallel.ForEach(GeometricVertexIndexs, vertexIndex =>
             {
@@ -40,13 +40,16 @@ namespace _3DGraphics.Classes
                     points[i] = new Point(Convert.ToInt32(coordinate.X), Convert.ToInt32(coordinate.Y));
                 }
 
-                if (points != null)
+                switch (SwitchLab.DrawLine.WireRGB)
                 {
-                    for (var i = 0; i < vertexIndex.Length - 1;)
-                    {
-                        DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[i], points[++i], widthZoneIndex, heightZoneIndex);
-                    }
-                    DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[vertexIndex.Length - 1], points[0], widthZoneIndex, heightZoneIndex);
+                    case SwitchLab.DrawLine.Wire:
+                        DrawLineWire(points, vertexIndex, rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
+                        break;
+                    case SwitchLab.DrawLine.WireRGB:
+                        DrawLineWireRGB(points, vertexIndex, rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
+                        break;
+                    case SwitchLab.DrawLine.Triangles:
+                        break;
                 }
             });
             bitmap.UnlockBits(bitmapData);
@@ -82,6 +85,49 @@ namespace _3DGraphics.Classes
                 X += XIncrement;
                 Y += YIncrement;
             }
+        }
+
+        public static unsafe void DrawLineWire(Point[] points, int[] vertexIndex, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
+        {
+            if (points != null)
+            {
+                for (var i = 0; i < vertexIndex.Length - 1;)
+                {
+                    DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[i], points[++i], widthZone, heightZone);
+                }
+                DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[vertexIndex.Length - 1], points[0], widthZone, heightZone);
+            }
+        }
+
+        public static unsafe void DrawLineWireRGB(Point[] points, int[] vertexIndex, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
+        {
+            if (points != null)
+            {
+                int r = 0;
+                int g = 0;
+                int b = 0;
+                
+                var rand = new Random();
+
+                for (var i = 0; i < vertexIndex.Length - 1;i++)
+                {
+                    r += points[i].X + rand.Next(100);
+                    g += points[i].Y + rand.Next(100);
+                    b += points[i].X + points[i].Y + rand.Next(100);
+                }
+
+                colorInt = Color.FromArgb(255, Math.Abs(r % 255), Math.Abs(g % 255), Math.Abs(b % 255)).ToArgb();
+                for (var i = 0; i < vertexIndex.Length-1;)
+                {
+                    DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[i], points[++i], widthZone, heightZone);
+                }
+                DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[vertexIndex.Length - 1], points[0], widthZone, heightZone);
+            }
+        }
+
+        public static unsafe void DrawLineTriangles(Point[] points, int[] vertexIndex, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
+        {
+
         }
     }
 }

@@ -30,7 +30,6 @@
         {
             opfdModelFile = new OpenFileDialog();
             bOpenModelFile = new Button();
-            bAutoRotateY = new Button();
             pInfo = new Panel();
             rtbInfo = new RichTextBox();
             bShowInfo = new Button();
@@ -51,16 +50,6 @@
             bOpenModelFile.Text = "Открыть модель";
             bOpenModelFile.UseVisualStyleBackColor = true;
             bOpenModelFile.Click += bOpenModelFile_Click;
-            // 
-            // bAutoRotateY
-            // 
-            bAutoRotateY.Location = new Point(12, 74);
-            bAutoRotateY.Name = "bAutoRotateY";
-            bAutoRotateY.Size = new Size(83, 56);
-            bAutoRotateY.TabIndex = 2;
-            bAutoRotateY.Text = "Вращать по Y";
-            bAutoRotateY.UseVisualStyleBackColor = true;
-            bAutoRotateY.Click += bAutoRotateY_Click;
             // 
             // pInfo
             // 
@@ -96,7 +85,6 @@
             ClientSize = new Size(584, 559);
             Controls.Add(bShowInfo);
             Controls.Add(pInfo);
-            Controls.Add(bAutoRotateY);
             Controls.Add(bOpenModelFile);
             DoubleBuffered = true;
             KeyPreview = true;
@@ -114,7 +102,6 @@
 
         private OpenFileDialog opfdModelFile;
         private Button bOpenModelFile;
-        private Button bAutoRotateY;
         private Panel pInfo;
         private RichTextBox rtbInfo;
         private Button bShowInfo;
