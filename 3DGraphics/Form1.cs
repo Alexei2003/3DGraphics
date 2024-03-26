@@ -1,5 +1,6 @@
 using _3DGraphics.Classes;
 using System.Windows.Forms;
+using Windows.Gaming.Input.ForceFeedback;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 using static _3DGraphics.Classes.ObjFileReader;
 
@@ -220,23 +221,26 @@ namespace _3DGraphics
             float changeResolutionWidth = (float)Width / WIDTH;
             float changeResolutionHeight = (float)Height / HEIGHT;
 
-            bOpenModelFile.Size = new Size(Convert.ToInt32(controlsSize["bOpenModelFile"].Width * changeResolutionWidth), Convert.ToInt32(controlsSize["bOpenModelFile"].Height * changeResolutionHeight));
-            bShowInfo.Size = new Size(Convert.ToInt32(controlsSize["bShowInfo"].Width * changeResolutionWidth), Convert.ToInt32(controlsSize["bShowInfo"].Height * changeResolutionHeight));
-            rtbInfo.Size = new Size(Convert.ToInt32(controlsSize["rtbInfo"].Width * changeResolutionWidth), Convert.ToInt32(controlsSize["rtbInfo"].Height * changeResolutionHeight));
-            pInfo.Size = new Size(Convert.ToInt32(controlsSize["pInfo"].Width * changeResolutionWidth), Convert.ToInt32(controlsSize["pInfo"].Height * changeResolutionHeight));
-
-            bShowInfo.Location = new Point(Width - bShowInfo.Width - 20, bShowInfo.Location.Y);
-            pInfo.Location = new Point(Width - pInfo.Width - 20, Convert.ToInt32(bShowInfo.Location.Y + bShowInfo.Size.Height + 10*changeResolutionHeight));
-
+            float size;
             Font tmpFont;
             if (changeResolutionWidth < changeResolutionHeight)
             {
                 tmpFont = new Font(bOpenModelFile.Font.FontFamily, baseTextSize * changeResolutionWidth);
+                size = changeResolutionWidth;
             }
             else
             {
                 tmpFont = new Font(bOpenModelFile.Font.FontFamily, baseTextSize * changeResolutionHeight);
+                size = changeResolutionHeight;
             }
+
+            bOpenModelFile.Size = new Size(Convert.ToInt32(controlsSize["bOpenModelFile"].Width * size), Convert.ToInt32(controlsSize["bOpenModelFile"].Height * size));
+            bShowInfo.Size = new Size(Convert.ToInt32(controlsSize["bShowInfo"].Width * size), Convert.ToInt32(controlsSize["bShowInfo"].Height * size));
+            rtbInfo.Size = new Size(Convert.ToInt32(controlsSize["rtbInfo"].Width * size), Convert.ToInt32(controlsSize["rtbInfo"].Height * size));
+            pInfo.Size = new Size(Convert.ToInt32(controlsSize["pInfo"].Width * size), Convert.ToInt32(controlsSize["pInfo"].Height * size));
+
+            bShowInfo.Location = new Point(Width - bShowInfo.Width - 20, bShowInfo.Location.Y);
+            pInfo.Location = new Point(Width - pInfo.Width - 20, Convert.ToInt32(bShowInfo.Location.Y + bShowInfo.Size.Height + 10* size));
             
             bOpenModelFile.Font = tmpFont;
             bShowInfo.Font = tmpFont;
