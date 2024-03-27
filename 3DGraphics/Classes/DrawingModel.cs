@@ -28,7 +28,7 @@ namespace _3DGraphics.Classes
             var colorInt = Color.White.ToArgb();
 
             DrawObject drawObject;
-            switch (SwitchLab.Draw.Triangles)
+            switch (SwitchLab.Draw.TrianglesRGB)
             {
                 case SwitchLab.Draw.Line:
                     drawObject = DrawLines;
@@ -39,6 +39,9 @@ namespace _3DGraphics.Classes
                 case SwitchLab.Draw.Triangles:
                     drawObject = DrawTriangles;
                     break;
+                case SwitchLab.Draw.TrianglesRGB:
+                    drawObject = DrawTrianglesRGB;
+                    break;
             }
 
             ///
@@ -47,14 +50,14 @@ namespace _3DGraphics.Classes
 
             var points = new PointF[]
             {
-                new PointF(SHIFT,SHIFT),
                 new PointF(SHIFT*2,SHIFT),
-                new PointF(SHIFT*2,SHIFT * 2),
-                new PointF(SHIFT*3,SHIFT*2),
+                new PointF(SHIFT,SHIFT*2),
+                new PointF(SHIFT,SHIFT*3),
+                new PointF(SHIFT*2,SHIFT*4),
             };
 
 
-            drawObject(points, new int[4], rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
+            drawObject(points, new int[points.Length], rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
 
             ///
 
@@ -74,6 +77,33 @@ namespace _3DGraphics.Classes
 
                             drawObject(points, vertexIndex, rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
                         });*/
+
+
+            /////////
+
+            /*            drawObject = DrawLines;
+
+                        // Цвет в int
+                        colorInt = Color.Red.ToArgb();
+
+                        Parallel.ForEach(geometricVertexIndexs, vertexIndex =>
+                        {
+                            var points = new PointF[vertexIndex.Length];
+                            for (var i = 0; i < vertexIndex.Length; i++)
+                            {
+                                ref var coordinate = ref geometricVertexСoordinates[vertexIndex[i]];
+                                if (coordinate.X > widthMaxReder || widthMinReder > coordinate.X || coordinate.Y > heightMaxReder || heightMinReder > coordinate.Y)
+                                {
+                                    points = null;
+                                    break;
+                                }
+                                points[i] = new PointF(coordinate.X, coordinate.Y);
+                            }
+
+                            drawObject(points, vertexIndex, rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
+                        });*/
+
+            ////////////
 
             bitmap.UnlockBits(bitmapData);
         }
@@ -110,6 +140,23 @@ namespace _3DGraphics.Classes
             }
         }
 
+        private static unsafe int GetRGBColour(PointF[] points, int[] vertexIndex)
+        {
+            int r = 0;
+            int g = 0;
+            int b = 0;
+
+            var rand = new Random();
+
+            for (var i = 0; i < vertexIndex.Length - 1; i++)
+            {
+                r += Convert.ToInt32(points[i].X + rand.Next(100));
+                g += Convert.ToInt32(points[i].Y + rand.Next(100));
+                b += Convert.ToInt32(points[i].X + points[i].Y + rand.Next(100));
+            }
+            return Color.FromArgb(255, Math.Abs(r % 255), Math.Abs(g % 255), Math.Abs(b % 255)).ToArgb();
+        }
+
         public static unsafe void DrawLines(PointF[] points, int[] vertexIndex, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
             if (points != null)
@@ -126,33 +173,37 @@ namespace _3DGraphics.Classes
         {
             if (points != null)
             {
-                int r = 0;
-                int g = 0;
-                int b = 0;
-
-                var rand = new Random();
-
-                for (var i = 0; i < vertexIndex.Length - 1; i++)
-                {
-                    r += Convert.ToInt32(points[i].X + rand.Next(100));
-                    g += Convert.ToInt32(points[i].Y + rand.Next(100));
-                    b += Convert.ToInt32(points[i].X + points[i].Y + rand.Next(100));
-                }
-
-                colorInt = Color.FromArgb(255, Math.Abs(r % 255), Math.Abs(g % 255), Math.Abs(b % 255)).ToArgb();
-                for (var i = 0; i < vertexIndex.Length - 1;)
-                {
-                    DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[i], points[++i], widthZone, heightZone);
-                }
-                DrawLine(rgbBitmap, bitmapData.Stride, colorInt, points[vertexIndex.Length - 1], points[0], widthZone, heightZone);
+                colorInt = GetRGBColour(points, vertexIndex);
+                DrawLines(points, vertexIndex, rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
             }
         }
 
+        // 1-short, 2-long
         public static unsafe void DrawTriangles(PointF[] points, int[] vertexIndex, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
             if (points != null)
             {
-                //Array.Sort(points, (p1, p2) => p1.X.CompareTo(p2.X));
+                bool left = true;
+
+                var maxX = points.Max(p => p.X);
+                var maxY = points.Max(p => p.Y);
+                for (var i = 0; i < vertexIndex.Length; i++)
+                {
+                    if (points[i].X == maxX)
+                    {
+                        left = false;
+                    }
+                }
+
+                if (left)
+                {
+                    Array.Sort(points, (p1, p2) => p1.X.CompareTo(p2.X));
+                }
+                else
+                {
+                    Array.Sort(points, (p1, p2) => p2.X.CompareTo(p1.X));
+                }
+
                 Array.Sort(points, (p1, p2) => p2.Y.CompareTo(p1.Y));
 
                 int YIncrement = 1;
@@ -167,9 +218,20 @@ namespace _3DGraphics.Classes
                     var dx1 = points[indP + 1].X - points[indP].X;
                     var dx2 = points[indP + 2].X - points[indP].X;
 
-                    var steps = points[indP].Y - points[indP + 2].Y;
-                    var XIncrement1 = dx1 / (float)steps;
-                    var XIncrement2 = dx2 / (float)steps;
+                    int steps1 = Convert.ToInt32(points[indP].Y - points[indP + 1].Y);
+                    int steps2 = Convert.ToInt32(points[indP].Y - points[indP + 2].Y);
+                    var XIncrement1 = dx1 / (float)steps1;
+                    var XIncrement2 = dx2 / (float)steps2;
+
+                    int steps;
+                    if (steps1 > steps2)
+                    {
+                        steps = steps1;
+                    }
+                    else
+                    {
+                        steps = steps2;
+                    }
 
                     for (var i = 0; i <= steps; i++)
                     {
@@ -177,8 +239,9 @@ namespace _3DGraphics.Classes
                         {
                             x1 = points[indP + 1].X;
                             dx1 = points[indP + 2].X - points[indP + 1].X;
-                            XIncrement1 = dx1 / (float)steps;
-                            minY = points[indP + 2].Y;
+                            steps1 = Convert.ToInt32(points[indP + 1].Y - points[indP + 2].Y);
+                            XIncrement1 = dx1 / (float)steps1;
+                            minY = points[indP + 2].Y - 1;
                         }
 
                         DrawLine(rgbBitmap, bitmapData.Stride, colorInt, new PointF(x1, y), new PointF(x2, y), widthZone, heightZone);
@@ -189,6 +252,12 @@ namespace _3DGraphics.Classes
                     }
                 }
             }
+        }
+
+        public static unsafe void DrawTrianglesRGB(PointF[] points, int[] vertexIndex, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
+        {
+            colorInt = GetRGBColour(points, vertexIndex);
+            DrawTriangles(points, vertexIndex, rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
         }
     }
 }

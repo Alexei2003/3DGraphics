@@ -2,6 +2,6 @@
 {
     internal static class SwitchLab
     {
-        public enum Draw { Line, LineRGB, Triangles }
+        public enum Draw { Line, LineRGB, Triangles, TrianglesRGB }
     }
 }
