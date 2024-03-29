@@ -28,7 +28,7 @@ namespace _3DGraphics.Classes
             var colorInt = Color.White.ToArgb();
 
             DrawObject drawObject;
-            switch (SwitchLab.Draw.TrianglesRGB)
+            switch (SwitchLab.Draw.Triangles)
             {
                 case SwitchLab.Draw.Line:
                     drawObject = DrawLines;
@@ -46,37 +46,39 @@ namespace _3DGraphics.Classes
 
             ///
 
-            const int SHIFT = 100;
+            /*            const int SHIFT = 100;
 
-            var points = new PointF[]
-            {
-                new PointF(SHIFT*2,SHIFT),
-                new PointF(SHIFT,SHIFT*2),
-                new PointF(SHIFT,SHIFT*3),
-                new PointF(SHIFT*2,SHIFT*4),
-            };
+                        var points = new PointF[]
+                        {
+                                        new PointF(SHIFT*4,SHIFT*3),
+                                        new PointF(SHIFT,SHIFT*2),
+                                        new PointF(SHIFT*2,SHIFT),
+                                        new PointF(SHIFT*3,SHIFT),
+                        };
 
 
-            drawObject(points, new int[points.Length], rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
+                        drawObject(points, new int[points.Length], rgbBitmap, bitmapData, colorInt, widthZone, heightZone);*/
 
             ///
 
-            /*            Parallel.ForEach(geometricVertexIndexs, vertexIndex =>
-                        {
-                            var points = new PointF[vertexIndex.Length];
-                            for (var i = 0; i < vertexIndex.Length; i++)
-                            {
-                                ref var coordinate = ref geometricVertexСoordinates[vertexIndex[i]];
-                                if (coordinate.X > widthMaxReder || widthMinReder > coordinate.X || coordinate.Y > heightMaxReder || heightMinReder > coordinate.Y)
-                                {
-                                    points = null;
-                                    break;
-                                }
-                                points[i] = new PointF(coordinate.X, coordinate.Y);
-                            }
+            //Parallel.ForEach(geometricVertexIndexs, vertexIndex =>
+            foreach ( var vertexIndex in geometricVertexIndexs)
+            {
+                var points = new PointF[vertexIndex.Length];
+                for (var i = 0; i < vertexIndex.Length; i++)
+                {
+                    ref var coordinate = ref geometricVertexСoordinates[vertexIndex[i]];
+                    if (coordinate.X > widthMaxReder || widthMinReder > coordinate.X || coordinate.Y > heightMaxReder || heightMinReder > coordinate.Y)
+                    {
+                        points = null;
+                        break;
+                    }
+                    points[i] = new PointF(coordinate.X, coordinate.Y);
+                }
 
-                            drawObject(points, vertexIndex, rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
-                        });*/
+                drawObject(points, vertexIndex, rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
+                //});
+            }
 
 
             /////////
@@ -183,81 +185,107 @@ namespace _3DGraphics.Classes
         {
             if (points != null)
             {
-                bool left = true;
+                float averageX = 0;
+                float averageY = 0;
 
-                var maxX = points.Max(p => p.X);
-                var maxY = points.Max(p => p.Y);
-                for (var i = 0; i < vertexIndex.Length; i++)
+                foreach (var point in points)
                 {
-                    if (points[i].X == maxX)
-                    {
-                        left = false;
-                    }
+                    averageX += point.X;
+                    averageY += point.Y;
                 }
 
-                if (left)
+                averageX /= points.Length;
+                averageY /= points.Length;
+
+                var averagePoint = new PointF(averageX, averageY);
+
+                for (var j = 0; j < points.Length - 1; j++)
                 {
-                    Array.Sort(points, (p1, p2) => p1.X.CompareTo(p2.X));
+                    DrawTrianglesFinal(points, vertexIndex, rgbBitmap, bitmapData, colorInt, widthZone, heightZone, averagePoint,j,j+1);
+                }
+                DrawTrianglesFinal(points, vertexIndex, rgbBitmap, bitmapData, colorInt, widthZone, heightZone, averagePoint, points.Length-1, 0);
+            }
+        }
+
+        private static unsafe void DrawTrianglesFinal(PointF[] points, int[] vertexIndex, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone, PointF averagePoint, int startInd, int finInd)
+        {
+            PointF p1;
+            PointF p2;
+            PointF p3;
+
+            if (averagePoint.X > points[startInd].X && averagePoint.X > points[finInd].X)
+            {
+                p1 = averagePoint;
+                p2 = points[startInd];
+                p3 = points[finInd];
+            }
+            else
+            {
+                if (points[startInd].X > averagePoint.X && points[startInd].X > points[finInd].X)
+                {
+                    p1 = points[startInd];
+                    p2 = averagePoint;
+                    p3 = points[finInd];
                 }
                 else
                 {
-                    Array.Sort(points, (p1, p2) => p2.X.CompareTo(p1.X));
+                    p1 = points[finInd];
+                    p2 = points[startInd];
+                    p3 = averagePoint;
                 }
+            }
 
-                Array.Sort(points, (p1, p2) => p2.Y.CompareTo(p1.Y));
+            const int YIncrement = 1;
 
-                int YIncrement = 1;
+            float y = p1.Y;
+            float x1 = p1.X;
+            float x2 = p1.X;
+            float minY = p2.Y;
 
-                for (var indP = 0; indP < vertexIndex.Length - 2; indP++)
+            var dx1 = p2.X - p1.X;
+            var dx2 = p3.X - p1.X;
+
+            int steps1 = Convert.ToInt32(p1.Y - p2.Y);
+            int steps2 = Convert.ToInt32(p1.Y - p3.Y);
+            var XIncrement1 = dx1 / (float)steps1;
+            var XIncrement2 = dx2 / (float)steps2;
+
+            int steps;
+            if (steps1 > steps2)
+            {
+                steps = steps1;
+            }
+            else
+            {
+                steps = steps2;
+            }
+
+            for (var i = 0; i <= steps; i++)
+            {
+                if (y <= minY)
                 {
-                    float y = points[indP].Y;
-                    float x1 = points[indP].X;
-                    float x2 = points[indP].X;
-                    float minY = points[indP + 1].Y;
-
-                    var dx1 = points[indP + 1].X - points[indP].X;
-                    var dx2 = points[indP + 2].X - points[indP].X;
-
-                    int steps1 = Convert.ToInt32(points[indP].Y - points[indP + 1].Y);
-                    int steps2 = Convert.ToInt32(points[indP].Y - points[indP + 2].Y);
-                    var XIncrement1 = dx1 / (float)steps1;
-                    var XIncrement2 = dx2 / (float)steps2;
-
-                    int steps;
-                    if (steps1 > steps2)
-                    {
-                        steps = steps1;
-                    }
-                    else
-                    {
-                        steps = steps2;
-                    }
-
-                    for (var i = 0; i <= steps; i++)
-                    {
-                        if (y <= minY)
-                        {
-                            x1 = points[indP + 1].X;
-                            dx1 = points[indP + 2].X - points[indP + 1].X;
-                            steps1 = Convert.ToInt32(points[indP + 1].Y - points[indP + 2].Y);
-                            XIncrement1 = dx1 / (float)steps1;
-                            minY = points[indP + 2].Y - 1;
-                        }
-
-                        DrawLine(rgbBitmap, bitmapData.Stride, colorInt, new PointF(x1, y), new PointF(x2, y), widthZone, heightZone);
-
-                        x1 += XIncrement1;
-                        x2 += XIncrement2;
-                        y -= YIncrement;
-                    }
+                    x1 = p2.X;
+                    dx1 = p3.X - p2.X;
+                    steps1 = Convert.ToInt32(p2.Y - p3.Y);
+                    XIncrement1 = dx1 / (float)steps1;
+                    minY = p3.Y - 1;
                 }
+
+                DrawLine(rgbBitmap, bitmapData.Stride, colorInt, new PointF(x1, y), new PointF(x2, y), widthZone, heightZone);
+
+                x1 += XIncrement1;
+                x2 += XIncrement2;
+                y -= YIncrement;
             }
         }
 
         public static unsafe void DrawTrianglesRGB(PointF[] points, int[] vertexIndex, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
-            colorInt = GetRGBColour(points, vertexIndex);
-            DrawTriangles(points, vertexIndex, rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
+            if (points != null)
+            {
+                colorInt = GetRGBColour(points, vertexIndex);
+                DrawTriangles(points, vertexIndex, rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
+            }
         }
     }
 }
