@@ -1,4 +1,5 @@
 using _3DGraphics.Classes;
+using _3DGraphics.Drawing;
 using System.Numerics;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 using static _3DGraphics.Classes.ObjFileReader;
