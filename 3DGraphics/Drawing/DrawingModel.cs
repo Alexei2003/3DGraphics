@@ -55,6 +55,18 @@ namespace _3DGraphics.Drawing
 
             }
 
+            const int SHIFT = 100;
+
+            //geometricVertexСoordinates = [new GeometricVertex(0+ SHIFT, 0 + SHIFT, 0,0), new GeometricVertex(200 + SHIFT, 0 + SHIFT, 0, 0), new GeometricVertex(300 + SHIFT, 100 + SHIFT, 0, 0), new GeometricVertex(100 + SHIFT, 100 + SHIFT, 0, 0),];
+            //geometricVertexСoordinates = [new GeometricVertex(100 + SHIFT, 0 + SHIFT, 0, 0), new GeometricVertex(300 + SHIFT, 0 + SHIFT, 0, 0), new GeometricVertex(0 + SHIFT, 100 + SHIFT, 0, 0), new GeometricVertex(200 + SHIFT, 100 + SHIFT, 0, 0),];
+
+            //geometricVertexСoordinates = [new GeometricVertex(100 + SHIFT, 0 + SHIFT, 0, 0), new GeometricVertex(100 + SHIFT, 300 + SHIFT, 0, 0), new GeometricVertex(0 + SHIFT, 200 + SHIFT, 0, 0), new GeometricVertex(0 + SHIFT, 100 + SHIFT, 0, 0),];
+            
+            //geometricVertexСoordinates = [new GeometricVertex(100 + SHIFT, 0 + SHIFT, 0, 0), new GeometricVertex(100 + SHIFT, 200 + SHIFT, 0, 0), new GeometricVertex(0 + SHIFT, 300 + SHIFT, 0, 0), new GeometricVertex(0 + SHIFT, 100 + SHIFT, 0, 0),];
+
+
+            //geometricVertexIndexs = [[0,1,2,3]];
+
             for (var j = 0; j < drawObjectFuncs.Count; j++)
             {
                 //Parallel.ForEach(geometricVertexIndexs, vertexIndex =>
