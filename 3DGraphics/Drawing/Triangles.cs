@@ -1,20 +1,22 @@
 ﻿using System.Drawing.Imaging;
+using System.IO.Packaging;
+using static _3DGraphics.Drawing.DrawingModel;
 
 namespace _3DGraphics.Drawing
 {
     internal static class Triangles
     {
-        public static unsafe void Draw(PointF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
+        public static unsafe void Draw(Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
             if (points != null)
             {
-                var pointsOriginal = new PointF[points.Length];
+                var pointsOriginal = new Point3DF[points.Length];
                 points.CopyTo(pointsOriginal, 0);
 
                 Array.Sort(points, (p1, p2) => p1.X.CompareTo(p2.X));
                 Array.Sort(points, (p1, p2) => p1.Y.CompareTo(p2.Y));
 
-                var listPoints = new List<PointF>();
+                var listPoints = new List<Point3DF>();
 
                 for (int i = 0; i < points.Length;)
                 {
@@ -57,7 +59,11 @@ namespace _3DGraphics.Drawing
                             }
 
 
-                            listPoints.Add(new PointF((pointsOriginal[down].X + (pointsOriginal[up].X - pointsOriginal[down].X) / (pointsOriginal[up].Y - pointsOriginal[down].Y) * (points[i].Y - pointsOriginal[down].Y)), points[i].Y));
+                            listPoints.Add(new Point3DF((
+                                pointsOriginal[down].X + (pointsOriginal[up].X - pointsOriginal[down].X) / (pointsOriginal[up].Y - pointsOriginal[down].Y) * (points[i].Y - pointsOriginal[down].Y)), 
+                                points[i].Y ,
+                                pointsOriginal[down].Z + ((pointsOriginal[up].Z  !=  pointsOriginal[down].Z) ? ((pointsOriginal[up].Z - pointsOriginal[down].Z) / (pointsOriginal[up].Z - pointsOriginal[down].Z) * (points[i].Z - pointsOriginal[down].Z)) : 0))
+                                );
 
                         }
                         i++;
@@ -76,7 +82,7 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        public static unsafe void DrawRGB(PointF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
+        public static unsafe void DrawRGB(Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
             if (points != null)
             {
@@ -85,7 +91,7 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        private static unsafe void DrawTriangle(PointF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
+        private static unsafe void DrawTriangle(Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
             const int YIncrement = 1;
 
@@ -101,8 +107,12 @@ namespace _3DGraphics.Drawing
 
             float x1 = points[0].X;
             float x2;
+            float z1 = points[0].Z;
+            float z2;
             float XIncrement1;
             float XIncrement2;
+            float ZIncrement1;
+            float ZIncrement2;
             if (points[0].Y == points[1].Y)
             {
                 float dx1 = points[0].X - points[2].X;
@@ -111,6 +121,13 @@ namespace _3DGraphics.Drawing
                 x2 = points[1].X;
                 XIncrement1 = -dx1 / steps;
                 XIncrement2 = -dx2 / steps;
+
+                float dz1 = points[0].Z - points[2].Z;
+                float dz2 = points[1].Z - points[2].Z;
+
+                z2 = points[1].Z;
+                ZIncrement1 = -dz1 / steps;
+                ZIncrement2 = -dz2 / steps;
             }
             else
             {
@@ -120,29 +137,39 @@ namespace _3DGraphics.Drawing
                 x2 = points[0].X;
                 XIncrement1 = dx1 / steps;
                 XIncrement2 = dx2 / steps;
+
+                float dz1 = points[1].Z - points[0].Z;
+                float dz2 = points[2].Z - points[0].Z;
+
+                z2 = points[0].Z;
+                ZIncrement1 = dz1 / steps;
+                ZIncrement2 = dz2 / steps;
+
             }
 
 
-            var p1Line = new PointF();
-            var p2Line = new PointF();
+            var p1Line = new Point3DF();
+            var p2Line = new Point3DF();
 
             for (var i = 0; i <= steps; i++)
             {
                 p1Line.X = x1;
                 p1Line.Y = y;
+                p1Line.Z = z1;
+
                 p2Line.X = x2;
                 p2Line.Y = y;
+                p2Line.Z = z2;
 
-                if (float.IsInfinity(x1) || float.IsInfinity(x2) || float.IsInfinity(y))
-                {
-                    continue;
-                }
 
-                Lines.DrawLine(rgbBitmap, bitmapData.Stride, colorInt, p1Line, p2Line, widthZone, heightZone);
+                Lines.DrawLineWithZBuffer(rgbBitmap, bitmapData.Stride, colorInt, p1Line, p2Line, widthZone, heightZone);
 
                 x1 += XIncrement1;
                 x2 += XIncrement2;
                 y += YIncrement;
+                z1+= ZIncrement1;
+                z2+= ZIncrement2;
+            
             }
         }
     }

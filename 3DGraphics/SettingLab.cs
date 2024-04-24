@@ -5,6 +5,6 @@
         public enum DrawModelType { Lines, LinesRGB, Triangles, TrianglesRGB, TrianglesLines }
 
         //DrawModelType.Lines
-        public static DrawModelType DrawModel = DrawModelType.TrianglesLines;
+        public static DrawModelType DrawModel = DrawModelType.TrianglesRGB;
     }
 }
