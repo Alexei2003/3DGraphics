@@ -13,28 +13,28 @@ namespace _3DGraphics.Classes
             });
         }
 
-        public static void GetFinalVectors(GeometricVertex[] GeometricVertexCoordinates, Camera camera)
+        public static void GetFinalVectors(GeometricVertex[] GeometricVertexCoordinates)
         {
             // Создаем матрицу масштабирования
-            var scaleMatrix = Matrix4x4.CreateScale(camera.Scale);
+            var scaleMatrix = Matrix4x4.CreateScale(Camera.Scale);
 
             // Создаем матрицу поворота
-            var rotationMatrix = Matrix4x4.CreateFromYawPitchRoll(camera.AngelsRotate.Y, camera.AngelsRotate.X, camera.AngelsRotate.Z);
+            var rotationMatrix = Matrix4x4.CreateFromYawPitchRoll(Camera.AngelsRotate.Y, Camera.AngelsRotate.X, Camera.AngelsRotate.Z);
 
             // Создаем матрицу переноса
-            var translationMatrix = Matrix4x4.CreateTranslation(camera.Translate);
+            var translationMatrix = Matrix4x4.CreateTranslation(Camera.Translate);
 
             // Собираем мировую матрицу
             var worldMatrix = scaleMatrix * rotationMatrix * translationMatrix;
 
             // Создание матрицы просмотра (View Matrix)
-            var viewMatrix = Matrix4x4.CreateLookAt(camera.Eye, camera.Target, camera.Up);
+            var viewMatrix = Matrix4x4.CreateLookAt(Camera.Eye, Camera.Target, Camera.Up);
 
             // Создание матрицы проекции (Projection Matrix)
-            var projectionMatrix = Matrix4x4.CreatePerspectiveFieldOfView(camera.FovRadian, camera.Aspect, camera.ZNear, camera.ZFar);
+            var projectionMatrix = Matrix4x4.CreatePerspectiveFieldOfView(Camera.FovRadian, Camera.Aspect, Camera.ZNear, Camera.ZFar);
 
             // Создание матрицы вида экрана (Viewport Matrix)
-            var viewportMatrix = Matrix4x4.CreateViewport(0, 0, camera.Size.Width, camera.Size.Height, camera.ZNear, camera.ZFar);
+            var viewportMatrix = Matrix4x4.CreateViewport(0, 0, Camera.Size.Width, Camera.Size.Height, Camera.ZNear, Camera.ZFar);
 
             // Комбинирование матриц
             var finalMatrix = worldMatrix * viewMatrix * projectionMatrix * viewportMatrix;

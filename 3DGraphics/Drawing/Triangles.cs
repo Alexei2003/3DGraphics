@@ -1,5 +1,4 @@
 ﻿using System.Drawing.Imaging;
-using System.IO.Packaging;
 using static _3DGraphics.Drawing.DrawingModel;
 
 namespace _3DGraphics.Drawing
@@ -18,6 +17,9 @@ namespace _3DGraphics.Drawing
 
                 var listPoints = new List<Point3DF>();
 
+                int up;
+                int down;
+
                 for (int i = 0; i < points.Length;)
                 {
                     if ((i + 1 != points.Length) && (points[i].Y == points[i + 1].Y))
@@ -32,8 +34,8 @@ namespace _3DGraphics.Drawing
                         listPoints.Add(points[i]);
                         if (i != 0 && i != points.Length - 1)
                         {
-                            int up = 0;
-                            int down = 0;
+                            up = 0;
+                            down = 0;
                             for (var j = 0; j < pointsOriginal.Length - 1; j++)
                             {
                                 if (pointsOriginal[j].Y > points[i].Y && pointsOriginal[j + 1].Y < points[i].Y)
@@ -60,9 +62,9 @@ namespace _3DGraphics.Drawing
 
 
                             listPoints.Add(new Point3DF((
-                                pointsOriginal[down].X + (pointsOriginal[up].X - pointsOriginal[down].X) / (pointsOriginal[up].Y - pointsOriginal[down].Y) * (points[i].Y - pointsOriginal[down].Y)), 
-                                points[i].Y ,
-                                pointsOriginal[down].Z + ((pointsOriginal[up].Z  !=  pointsOriginal[down].Z) ? ((pointsOriginal[up].Z - pointsOriginal[down].Z) / (pointsOriginal[up].Z - pointsOriginal[down].Z) * (points[i].Z - pointsOriginal[down].Z)) : 0))
+                                pointsOriginal[down].X + ((pointsOriginal[up].X - pointsOriginal[down].X) / (pointsOriginal[up].Y - pointsOriginal[down].Y) * (points[i].Y - pointsOriginal[down].Y))),
+                                points[i].Y,
+                                pointsOriginal[down].Z + ((pointsOriginal[up].Z != pointsOriginal[down].Z) ? ((pointsOriginal[up].Z - pointsOriginal[down].Z) / (pointsOriginal[up].Z - pointsOriginal[down].Z) * (points[i].Z - pointsOriginal[down].Z)) : 0))
                                 );
 
                         }
@@ -70,14 +72,21 @@ namespace _3DGraphics.Drawing
                     }
                 }
 
-                points = listPoints.ToArray();
+                var tmpPoints = listPoints.ToArray();
 
-                Array.Sort(points, (p1, p2) => p1.X.CompareTo(p2.X));
-                Array.Sort(points, (p1, p2) => p1.Y.CompareTo(p2.Y));
+                Array.Sort(tmpPoints, (p1, p2) => p1.X.CompareTo(p2.X));
+                Array.Sort(tmpPoints, (p1, p2) => p1.Y.CompareTo(p2.Y));
 
-                for (var i = 0; i < points.Length - 2; i++)
+                for (var i = 0; i < tmpPoints.Length - 2; i++)
                 {
-                    DrawTriangle([points[i], points[i + 1], points[i + 2]], rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
+                    try
+                    {
+                        DrawTriangle([tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]], rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
             }
         }
@@ -93,6 +102,8 @@ namespace _3DGraphics.Drawing
 
         private static unsafe void DrawTriangle(Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
+            colorInt = GetRGBLight(points);
+
             const int YIncrement = 1;
 
             var steps1 = Math.Abs(Convert.ToInt32(points[0].Y - points[1].Y));
@@ -162,14 +173,15 @@ namespace _3DGraphics.Drawing
                 p2Line.Z = z2;
 
 
+
                 Lines.DrawLineWithZBuffer(rgbBitmap, bitmapData.Stride, colorInt, p1Line, p2Line, widthZone, heightZone);
 
                 x1 += XIncrement1;
                 x2 += XIncrement2;
                 y += YIncrement;
-                z1+= ZIncrement1;
-                z2+= ZIncrement2;
-            
+                z1 += ZIncrement1;
+                z2 += ZIncrement2;
+
             }
         }
     }

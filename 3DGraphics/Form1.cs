@@ -11,7 +11,6 @@ namespace _3DGraphics
         private ObjFileReader.ModelData modelData = null;
         private ObjFileReader.ModelData modelDataPaint = null;
         private readonly System.Threading.Timer timerFPS;
-        private Camera camera = null;
 
         private const int WIDTH = 600;
         private const int HEIGHT = 600;
@@ -37,7 +36,7 @@ namespace _3DGraphics
             ControlResize();
             ZBuffer.Resaze(WIDTH, Height);
 
-            camera = new Camera(Width, Height);
+            Camera.Resize(Width, Height);
 
             var timerCallback = new TimerCallback(UpdateFPS);
             timerFPS = new System.Threading.Timer(timerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
@@ -47,13 +46,13 @@ namespace _3DGraphics
         {
             var strInfo = "" +
                     $"FPS = {frameCount}\n" +
-                    $"Aspect = {camera.Aspect}\n" +
-                    $"Width = {camera.Size.Width}\n" +
-                    $"Height = {camera.Size.Height}\n" +
-                    $"Fov = {camera.FovAngle}\n" +
-                    $"Scale = {camera.Scale.X}\n" +
-                    $"ZCamera = {camera.Eye.Z}\n" +
-                    $"ZTarget = {camera.Translate.Z}\n";
+                    $"Aspect = {Camera.Aspect}\n" +
+                    $"Width = {Camera.Size.Width}\n" +
+                    $"Height = {Camera.Size.Height}\n" +
+                    $"Fov = {Camera.FovAngle}\n" +
+                    $"Scale = {Camera.Scale.X}\n" +
+                    $"ZCamera = {Camera.Eye.Z}\n" +
+                    $"ZTarget = {Camera.Translate.Z}\n";
 
             lock (lockFrameCount)
             {
@@ -113,7 +112,7 @@ namespace _3DGraphics
                 -(modelData.GeometricVertexCoordinates.Max(v => v.Z) + modelData.GeometricVertexCoordinates.Min(v => v.Z)) / 2));
 
             modelDataPaint = new ModelData(modelData);
-            camera = new Camera(Width, Height);
+            Camera.Resize(Width, Height);
             CreateModelDataPaint();
         }
 
@@ -128,7 +127,7 @@ namespace _3DGraphics
 
             ZBuffer.Resaze(Width, Height);
 
-            camera.Size = Size;
+            Camera.Size = Size;
             CreateModelDataPaint();
             ControlUpdate();
         }
@@ -138,7 +137,7 @@ namespace _3DGraphics
             if (modelData != null)
             {
                 modelDataPaint.SetCopyValue(modelData);
-                CoordinateTransformations.GetFinalVectors(modelDataPaint.GeometricVertexCoordinates, camera);
+                CoordinateTransformations.GetFinalVectors(modelDataPaint.GeometricVertexCoordinates);
             }
         }
 
@@ -157,68 +156,68 @@ namespace _3DGraphics
                     case Keys.X:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
                         {
-                            camera.AngelsRotate.X -= angelRotate;
+                            Camera.AngelsRotate.X -= angelRotate;
                         }
                         else
                         {
-                            camera.AngelsRotate.X += angelRotate;
+                            Camera.AngelsRotate.X += angelRotate;
                         }
                         break;
                     case Keys.Y:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
                         {
-                            camera.AngelsRotate.Y -= angelRotate;
+                            Camera.AngelsRotate.Y -= angelRotate;
                         }
                         else
                         {
-                            camera.AngelsRotate.Y += angelRotate;
+                            Camera.AngelsRotate.Y += angelRotate;
                         }
                         break;
                     case Keys.Z:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
                         {
-                            camera.AngelsRotate.Z -= angelRotate;
+                            Camera.AngelsRotate.Z -= angelRotate;
                         }
                         else
                         {
-                            camera.AngelsRotate.Z += angelRotate;
+                            Camera.AngelsRotate.Z += angelRotate;
                         }
                         break;
                     case Keys.Oemplus:
-                        camera.Scale *= scale;
+                        Camera.Scale *= scale;
                         break;
                     case Keys.OemMinus:
-                        camera.Scale /= scale;
+                        Camera.Scale /= scale;
                         break;
                     case Keys.Up:
-                        camera.IncEyeZ(-near);
+                        Camera.IncEyeZ(-near);
                         break;
                     case Keys.Down:
-                        camera.IncEyeZ(near);
+                        Camera.IncEyeZ(near);
                         break;
                     case Keys.Add:
-                        camera.IncFovAngle(cahngeAngelFov);
+                        Camera.IncFovAngle(cahngeAngelFov);
                         break;
                     case Keys.Subtract:
-                        camera.IncFovAngle(-cahngeAngelFov);
+                        Camera.IncFovAngle(-cahngeAngelFov);
                         break;
                     case Keys.Q:
-                        camera.Translate.Z -= translate;
+                        Camera.Translate.Z -= translate;
                         break;
                     case Keys.E:
-                        camera.Translate.Z += translate;
+                        Camera.Translate.Z += translate;
                         break;
                     case Keys.W:
-                        camera.Translate.Y += translate;
+                        Camera.Translate.Y += translate;
                         break;
                     case Keys.S:
-                        camera.Translate.Y -= translate;
+                        Camera.Translate.Y -= translate;
                         break;
                     case Keys.A:
-                        camera.Translate.X -= translate;
+                        Camera.Translate.X -= translate;
                         break;
                     case Keys.D:
-                        camera.Translate.X += translate;
+                        Camera.Translate.X += translate;
                         break;
                     default:
                         return;
@@ -282,9 +281,9 @@ namespace _3DGraphics
             {
                 const int COUNT_RAND = 10;
                 const float SHIFT_AXIS = (float)Math.PI / 1000;
-                camera.AngelsRotate.X += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
-                camera.AngelsRotate.Y += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
-                camera.AngelsRotate.Z += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
+                Camera.AngelsRotate.X += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
+                Camera.AngelsRotate.Y += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
+                Camera.AngelsRotate.Z += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
                 CreateModelDataPaint();
             }
         }

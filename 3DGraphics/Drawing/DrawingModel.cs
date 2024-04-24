@@ -1,4 +1,7 @@
-﻿using System.Drawing.Imaging;
+﻿using _3DGraphics.Classes;
+using System.Drawing.Imaging;
+using System.Numerics;
+using Windows.Media.Devices;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 
 namespace _3DGraphics.Drawing
@@ -68,17 +71,17 @@ namespace _3DGraphics.Drawing
 
             //geometricVertexIndexs = [[0,1,2,3]];
 
-/*            geometricVertexСoordinates = [
-                new GeometricVertex(0 + SHIFT, 0 + SHIFT, -15, 0), new GeometricVertex(400 + SHIFT, 0 + SHIFT, 0, 0), new GeometricVertex(0 + SHIFT, 400 + SHIFT, 0, 0), new GeometricVertex(400 + SHIFT, 400 + SHIFT, 0, 0),
-                new GeometricVertex(100 + SHIFT, 0 + SHIFT, -10, 0), new GeometricVertex(100 + SHIFT, 200 + SHIFT, -10, 0), new GeometricVertex(0 + SHIFT, 300 + SHIFT, -10, 0), new GeometricVertex(0 + SHIFT, 100 + SHIFT, -10, 0),
-            ];
+            /*            geometricVertexСoordinates = [
+                            new GeometricVertex(0 + SHIFT, 0 + SHIFT, -15, 0), new GeometricVertex(400 + SHIFT, 0 + SHIFT, 0, 0), new GeometricVertex(0 + SHIFT, 400 + SHIFT, 0, 0), new GeometricVertex(400 + SHIFT, 400 + SHIFT, 0, 0),
+                            new GeometricVertex(100 + SHIFT, 0 + SHIFT, -10, 0), new GeometricVertex(100 + SHIFT, 200 + SHIFT, -10, 0), new GeometricVertex(0 + SHIFT, 300 + SHIFT, -10, 0), new GeometricVertex(0 + SHIFT, 100 + SHIFT, -10, 0),
+                        ];
 
-            geometricVertexIndexs = [[0, 1, 2, 3], [4, 5, 6, 7]];*/
+                        geometricVertexIndexs = [[0, 1, 2, 3], [4, 5, 6, 7]];*/
 
             for (var j = 0; j < drawObjectFuncs.Count; j++)
             {
-                Parallel.ForEach(geometricVertexIndexs, vertexIndex =>
-                //foreach (var vertexIndex in geometricVertexIndexs)
+                //Parallel.ForEach(geometricVertexIndexs, vertexIndex =>
+                foreach (var vertexIndex in geometricVertexIndexs)
                 {
                     var points = new Point3DF[vertexIndex.Length];
                     for (var i = 0; i < vertexIndex.Length; i++)
@@ -93,8 +96,8 @@ namespace _3DGraphics.Drawing
                     }
 
                     drawObjectFuncs[j](points, rgbBitmap, bitmapData, colorInts[j], widthZone, heightZone);
-                });
-                //}
+                //});
+                }
             }
 
             bitmap.UnlockBits(bitmapData);
@@ -113,6 +116,35 @@ namespace _3DGraphics.Drawing
                 b += Convert.ToInt32(points[i].Z);
             }
             return Color.FromArgb(255, Math.Abs(r % 255), Math.Abs(g % 255), Math.Abs(b % 255)).ToArgb();
+        }
+
+        public static unsafe int GetRGBLight(Point3DF[] points)
+        {
+            int light = 0;
+
+            //ABC
+            var ab = new Vector3(points[1].X - points[0].X, points[1].Y - points[0].Y, points[1].Z - points[0].Z);
+            var ac = new Vector3(points[2].X - points[0].X, points[2].Y - points[0].Y, points[2].Z - points[0].Z);
+
+            float n1 = (ab.Y * ac.Z) - (ab.Z*ac.Y);
+            float n2 = ab.Z * ac.X - ab.X * ac.Z;
+            float n3 = ab.X * ac.Y - ab.Y * ac.X;
+
+            var normA = Vector3.Normalize(new Vector3(n1, n2, n3));
+
+            var normCameraA = Vector3.Normalize(new Vector3(points[0].X - Camera.Eye.X, points[0].Y - Camera.Eye.Y, points[0].Z - Camera.Eye.Z));
+
+            var dotNormalA = Vector3.Dot(normA,normCameraA);
+
+            var lengthNormA = float.Sqrt(float.Pow(normA.X,2) + float.Pow(normA.Y, 2) + float.Pow(normA.Z, 2));
+            var lengthnormCameraA = float.Sqrt(float.Pow(normCameraA.X, 2) + float.Pow(normCameraA.Y, 2) + float.Pow(normCameraA.Z, 2));
+
+            var cosA = dotNormalA / (lengthnormCameraA * lengthnormCameraA);
+
+
+            light = Convert.ToInt32(255 * (float.Abs(cosA)) % 255);
+
+            return Color.FromArgb(255, Math.Abs(light), Math.Abs(light), Math.Abs(light)).ToArgb();
         }
 
         public struct Point3DF
