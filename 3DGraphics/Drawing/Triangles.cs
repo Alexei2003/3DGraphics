@@ -1,4 +1,6 @@
-﻿using System.Drawing.Imaging;
+﻿using _3DGraphics.Classes;
+using System.Drawing.Imaging;
+using System.Numerics;
 using static _3DGraphics.Drawing.DrawingModel;
 
 namespace _3DGraphics.Drawing
@@ -102,7 +104,15 @@ namespace _3DGraphics.Drawing
 
         private static unsafe void DrawTriangle(Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
-            colorInt = GetRGBLight(points);
+            int? tmpColorInt = GetRGBLight(points);
+            if(tmpColorInt == null)
+            {
+                return;
+            }
+            else
+            {
+                colorInt = tmpColorInt.Value;
+            }
 
             const int YIncrement = 1;
 

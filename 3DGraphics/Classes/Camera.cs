@@ -8,7 +8,7 @@ namespace _3DGraphics.Classes
         public static Vector3 AngelsRotate = new(0, 0, 0);
         public static Vector3 Translate = new(0, 0, 0);
 
-        public static Vector3 Eye = new(0, 0, 100);
+        public static Vector3 Eye = new(1920/2, 1080/2, 100);
         public static Vector3 Up = new(0, 1, 0);
         public static Vector3 Target = new(0, 0, 0);
         public static float Aspect;
