@@ -1,8 +1,6 @@
 ﻿using _3DGraphics.Classes;
 using System.Drawing.Imaging;
-using System.Numerics;
 using static _3DGraphics.Classes.BaseGraphisStructs;
-using static _3DGraphics.Drawing.DrawingModel;
 
 namespace _3DGraphics.Drawing
 {
@@ -82,13 +80,14 @@ namespace _3DGraphics.Drawing
 
                 for (var i = 0; i < tmpPoints.Length - 2; i++)
                 {
-                    try
-                    {
-                        DrawTriangle([tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]], rgbBitmap, bitmapData, colorInt, widthZone, heightZone);
-                    }
-                    catch
+                    var tmpColorInt = GetTriangleLight(pointsOriginal);
+                    if (tmpColorInt == null)
                     {
                         continue;
+                    }
+                    else
+                    {
+                        DrawTriangle([tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]], rgbBitmap, bitmapData, tmpColorInt.Value, widthZone, heightZone);
                     }
                 }
             }
@@ -105,16 +104,6 @@ namespace _3DGraphics.Drawing
 
         private static unsafe void DrawTriangle(BaseGraphisStructs.Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
-            var tmpColorInt = GetTriangleLight(points);
-            if(tmpColorInt == null)
-            {
-                return;
-            }
-            else
-            {
-                colorInt = tmpColorInt.Value;
-            }
-
             const int YIncrement = 1;
 
             var steps1 = Math.Abs(Convert.ToInt32(points[0].Y - points[1].Y));
@@ -182,8 +171,6 @@ namespace _3DGraphics.Drawing
                 p2Line.Y = y;
                 p2Line.Z = z2;
 
-
-
                 Lines.DrawLineWithZBuffer(rgbBitmap, bitmapData.Stride, colorInt, p1Line, p2Line, widthZone, heightZone);
 
                 x1 += XIncrement1;
@@ -195,40 +182,85 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        public static int? GetTriangleLight(Point3DF[] points)
+        private static int? GetTriangleLight(Point3DF[] points)
         {
-            int light = 0;
+            var cos = CalculateCos(points);
 
-            //ABC
-            var ab = new Vector3(points[1].X - points[0].X, points[1].Y - points[0].Y, points[1].Z - points[0].Z);
-            var ac = new Vector3(points[2].X - points[0].X, points[2].Y - points[0].Y, points[2].Z - points[0].Z);
-
-            float n1 = (ab.Y * ac.Z) - (ab.Z * ac.Y);
-            float n2 = ab.Z * ac.X - ab.X * ac.Z;
-            float n3 = ab.X * ac.Y - ab.Y * ac.X;
-
-            var normA = Vector3.Normalize(new Vector3(n1, n2, n3));
-
-            var normCameraA = Vector3.Normalize(new Vector3(points[0].X - Camera.Eye.X, points[0].Y - Camera.Eye.Y, points[0].Z - Camera.Eye.Z));
-
-            var dotNormalA = Vector3.Dot(normA, normCameraA);
-
-            var lengthNormA = float.Sqrt(float.Pow(normA.X, 2) + float.Pow(normA.Y, 2) + float.Pow(normA.Z, 2));
-            var lengthNormCameraA = float.Sqrt(float.Pow(normCameraA.X, 2) + float.Pow(normCameraA.Y, 2) + float.Pow(normCameraA.Z, 2));
-
-            var cosA = dotNormalA / (lengthNormCameraA * lengthNormA);
-
-
-            light = Convert.ToInt32(255 * (float.Abs(cosA)) % 255);
-
-            if(cosA > 0)
+            if (cos > 0)
             {
-                return Color.FromArgb(255, Math.Abs(light), Math.Abs(light), Math.Abs(light)).ToArgb();
+                var light = Convert.ToInt32(255 * cos.Value);
+                return Color.FromArgb(255, int.Abs(light), int.Abs(light), int.Abs(light)).ToArgb();
             }
             else
             {
                 return null;
             }
         }
+
+        private static float? CalculateCos(Point3DF[] points)
+        {
+            // Вычисляем нормали к каждой вершине треугольника
+            var normal1 = CalculatePointNormal(points[0], points[1], points[2]);
+            var normal2 = CalculatePointNormal(points[1], points[2], points[0]);
+            var normal3 = CalculatePointNormal(points[2], points[0], points[1]);
+
+            // Вычисляем вектор от камеры к каждой вершине
+            var vectors = new Point3DF[]
+            {
+                new Point3DF(points[0].X - Camera.Light.X, points[0].Y - Camera.Light.Y, points[0].Z - Camera.Light.Z),
+                new Point3DF(points[1].X - Camera.Light.X, points[1].Y - Camera.Light.Y, points[1].Z - Camera.Light.Z),
+                new Point3DF(points[2].X - Camera.Light.X, points[2].Y - Camera.Light.Y, points[2].Z - Camera.Light.Z)
+            };
+
+            // Вычисляем косинус угла между вектором и нормалью для каждой вершины
+            var cosAngle1 = CalculateCosBetweenVectors(vectors[0], normal1);
+            var cosAngle2 = CalculateCosBetweenVectors(vectors[1], normal2);
+            var cosAngle3 = CalculateCosBetweenVectors(vectors[2], normal3);
+
+            // Возвращаем среднее значение косинусов углов для каждой вершины
+            return (cosAngle1 + cosAngle2 + cosAngle3) / 3f;
+        }
+
+        private static float CalculateCosBetweenVectors(Point3DF vector, Point3DF normal)
+        {
+            // Вычисляем длины вектора и нормали
+            var vectorLength = (float)Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z);
+            var normalLength = (float)Math.Sqrt(normal.X * normal.X + normal.Y * normal.Y + normal.Z * normal.Z);
+
+            // Вычисляем скалярное произведение вектора и нормали
+            var dotProduct = vector.X * normal.X + vector.Y * normal.Y + vector.Z * normal.Z;
+
+            // Вычисляем косинус угла
+            return dotProduct / (vectorLength * normalLength);
+        }
+
+        private static Point3DF CalculatePointNormal(Point3DF p1, Point3DF p2, Point3DF p3)
+        {
+            // Вычисляем векторы p1p2 и p1p3
+            var p1p2X = p2.X - p1.X;
+            var p1p2Y = p2.Y - p1.Y;
+            var p1p2Z = p2.Z - p1.Z;
+
+            var p1p3X = p3.X - p1.X;
+            var p1p3Y = p3.Y - p1.Y;
+            var p1p3Z = p3.Z - p1.Z;
+
+            // Вычисляем векторное произведение p1p2 и p1p3
+            var normalX = p1p2Y * p1p3Z - p1p2Z * p1p3Y;
+            var normalY = p1p2Z * p1p3X - p1p2X * p1p3Z;
+            var normalZ = p1p2X * p1p3Y - p1p2Y * p1p3X;
+
+            // Нормализуем полученный вектор нормали
+            var length = (float)Math.Sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ);
+            if (length != 0)
+            {
+                normalX /= length;
+                normalY /= length;
+                normalZ /= length;
+            }
+
+            return new Point3DF(normalX, normalY, normalZ);
+        }
+
     }
 }
