@@ -62,8 +62,8 @@ namespace _3DGraphics.Drawing
 
             for (var j = 0; j < drawObjectFuncs.Count; j++)
             {
-                //Parallel.ForEach(geometricVertexIndexs, vertexIndex =>
-                foreach (var vertexIndex in geometricVertexIndexs)
+                Parallel.ForEach(geometricVertexIndexs, vertexIndex =>
+                //foreach (var vertexIndex in geometricVertexIndexs)
                 {
                     var points = new Point3DF[vertexIndex.Length];
                     for (var i = 0; i < vertexIndex.Length; i++)
@@ -78,8 +78,8 @@ namespace _3DGraphics.Drawing
                     }
 
                     drawObjectFuncs[j](points, rgbBitmap, bitmapData, colorInts[j], widthZone, heightZone);
-                //});
-                }
+                });
+                //}
             }
 
             bitmap.UnlockBits(bitmapData);

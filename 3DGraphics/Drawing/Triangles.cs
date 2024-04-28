@@ -78,15 +78,12 @@ namespace _3DGraphics.Drawing
                 Array.Sort(tmpPoints, (p1, p2) => p1.X.CompareTo(p2.X));
                 Array.Sort(tmpPoints, (p1, p2) => p1.Y.CompareTo(p2.Y));
 
-                for (var i = 0; i < tmpPoints.Length - 2; i++)
+                var tmpColorInt = GetTriangleLight(pointsOriginal);
+                if (tmpColorInt != null)
                 {
-                    var tmpColorInt = GetTriangleLight(pointsOriginal);
-                    if (tmpColorInt == null)
+                    for (var i = 0; i < tmpPoints.Length - 2; i++)
                     {
-                        continue;
-                    }
-                    else
-                    {
+
                         DrawTriangle([tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]], rgbBitmap, bitmapData, tmpColorInt.Value, widthZone, heightZone);
                     }
                 }
@@ -199,26 +196,35 @@ namespace _3DGraphics.Drawing
 
         private static float? CalculateCos(Point3DF[] points)
         {
-            // Вычисляем нормали к каждой вершине треугольника
-            var normal1 = CalculatePointNormal(points[0], points[1], points[2]);
-            var normal2 = CalculatePointNormal(points[1], points[2], points[0]);
-            var normal3 = CalculatePointNormal(points[2], points[0], points[1]);
+            var normals = new Point3DF[points.Length];
+
+            for ( var i = 0; i<normals.Length-2; i++)
+            {
+                normals[i] = CalculatePointNormal(points[i], points[i+1], points[i+2]);
+            }
+
+            var max = normals.Length - 1;
+
+            normals[max-1] = CalculatePointNormal(points[max-1], points[max], points[0]);
+            normals[max] = CalculatePointNormal(points[max], points[0], points[1]);
 
             // Вычисляем вектор от камеры к каждой вершине
-            var vectors = new Point3DF[]
-            {
-                new Point3DF(points[0].X - Camera.Light.X, points[0].Y - Camera.Light.Y, points[0].Z - Camera.Light.Z),
-                new Point3DF(points[1].X - Camera.Light.X, points[1].Y - Camera.Light.Y, points[1].Z - Camera.Light.Z),
-                new Point3DF(points[2].X - Camera.Light.X, points[2].Y - Camera.Light.Y, points[2].Z - Camera.Light.Z)
-            };
+            var vectors = new Point3DF[points.Length];
 
-            // Вычисляем косинус угла между вектором и нормалью для каждой вершины
-            var cosAngle1 = CalculateCosBetweenVectors(vectors[0], normal1);
-            var cosAngle2 = CalculateCosBetweenVectors(vectors[1], normal2);
-            var cosAngle3 = CalculateCosBetweenVectors(vectors[2], normal3);
+            for( var i = 0; i < vectors.Length; i++)
+            {
+                vectors[i] = new Point3DF(points[i].X - Camera.Light.X, points[i].Y - Camera.Light.Y, points[i].Z - Camera.Light.Z);
+            }
+
+            float cos = 0;
+
+            for(var i = 0; i< points.Length; i++)
+            {
+                cos = CalculateCosBetweenVectors(vectors[i], normals[i]);
+            }
 
             // Возвращаем среднее значение косинусов углов для каждой вершины
-            return (cosAngle1 + cosAngle2 + cosAngle3) / 3f;
+            return cos / points.Length;
         }
 
         private static float CalculateCosBetweenVectors(Point3DF vector, Point3DF normal)

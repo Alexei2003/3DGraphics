@@ -70,7 +70,7 @@ namespace _3DGraphics.Classes
             if (Eye.Z + Z > 20)
             {
                 Eye.Z += Z;
-                Light.Z = Eye.Z /10;
+                Light.Z = Eye.Z;
             }
         }
     }
