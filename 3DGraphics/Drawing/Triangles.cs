@@ -1,21 +1,24 @@
-﻿using System.Drawing.Imaging;
+﻿using _3DGraphics.Classes;
+using System.Drawing.Imaging;
+using System.Numerics;
+using static _3DGraphics.Classes.BaseGraphisStructs;
 using static _3DGraphics.Drawing.DrawingModel;
 
 namespace _3DGraphics.Drawing
 {
     internal static class Triangles
     {
-        public static unsafe void Draw(Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
+        public static unsafe void Draw(BaseGraphisStructs.Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
             if (points != null)
             {
-                var pointsOriginal = new Point3DF[points.Length];
+                var pointsOriginal = new BaseGraphisStructs.Point3DF[points.Length];
                 points.CopyTo(pointsOriginal, 0);
 
                 Array.Sort(points, (p1, p2) => p1.X.CompareTo(p2.X));
                 Array.Sort(points, (p1, p2) => p1.Y.CompareTo(p2.Y));
 
-                var listPoints = new List<Point3DF>();
+                var listPoints = new List<BaseGraphisStructs.Point3DF>();
 
                 int up;
                 int down;
@@ -61,7 +64,7 @@ namespace _3DGraphics.Drawing
                             }
 
 
-                            listPoints.Add(new Point3DF((
+                            listPoints.Add(new BaseGraphisStructs.Point3DF((
                                 pointsOriginal[down].X + ((pointsOriginal[up].X - pointsOriginal[down].X) / (pointsOriginal[up].Y - pointsOriginal[down].Y) * (points[i].Y - pointsOriginal[down].Y))),
                                 points[i].Y,
                                 pointsOriginal[down].Z + ((pointsOriginal[up].Z != pointsOriginal[down].Z) ? ((pointsOriginal[up].Z - pointsOriginal[down].Z) / (pointsOriginal[up].Z - pointsOriginal[down].Z) * (points[i].Z - pointsOriginal[down].Z)) : 0))
@@ -91,7 +94,7 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        public static unsafe void DrawRGB(Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
+        public static unsafe void DrawRGB(BaseGraphisStructs.Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
             if (points != null)
             {
@@ -100,9 +103,17 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        private static unsafe void DrawTriangle(Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
+        private static unsafe void DrawTriangle(BaseGraphisStructs.Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
-            colorInt = GetRGBLight(points);
+            var tmpColorInt = GetTriangleLight(points);
+            if(tmpColorInt == null)
+            {
+                return;
+            }
+            else
+            {
+                colorInt = tmpColorInt.Value;
+            }
 
             const int YIncrement = 1;
 
@@ -158,9 +169,8 @@ namespace _3DGraphics.Drawing
 
             }
 
-
-            var p1Line = new Point3DF();
-            var p2Line = new Point3DF();
+            var p1Line = new BaseGraphisStructs.Point3DF();
+            var p2Line = new BaseGraphisStructs.Point3DF();
 
             for (var i = 0; i <= steps; i++)
             {
@@ -182,6 +192,42 @@ namespace _3DGraphics.Drawing
                 z1 += ZIncrement1;
                 z2 += ZIncrement2;
 
+            }
+        }
+
+        public static int? GetTriangleLight(Point3DF[] points)
+        {
+            int light = 0;
+
+            //ABC
+            var ab = new Vector3(points[1].X - points[0].X, points[1].Y - points[0].Y, points[1].Z - points[0].Z);
+            var ac = new Vector3(points[2].X - points[0].X, points[2].Y - points[0].Y, points[2].Z - points[0].Z);
+
+            float n1 = (ab.Y * ac.Z) - (ab.Z * ac.Y);
+            float n2 = ab.Z * ac.X - ab.X * ac.Z;
+            float n3 = ab.X * ac.Y - ab.Y * ac.X;
+
+            var normA = Vector3.Normalize(new Vector3(n1, n2, n3));
+
+            var normCameraA = Vector3.Normalize(new Vector3(points[0].X - Camera.Eye.X, points[0].Y - Camera.Eye.Y, points[0].Z - Camera.Eye.Z));
+
+            var dotNormalA = Vector3.Dot(normA, normCameraA);
+
+            var lengthNormA = float.Sqrt(float.Pow(normA.X, 2) + float.Pow(normA.Y, 2) + float.Pow(normA.Z, 2));
+            var lengthNormCameraA = float.Sqrt(float.Pow(normCameraA.X, 2) + float.Pow(normCameraA.Y, 2) + float.Pow(normCameraA.Z, 2));
+
+            var cosA = dotNormalA / (lengthNormCameraA * lengthNormA);
+
+
+            light = Convert.ToInt32(255 * (float.Abs(cosA)) % 255);
+
+            if(cosA > 0)
+            {
+                return Color.FromArgb(255, Math.Abs(light), Math.Abs(light), Math.Abs(light)).ToArgb();
+            }
+            else
+            {
+                return null;
             }
         }
     }

@@ -15,7 +15,7 @@
 
         public static bool CheckAndSetDistance(int x, int y, float value)
         {
-            if (zBuffer[x, y] > value)
+            if (zBuffer[x, y] < value)
             {
                 zBuffer[x, y] = value;
                 return true;
@@ -44,7 +44,7 @@
             {
                 for (var j = 0; j < height; j++)
                 {
-                    zBuffer[i, j] = 10000;
+                    zBuffer[i, j] = -10000000;
                 }
             }
         }

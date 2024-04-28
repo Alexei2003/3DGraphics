@@ -121,5 +121,26 @@ namespace _3DGraphics.Classes
 
             public NormalVertice(Vector4 vector) : base(vector) { }
         }
+
+        public struct Point3DF
+        {
+            public float X { get; set; }
+            public float Y { get; set; }
+            public float Z { get; set; }
+
+            public Point3DF(float x, float y, float z)
+            {
+                X = x;
+                Y = y;
+                Z = z;
+            }
+
+            public Point3DF(PointF p, float z)
+            {
+                X = p.X;
+                Y = p.Y;
+                Z = z;
+            }
+        }
     }
 }

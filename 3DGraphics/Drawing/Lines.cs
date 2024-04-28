@@ -1,4 +1,5 @@
-﻿using System.Drawing.Imaging;
+﻿using _3DGraphics.Classes;
+using System.Drawing.Imaging;
 using Windows.UI.WebUI;
 using static _3DGraphics.Drawing.DrawingModel;
 
@@ -6,7 +7,7 @@ namespace _3DGraphics.Drawing
 {
     internal static class Lines
     {
-        public static unsafe void Draw(Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
+        public static unsafe void Draw(BaseGraphisStructs.Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
             if (points != null)
             {
@@ -18,7 +19,7 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        public static unsafe void DrawRGB(Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
+        public static unsafe void DrawRGB(BaseGraphisStructs.Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone)
         {
             if (points != null)
             {
@@ -27,7 +28,7 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        public static unsafe void DrawLine(int* rgbBitmap, int stride, int colorInt, Point3DF point1, Point3DF point2, int widthZone, int heightZone)
+        public static unsafe void DrawLine(int* rgbBitmap, int stride, int colorInt, BaseGraphisStructs.Point3DF point1, BaseGraphisStructs.Point3DF point2, int widthZone, int heightZone)
         {
             var dx = point2.X - point1.X;
             var dy = point2.Y - point1.Y;
@@ -62,7 +63,7 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        public static unsafe void DrawLineWithZBuffer(int* rgbBitmap, int stride, int colorInt, Point3DF point1, Point3DF point2, int widthZone, int heightZone)
+        public static unsafe void DrawLineWithZBuffer(int* rgbBitmap, int stride, int colorInt, BaseGraphisStructs.Point3DF point1, BaseGraphisStructs.Point3DF point2, int widthZone, int heightZone)
         {
             var dx = point2.X - point1.X;
             var dy = point2.Y - point1.Y;
