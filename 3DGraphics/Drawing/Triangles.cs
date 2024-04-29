@@ -1,5 +1,6 @@
 ﻿using _3DGraphics.Classes;
 using System.Drawing.Imaging;
+using System.Numerics;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 
 namespace _3DGraphics.Drawing
@@ -179,12 +180,16 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        private static int? GetTriangleLight(Point3DF[] points)
+        public static int? GetTriangleLight(Point3DF[] points)
         {
             var cos = CalculateCos(points);
 
-            if (cos > 0)
+            if (cos >= 0)
             {
+                if (cos > 1)
+                {
+                    return Color.FromArgb(255, 255, 255, 255).ToArgb();
+                }
                 var light = Convert.ToInt32(255 * cos.Value);
                 return Color.FromArgb(255, int.Abs(light), int.Abs(light), int.Abs(light)).ToArgb();
             }
@@ -196,76 +201,36 @@ namespace _3DGraphics.Drawing
 
         private static float? CalculateCos(Point3DF[] points)
         {
-            var normals = new Point3DF[points.Length];
-
-            for ( var i = 0; i<normals.Length-2; i++)
+            var polygon = new Vector3[]
             {
-                normals[i] = CalculatePointNormal(points[i], points[i+1], points[i+2]);
+                new(points[0].X, points[0].Y, points[0].Z),
+                new(points[1].X, points[1].Y, points[1].Z),
+                new(points[2].X, points[2].Y, points[2].Z)
+            };
+
+            // Вычисление вектора от точки к полигону
+            var vector = polygon[0] - Camera.Light;
+            var normalizedVector = Vector3.Normalize(vector);
+
+            // Вычисление скалярного произведения нормализованного вектора и нормали полигона
+            var norm = GetPolygonNormal(polygon);
+            var normalizedNorm = Vector3.Normalize(norm);
+
+            var cosAngle = Vector3.Dot(normalizedVector, normalizedNorm);
+
+            if(cosAngle > 1)
+            {
+
             }
 
-            var max = normals.Length - 1;
-
-            normals[max-1] = CalculatePointNormal(points[max-1], points[max], points[0]);
-            normals[max] = CalculatePointNormal(points[max], points[0], points[1]);
-
-            // Вычисляем вектор от камеры к каждой вершине
-            var vectors = new Point3DF[points.Length];
-
-            for( var i = 0; i < vectors.Length; i++)
-            {
-                vectors[i] = new Point3DF(points[i].X - Camera.Light.X, points[i].Y - Camera.Light.Y, points[i].Z - Camera.Light.Z);
-            }
-
-            float cos = 0;
-
-            for(var i = 0; i< points.Length; i++)
-            {
-                cos = CalculateCosBetweenVectors(vectors[i], normals[i]);
-            }
-
-            // Возвращаем среднее значение косинусов углов для каждой вершины
-            return cos / points.Length;
+            return cosAngle;
         }
 
-        private static float CalculateCosBetweenVectors(Point3DF vector, Point3DF normal)
+        private static Vector3 GetPolygonNormal(Vector3[] polygon)
         {
-            // Вычисляем длины вектора и нормали
-            var vectorLength = (float)Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z);
-            var normalLength = (float)Math.Sqrt(normal.X * normal.X + normal.Y * normal.Y + normal.Z * normal.Z);
-
-            // Вычисляем скалярное произведение вектора и нормали
-            var dotProduct = vector.X * normal.X + vector.Y * normal.Y + vector.Z * normal.Z;
-
-            // Вычисляем косинус угла
-            return dotProduct / (vectorLength * normalLength);
-        }
-
-        private static Point3DF CalculatePointNormal(Point3DF p1, Point3DF p2, Point3DF p3)
-        {
-            // Вычисляем векторы p1p2 и p1p3
-            var p1p2X = p2.X - p1.X;
-            var p1p2Y = p2.Y - p1.Y;
-            var p1p2Z = p2.Z - p1.Z;
-
-            var p1p3X = p3.X - p1.X;
-            var p1p3Y = p3.Y - p1.Y;
-            var p1p3Z = p3.Z - p1.Z;
-
-            // Вычисляем векторное произведение p1p2 и p1p3
-            var normalX = p1p2Y * p1p3Z - p1p2Z * p1p3Y;
-            var normalY = p1p2Z * p1p3X - p1p2X * p1p3Z;
-            var normalZ = p1p2X * p1p3Y - p1p2Y * p1p3X;
-
-            // Нормализуем полученный вектор нормали
-            var length = (float)Math.Sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ);
-            if (length != 0)
-            {
-                normalX /= length;
-                normalY /= length;
-                normalZ /= length;
-            }
-
-            return new Point3DF(normalX, normalY, normalZ);
+            var side1 = polygon[1] - polygon[0];
+            var side2 = polygon[2] - polygon[0];
+            return Vector3.Cross(side1, side2);
         }
 
     }

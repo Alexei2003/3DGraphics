@@ -67,7 +67,7 @@ namespace _3DGraphics.Classes
 
         public static void IncEyeZ(int Z)
         {
-            if (Eye.Z + Z > 20)
+            if (Eye.Z + Z > 5)
             {
                 Eye.Z += Z;
                 Light.Z = Eye.Z;

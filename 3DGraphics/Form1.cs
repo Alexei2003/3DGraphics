@@ -1,6 +1,7 @@
 using _3DGraphics.Classes;
 using _3DGraphics.Drawing;
 using System.Numerics;
+using Windows.UI.WebUI;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 using static _3DGraphics.Classes.ObjFileReader;
 
@@ -40,6 +41,16 @@ namespace _3DGraphics
 
             var timerCallback = new TimerCallback(UpdateFPS);
             timerFPS = new System.Threading.Timer(timerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+
+/*            var points = new BaseGraphisStructs.Point3DF[3];
+
+            points[0] = new BaseGraphisStructs.Point3DF(-100,0,100);
+            points[1] = new BaseGraphisStructs.Point3DF(100, 0, 100);
+            points[2] = new BaseGraphisStructs.Point3DF(0, -100, -100);
+
+            Camera.Light = new Vector3(0,0,200);
+
+            var a = Triangles.GetTriangleLight(points);*/
         }
 
         private void UpdateFPS(object state)
@@ -149,7 +160,7 @@ namespace _3DGraphics
                 const float cahngeAngelFov = 1f;
                 var scale = new Vector3(1.1f, 1.1f, 1.1f);
                 const int translate = 1;
-                const int near = 25;
+                const int near = 5;
 
                 switch (e.KeyCode)
                 {
