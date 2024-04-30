@@ -5,7 +5,7 @@ namespace _3DGraphics.Classes
     internal static class Camera
     {
         public static Vector3 Scale = new(1, 1, 1);
-        public static Vector3 AngelsRotate = new(0, 0, 0);
+        //public static Vector3 AngelsRotate = new(0, 0, 0);
         public static Vector3 Translate = new(0, 0, 0);
 
         public static Vector3 Eye = new(0, 0, 100);
@@ -62,11 +62,13 @@ namespace _3DGraphics.Classes
             FovAngle += angle;
         }
 
-        public static void IncEyeZ(int Z)
+        public static void IncEyeDistance(int change)
         {
-            if (Eye.Z + Z > 5)
+            if (Math.Abs(Math.Pow(Math.Pow(Eye.X + change, 2) + Math.Pow(Eye.Y + change, 2) + Math.Pow(Eye.Z + change, 2), 0.5f)) > 5)
             {
-                Eye.Z += Z;
+/*                Eye.Y += change;
+                Eye.X += change;*/
+                Eye.Z += change;
             }
         }
     }

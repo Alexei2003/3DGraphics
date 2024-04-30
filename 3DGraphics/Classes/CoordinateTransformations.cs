@@ -19,9 +19,9 @@ namespace _3DGraphics.Classes
             // Создаем матрицу поворота
             var rotationMatrix = Matrix4x4.CreateFromYawPitchRoll(angle.Y, angle.X, angle.Z);
 
-
             var vect = new Vector4(Camera.Eye, 1);
             vect = Vector4.Transform(vect, rotationMatrix);
+
             Camera.Eye = new Vector3(vect.X, vect.Y, vect.Z);
         }
 
@@ -46,7 +46,7 @@ namespace _3DGraphics.Classes
             var viewportMatrix = Matrix4x4.CreateViewport(0, 0, Camera.Size.Width, Camera.Size.Height, Camera.ZNear, Camera.ZFar);
 
             // Комбинирование матриц
-            var finalMatrix = worldMatrix * viewMatrix; //* projectionMatrix * viewportMatrix;
+            var finalMatrix = worldMatrix; // * viewMatrix//* projectionMatrix * viewportMatrix;
 
             // Преобразование координат вершин
             Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
@@ -64,7 +64,7 @@ namespace _3DGraphics.Classes
                 modelData.GeometricVertexToNormalCoordinates[i] = new BaseGraphisStructs.CoordinateVector(modelData.GeometricVertexCoordinates[i].Coordinates);
             }
 
-            finalMatrix = projectionMatrix * viewportMatrix;
+            finalMatrix = viewMatrix * projectionMatrix * viewportMatrix;
 
             // Преобразование координат вершин
             Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>

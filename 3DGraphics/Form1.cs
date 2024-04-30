@@ -1,6 +1,7 @@
 using _3DGraphics.Classes;
 using _3DGraphics.Drawing;
 using System.Numerics;
+using Windows.Perception.People;
 using Windows.UI.WebUI;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 using static _3DGraphics.Classes.ObjFileReader;
@@ -161,7 +162,7 @@ namespace _3DGraphics
                         }
                         else
                         {
-                            CoordinateTransformations.RotateCamera(new Vector3(angelRotate, 0, 0));
+                            CoordinateTransformations.RotateCamera(new Vector3(angelRotate,0, 0));
                         }
                         break;
                     case Keys.Y:
@@ -176,15 +177,11 @@ namespace _3DGraphics
                         break;
                     case Keys.Z:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
-                        {
-                            Camera.AngelsRotate.Z -= angelRotate;
-
+                        { 
                             CoordinateTransformations.RotateCamera(new Vector3(0,0,-angelRotate));
                         }
                         else
                         {
-                            Camera.AngelsRotate.Z += angelRotate;
-
                             CoordinateTransformations.RotateCamera(new Vector3(0, 0, angelRotate));
                         }
                         break;
@@ -195,10 +192,10 @@ namespace _3DGraphics
                         Camera.Scale /= scale;
                         break;
                     case Keys.Up:
-                        Camera.IncEyeZ(-near);
+                        Camera.IncEyeDistance(-near);
                         break;
                     case Keys.Down:
-                        Camera.IncEyeZ(near);
+                        Camera.IncEyeDistance(near);
                         break;
                     case Keys.Add:
                         Camera.IncFovAngle(cahngeAngelFov);
@@ -284,13 +281,13 @@ namespace _3DGraphics
         {
             if (modelData != null)
             {
-                const int COUNT_RAND = 10;
+                /*const int COUNT_RAND = 10;
                 const float SHIFT_AXIS = (float)Math.PI / 1000;
                 Camera.AngelsRotate.X += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
                 Camera.AngelsRotate.Y += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
                 Camera.AngelsRotate.Z += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
                 CreateModelDataPaint();
-            }
+*/            }
         }
     }
 }
