@@ -12,7 +12,7 @@ namespace _3DGraphics.Classes
         {
             public CoordinateVector[] GeometricVertexCoordinates { get; set; }
             public TextureVector[] TextureVertexCoordinates { get; set; }
-            public NormalVertice[] NormalVertexCoordinates { get; set; }
+            public NormalVector[] NormalVertexCoordinates { get; set; }
             public int[][] GeometricVertexIndexs { get; set; }
             public int[][] TextureVertexIndexs { get; set; }
             public int[][] NormalVertexIndexs { get; set; }
@@ -26,7 +26,7 @@ namespace _3DGraphics.Classes
             {
                 GeometricVertexCoordinates = new CoordinateVector[modelData.GeometricVertexCoordinates.Length];
                 TextureVertexCoordinates = new TextureVector[modelData.TextureVertexCoordinates.Length];
-                NormalVertexCoordinates = new NormalVertice[modelData.NormalVertexCoordinates.Length];
+                NormalVertexCoordinates = new NormalVector[modelData.NormalVertexCoordinates.Length];
 
                 Parallel.For(0, modelData.GeometricVertexCoordinates.Length, (Action<int>)(i =>
                 {
@@ -40,7 +40,7 @@ namespace _3DGraphics.Classes
 
                 Parallel.For(0, modelData.NormalVertexCoordinates.Length, i =>
                 {
-                    NormalVertexCoordinates[i] = new NormalVertice(modelData.NormalVertexCoordinates[i].Coordinates);
+                    NormalVertexCoordinates[i] = new NormalVector(modelData.NormalVertexCoordinates[i].Coordinates);
                 });
 
                 GeometricVertexIndexs = (int[][])modelData.GeometricVertexIndexs.Clone();
@@ -73,7 +73,7 @@ namespace _3DGraphics.Classes
 
             var geometricVertexsList = new List<CoordinateVector>(VERTEXS_COUNT);
             var textureVerticesList = new List<TextureVector>(VERTEXS_COUNT);
-            var normalVerticesList = new List<NormalVertice>(VERTEXS_COUNT);
+            var normalVerticesList = new List<NormalVector>(VERTEXS_COUNT);
             var geometricVertexIndexsList = new List<int[]>(VERTEX_INDEXS_COUNT);
             var textureVertexIndexsList = new List<int[]>(VERTEX_INDEXS_COUNT);
             var normalVertexIndexsList = new List<int[]>(VERTEX_INDEXS_COUNT);
@@ -85,15 +85,7 @@ namespace _3DGraphics.Classes
                 // Координаты геометрических вершин
                 if (line.Length > 0 && line[0] == 'v' && line[1] == ' ')
                 {
-                    switch (parametersStr.Length)
-                    {
-                        case 4:
-                            geometricVertexsList.Add(new CoordinateVector(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
-                            break;
-                        case 5:
-                            geometricVertexsList.Add(new CoordinateVector(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
-                            break;
-                    }
+                    geometricVertexsList.Add(new CoordinateVector(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
                 }
 
                 // Координаты текстурных вершин
@@ -116,7 +108,7 @@ namespace _3DGraphics.Classes
                 // Координаты текстурных вершин
                 if (line.Length > 0 && line[0] == 'v' && line[1] == 'n')
                 {
-                    textureVerticesList.Add(new TextureVector(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
+                    normalVerticesList.Add(new NormalVector(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
                 }
 
                 if (line.Length > 0 && line[0] == 'f' && line[1] == ' ')

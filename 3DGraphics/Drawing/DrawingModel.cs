@@ -59,27 +59,29 @@ namespace _3DGraphics.Drawing
 
             for (var j = 0; j < drawObjectFuncs.Count; j++)
             {
-                Parallel.ForEach(modelData.GeometricVertexIndexs, vertexIndex =>
-                //foreach (var vertexIndex in geometricVertexIndexs)
+                for(var index = 0; index< modelData.GeometricVertexIndexs.Length; index++) 
+                //Parallel.For(0, modelData.GeometricVertexIndexs.Length, index =>
                 {
-                    var points = new BaseGraphisStructs.CoordinateVector[vertexIndex.Length];
-                    for (var i = 0; i < vertexIndex.Length; i++)
+                    var geometricPoints = new BaseGraphisStructs.CoordinateVector[modelData.GeometricVertexIndexs[index].Length];
+                    var normalPoints = new BaseGraphisStructs.NormalVector[modelData.NormalVertexIndexs[index].Length];
+                    for (var i = 0; i < modelData.GeometricVertexIndexs[index].Length; i++)
                     {
-                        ref var coordinate = ref modelData.GeometricVertexCoordinates[vertexIndex[i]];
-                        if (coordinate.X > widthMaxReder || widthMinReder > coordinate.X || coordinate.Y > heightMaxReder || heightMinReder > coordinate.Y)
+                        ref var geometricCoordinate = ref modelData.GeometricVertexCoordinates[modelData.GeometricVertexIndexs[index][i]];
+                        if (geometricCoordinate.X > widthMaxReder || widthMinReder > geometricCoordinate.X || geometricCoordinate.Y > heightMaxReder || heightMinReder > geometricCoordinate.Y)
                         {
-                            points = null;
+                            geometricPoints = null;
                             break;
                         }
-                        points[i] = coordinate;
+                        geometricPoints[i] = geometricCoordinate;
+                        normalPoints[i] = modelData.NormalVertexCoordinates[modelData.NormalVertexIndexs[index][i]];
                     }
 
-                    if (points != null)
+                    if (geometricPoints != null)
                     {
                         drawObjectFuncs[j](new DrawingParams()
                         {
-                            Coordinate = points,
-                            //Normal =,
+                            Coordinate = geometricPoints,
+                            Normal = normalPoints,
                             RgbBitmap = rgbBitmap,
                             Stride = bitmapData.Stride,
                             ColorInt = colorInts[j],
@@ -87,8 +89,8 @@ namespace _3DGraphics.Drawing
                             HeightZone = heightZone,
                         });
                     }
-                });
-                //}
+                    //});
+                }
             }
 
             bitmap.UnlockBits(bitmapData);

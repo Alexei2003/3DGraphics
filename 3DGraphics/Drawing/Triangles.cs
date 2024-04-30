@@ -75,7 +75,7 @@ namespace _3DGraphics.Drawing
             Array.Sort(tmpPoints, (p1, p2) => p1.X.CompareTo(p2.X));
             Array.Sort(tmpPoints, (p1, p2) => p1.Y.CompareTo(p2.Y));
 
-            var tmpColourInt = GetTriangleLight(@params.Coordinate);
+            var tmpColourInt = GetTriangleLight(@params);
             if (tmpColourInt != null)
             {
                 @params.ColorInt = tmpColourInt.Value;
@@ -175,9 +175,9 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        public static int? GetTriangleLight(BaseGraphisStructs.CoordinateVector[] points)
+        private static int? GetTriangleLight(DrawingParams @params)
         {
-            var cos = CalculateCos(points);
+            var cos = CalculateCos(@params);
 
             if (cos >= 0)
             {
@@ -185,7 +185,7 @@ namespace _3DGraphics.Drawing
                 {
                     return Color.FromArgb(255, 255, 255, 255).ToArgb();
                 }
-                var light = Convert.ToInt32(255 * cos.Value);
+                var light = Convert.ToInt32(255 * cos);
                 return Color.FromArgb(255, int.Abs(light), int.Abs(light), int.Abs(light)).ToArgb();
             }
             else
@@ -194,21 +194,15 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        private static float? CalculateCos(BaseGraphisStructs.CoordinateVector[] points)
+        private static float CalculateCos(DrawingParams @params)
         {
-            var polygon = new Vector3[]
-            {
-                new(points[0].X, points[0].Y, points[0].Z),
-                new(points[1].X, points[1].Y, points[1].Z),
-                new(points[2].X, points[2].Y, points[2].Z)
-            };
 
             // Вычисление вектора от точки к полигону
-            var vector = polygon[0] - Camera.Light;
+            var vector = @params.Coordinate[0].Coordinates - Camera.Light;
             var normalizedVector = Vector3.Normalize(vector);
 
             // Вычисление скалярного произведения нормализованного вектора и нормали полигона
-            var norm = GetPolygonNormal(polygon);
+            var norm = @params.Normal[0].Coordinates;
             var normalizedNorm = Vector3.Normalize(norm);
 
             var cosAngle = Vector3.Dot(normalizedVector, normalizedNorm);
@@ -221,12 +215,12 @@ namespace _3DGraphics.Drawing
             return cosAngle;
         }
 
-        private static Vector3 GetPolygonNormal(Vector3[] polygon)
+/*        private static Vector3 GetPolygonNormal(Vector3[] polygon)
         {
             var side1 = polygon[1] - polygon[0];
             var side2 = polygon[2] - polygon[0];
             return Vector3.Cross(side1, side2);
-        }
+        }*/
 
     }
 }

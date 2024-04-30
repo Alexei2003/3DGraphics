@@ -80,7 +80,7 @@ namespace _3DGraphics.Classes
             public TextureVector(Vector3 vector) : base(vector) { }
         }
 
-        public sealed class NormalVertice : Vector
+        public sealed class NormalVector : Vector
         {
             public float I
             {
@@ -98,11 +98,11 @@ namespace _3DGraphics.Classes
                 set => coordinates[2] = value;
             }
 
-            public NormalVertice() : base() { }
+            public NormalVector() : base() { }
 
-            public NormalVertice(float i, float j, float k) : base(i, j, k) { }
+            public NormalVector(float i, float j, float k) : base(i, j, k) { }
 
-            public NormalVertice(Vector3 vector) : base(vector) { }
+            public NormalVector(Vector3 vector) : base(vector) { }
         }
     }
 }
