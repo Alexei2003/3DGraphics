@@ -11,6 +11,7 @@ namespace _3DGraphics.Drawing
     internal unsafe class DrawingParams
     {
         public BaseGraphisStructs.CoordinateVector[] Coordinate { get; set; } = null;
+        public BaseGraphisStructs.CoordinateVector[] CoordinateToNormal { get; set; } = null;
         public BaseGraphisStructs.TextureVector[] Texture { get; set; } = null;
         public BaseGraphisStructs.NormalVector[] Normal { get; set; } = null;
 

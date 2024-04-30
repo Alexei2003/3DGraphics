@@ -146,7 +146,7 @@ namespace _3DGraphics
         {
             if (modelData != null)
             {
-                const float angelRotate = (float)Math.PI / 100;
+                const float angelRotate = (float)Math.PI / 10;
                 const float cahngeAngelFov = 1f;
                 var scale = new Vector3(1.1f, 1.1f, 1.1f);
                 const int translate = 1;
@@ -157,31 +157,35 @@ namespace _3DGraphics
                     case Keys.X:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
                         {
-                            Camera.AngelsRotate.X -= angelRotate;
+                            CoordinateTransformations.RotateCamera(new Vector3(-angelRotate,0,0));
                         }
                         else
                         {
-                            Camera.AngelsRotate.X += angelRotate;
+                            CoordinateTransformations.RotateCamera(new Vector3(angelRotate, 0, 0));
                         }
                         break;
                     case Keys.Y:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
                         {
-                            Camera.AngelsRotate.Y -= angelRotate;
+                            CoordinateTransformations.RotateCamera(new Vector3(0,-angelRotate, 0));
                         }
                         else
                         {
-                            Camera.AngelsRotate.Y += angelRotate;
+                            CoordinateTransformations.RotateCamera(new Vector3(0,angelRotate, 0));
                         }
                         break;
                     case Keys.Z:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
                         {
                             Camera.AngelsRotate.Z -= angelRotate;
+
+                            CoordinateTransformations.RotateCamera(new Vector3(0,0,-angelRotate));
                         }
                         else
                         {
                             Camera.AngelsRotate.Z += angelRotate;
+
+                            CoordinateTransformations.RotateCamera(new Vector3(0, 0, angelRotate));
                         }
                         break;
                     case Keys.Oemplus:

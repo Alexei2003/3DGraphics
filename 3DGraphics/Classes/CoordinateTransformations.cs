@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using static _3DGraphics.Classes.BaseGraphisStructs;
+using static _3DGraphics.Classes.ObjFileReader;
 
 namespace _3DGraphics.Classes
 {
@@ -13,19 +14,27 @@ namespace _3DGraphics.Classes
             });
         }
 
+        public static void RotateCamera(Vector3 angle)
+        {
+            // Создаем матрицу поворота
+            var rotationMatrix = Matrix4x4.CreateFromYawPitchRoll(angle.Y, angle.X, angle.Z);
+
+
+            var vect = new Vector4(Camera.Eye, 1);
+            vect = Vector4.Transform(vect, rotationMatrix);
+            Camera.Eye = new Vector3(vect.X, vect.Y, vect.Z);
+        }
+
         public static void GetFinalVectors(ObjFileReader.ModelData modelData)
         {
             // Создаем матрицу масштабирования
             var scaleMatrix = Matrix4x4.CreateScale(Camera.Scale);
 
-            // Создаем матрицу поворота
-            var rotationMatrix = Matrix4x4.CreateFromYawPitchRoll(Camera.AngelsRotate.Y, Camera.AngelsRotate.X, Camera.AngelsRotate.Z);
-
             // Создаем матрицу переноса
             var translationMatrix = Matrix4x4.CreateTranslation(Camera.Translate);
 
             // Собираем мировую матрицу
-            var worldMatrix = scaleMatrix * rotationMatrix * translationMatrix;
+            var worldMatrix = scaleMatrix * translationMatrix;
 
             // Создание матрицы просмотра (View Matrix)
             var viewMatrix = Matrix4x4.CreateLookAt(Camera.Eye, Camera.Target, Camera.Up);
@@ -38,14 +47,32 @@ namespace _3DGraphics.Classes
 
             // Комбинирование матриц
             var finalMatrix = worldMatrix * viewMatrix; //* projectionMatrix * viewportMatrix;
-            
+
             // Преобразование координат вершин
             Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
             {
                 var vect = new Vector4(modelData.GeometricVertexCoordinates[i].Coordinates, 1);
                 vect = Vector4.Transform(vect, finalMatrix);
                 //vect = Vector4.Divide(vect, vect.W);
-                modelData.GeometricVertexCoordinates[i] = new BaseGraphisStructs.CoordinateVector(vect.X,vect.Y,vect.Z);
+                modelData.GeometricVertexCoordinates[i] = new BaseGraphisStructs.CoordinateVector(vect.X, vect.Y, vect.Z);
+            });
+
+            modelData.GeometricVertexToNormalCoordinates = new CoordinateVector[modelData.GeometricVertexCoordinates.Length];
+
+            for (var i = 0; i < modelData.GeometricVertexCoordinates.Length; i++)
+            {
+                modelData.GeometricVertexToNormalCoordinates[i] = new BaseGraphisStructs.CoordinateVector(modelData.GeometricVertexCoordinates[i].Coordinates);
+            }
+
+            finalMatrix = projectionMatrix * viewportMatrix;
+
+            // Преобразование координат вершин
+            Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
+            {
+                var vect = new Vector4(modelData.GeometricVertexCoordinates[i].Coordinates, 1);
+                vect = Vector4.Transform(vect, finalMatrix);
+                vect = Vector4.Divide(vect, vect.W);
+                modelData.GeometricVertexCoordinates[i] = new BaseGraphisStructs.CoordinateVector(vect.X, vect.Y, vect.Z);
             });
         }
     }

@@ -199,7 +199,7 @@ namespace _3DGraphics.Drawing
             for (var i = 0; i < @params.Coordinate.Length;i++)
             {
                 // Вычисление вектора от точки к полигону
-                var vector = @params.Coordinate[i].Coordinates - Camera.Eye;//Camera.Light;
+                var vector = @params.CoordinateToNormal[i].Coordinates - Camera.Eye;
                 var normalizedVector = Vector3.Normalize(vector);
 
                 // Вычисление скалярного произведения нормализованного вектора и нормали полигона

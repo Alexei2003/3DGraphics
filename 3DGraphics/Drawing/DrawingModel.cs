@@ -63,6 +63,7 @@ namespace _3DGraphics.Drawing
                 //Parallel.For(0, modelData.GeometricVertexIndexs.Length, index =>
                 {
                     var geometricPoints = new BaseGraphisStructs.CoordinateVector[modelData.GeometricVertexIndexs[index].Length];
+                    var geometricToNormalPoints = new BaseGraphisStructs.CoordinateVector[modelData.GeometricVertexIndexs[index].Length];
                     var normalPoints = new BaseGraphisStructs.NormalVector[modelData.NormalVertexIndexs[index].Length];
                     for (var i = 0; i < modelData.GeometricVertexIndexs[index].Length; i++)
                     {
@@ -73,6 +74,7 @@ namespace _3DGraphics.Drawing
                             break;
                         }
                         geometricPoints[i] = geometricCoordinate;
+                        geometricToNormalPoints[i] = modelData.GeometricVertexToNormalCoordinates[modelData.GeometricVertexIndexs[index][i]];
                         normalPoints[i] = modelData.NormalVertexCoordinates[modelData.NormalVertexIndexs[index][i]];
                     }
 
@@ -81,6 +83,7 @@ namespace _3DGraphics.Drawing
                         drawObjectFuncs[j](new DrawingParams()
                         {
                             Coordinate = geometricPoints,
+                            CoordinateToNormal = geometricToNormalPoints,
                             Normal = normalPoints,
                             RgbBitmap = rgbBitmap,
                             Stride = bitmapData.Stride,

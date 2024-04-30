@@ -11,6 +11,7 @@ namespace _3DGraphics.Classes
         public class ModelData
         {
             public CoordinateVector[] GeometricVertexCoordinates { get; set; }
+            public CoordinateVector[] GeometricVertexToNormalCoordinates { get; set; }
             public TextureVector[] TextureVertexCoordinates { get; set; }
             public NormalVector[] NormalVertexCoordinates { get; set; }
             public int[][] GeometricVertexIndexs { get; set; }

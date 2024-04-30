@@ -8,8 +8,7 @@ namespace _3DGraphics.Classes
         public static Vector3 AngelsRotate = new(0, 0, 0);
         public static Vector3 Translate = new(0, 0, 0);
 
-        public static Vector3 Eye = new(1, 1, 100);
-        public static Vector3 Light = new(0, 0, 100);
+        public static Vector3 Eye = new(0, 0, 100);
         public static Vector3 Up = new(0, 1, 0);
         public static Vector3 Target = new(0, 0, 0);
         public static float Aspect;
@@ -23,8 +22,6 @@ namespace _3DGraphics.Classes
             set
             {
                 size = value;
-                Light.X = size.Width / 2;
-                Light.Y = size.Height / 2;
                 Aspect = (float)size.Width / size.Height;
             }
         }
@@ -70,7 +67,6 @@ namespace _3DGraphics.Classes
             if (Eye.Z + Z > 5)
             {
                 Eye.Z += Z;
-                Light.Z = Eye.Z;
             }
         }
     }
