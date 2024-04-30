@@ -187,8 +187,6 @@ namespace _3DGraphics.Drawing
             }
             else
             {
-                var light = Convert.ToInt32(255 * 1);
-                return Color.FromArgb(255, int.Abs(light), int.Abs(light), int.Abs(light)).ToArgb();
                 return null;
             }
         }
