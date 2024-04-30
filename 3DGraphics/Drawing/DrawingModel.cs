@@ -1,16 +1,13 @@
 ﻿using _3DGraphics.Classes;
 using System.Drawing.Imaging;
-using System.Numerics;
-using Windows.Media.Devices;
-using static _3DGraphics.Classes.BaseGraphisStructs;
 
 namespace _3DGraphics.Drawing
 {
     internal static class DrawingModel
     {
-        public unsafe delegate void DrawObject(BaseGraphisStructs.Point3DF[] points, int* rgbBitmap, BitmapData bitmapData, int colorInt, int widthZone, int heightZone);
+        public delegate void DrawObject(DrawingParams @params);
 
-        public static unsafe void Draw(Bitmap bitmap, GeometricVertex[] geometricVertexСoordinates, int[][] geometricVertexIndexs)
+        public static unsafe void Draw(Bitmap bitmap, ObjFileReader.ModelData modelData)
         {
             ZBuffer.Clear();
 
@@ -62,22 +59,34 @@ namespace _3DGraphics.Drawing
 
             for (var j = 0; j < drawObjectFuncs.Count; j++)
             {
-                Parallel.ForEach(geometricVertexIndexs, vertexIndex =>
+                Parallel.ForEach(modelData.GeometricVertexIndexs, vertexIndex =>
                 //foreach (var vertexIndex in geometricVertexIndexs)
                 {
-                    var points = new Point3DF[vertexIndex.Length];
+                    var points = new BaseGraphisStructs.CoordinateVector[vertexIndex.Length];
                     for (var i = 0; i < vertexIndex.Length; i++)
                     {
-                        ref var coordinate = ref geometricVertexСoordinates[vertexIndex[i]];
+                        ref var coordinate = ref modelData.GeometricVertexCoordinates[vertexIndex[i]];
                         if (coordinate.X > widthMaxReder || widthMinReder > coordinate.X || coordinate.Y > heightMaxReder || heightMinReder > coordinate.Y)
                         {
                             points = null;
                             break;
                         }
-                        points[i] = new Point3DF(coordinate.X, coordinate.Y, coordinate.Z);
+                        points[i] = coordinate;
                     }
 
-                    drawObjectFuncs[j](points, rgbBitmap, bitmapData, colorInts[j], widthZone, heightZone);
+                    if (points != null)
+                    {
+                        drawObjectFuncs[j](new DrawingParams()
+                        {
+                            Coordinate = points,
+                            //Normal =,
+                            RgbBitmap = rgbBitmap,
+                            Stride = bitmapData.Stride,
+                            ColorInt = colorInts[j],
+                            WidthZone = widthZone,
+                            HeightZone = heightZone,
+                        });
+                    }
                 });
                 //}
             }
@@ -85,7 +94,7 @@ namespace _3DGraphics.Drawing
             bitmap.UnlockBits(bitmapData);
         }
 
-        public static int GetRGBColor(Point3DF[] points)
+        public static int GetRGBColor(BaseGraphisStructs.CoordinateVector[] points)
         {
             int r = 0;
             int g = 0;

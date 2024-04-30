@@ -5,7 +5,7 @@ namespace _3DGraphics.Classes
 {
     internal static class CoordinateTransformations
     {
-        public static void TranslateVectors(GeometricVertex[] vectors, CoordinateVector translation)
+        public static void TranslateVectors(CoordinateVector[] vectors, CoordinateVector translation)
         {
             Parallel.For(0, vectors.Length, i =>
             {
@@ -13,7 +13,7 @@ namespace _3DGraphics.Classes
             });
         }
 
-        public static void GetFinalVectors(GeometricVertex[] GeometricVertexCoordinates)
+        public static void GetFinalVectors(CoordinateVector[] GeometricVertexCoordinates)
         {
             // Создаем матрицу масштабирования
             var scaleMatrix = Matrix4x4.CreateScale(Camera.Scale);
@@ -38,12 +38,14 @@ namespace _3DGraphics.Classes
 
             // Комбинирование матриц
             var finalMatrix = worldMatrix * viewMatrix * projectionMatrix * viewportMatrix;
-
+            
             // Преобразование координат вершин
             Parallel.For(0, GeometricVertexCoordinates.Length, i =>
             {
-                GeometricVertexCoordinates[i].Coordinates = Vector4.Transform(GeometricVertexCoordinates[i].Coordinates, finalMatrix);
-                GeometricVertexCoordinates[i].Coordinates = Vector4.Divide(GeometricVertexCoordinates[i].Coordinates, GeometricVertexCoordinates[i].W);
+                var vect = new Vector4(GeometricVertexCoordinates[i].Coordinates, 1);
+                vect = Vector4.Transform(vect, finalMatrix);
+                vect = Vector4.Divide(vect, vect.W);
+                GeometricVertexCoordinates[i] = new BaseGraphisStructs.CoordinateVector(vect.X,vect.Y,vect.Z);
             });
         }
     }

@@ -6,25 +6,25 @@ namespace _3DGraphics.Classes
     {
         public abstract class Vector
         {
-            public Vector4 Coordinates
+            public Vector3 Coordinates
             {
                 get => coordinates;
                 set => coordinates = value;
             }
 
-            protected Vector4 coordinates;
+            protected Vector3 coordinates;
 
             public Vector()
             {
-                coordinates = new Vector4();
+                coordinates = new Vector3();
             }
 
-            public Vector(float a, float b, float c, float d = 0)
+            public Vector(float a, float b, float c)
             {
-                coordinates = new Vector4(a, b, c, d);
+                coordinates = new Vector3(a, b, c);
             }
 
-            public Vector(Vector4 vector)
+            public Vector(Vector3 vector)
             {
                 coordinates = vector;
             }
@@ -52,27 +52,10 @@ namespace _3DGraphics.Classes
 
             public CoordinateVector(float x, float y, float z) : base(x, y, z) { }
 
-            public CoordinateVector(float x, float y, float z, float d = 0) : base(x, y, z, d) { }
-
-            public CoordinateVector(Vector4 vector) : base(vector) { }
+            public CoordinateVector(Vector3 vector) : base(vector) { }
         }
 
-        public sealed class GeometricVertex : CoordinateVector
-        {
-            public float W
-            {
-                get => coordinates[3];
-                set => coordinates[3] = value;
-            }
-
-            public GeometricVertex() : base() { }
-
-            public GeometricVertex(float x, float y, float z, float w) : base(x, y, z, w) { }
-
-            public GeometricVertex(Vector4 vector) : base(vector) { }
-        }
-
-        public sealed class TextureVertice : Vector
+        public sealed class TextureVector : Vector
         {
             public float U
             {
@@ -90,11 +73,11 @@ namespace _3DGraphics.Classes
                 set => coordinates[2] = value;
             }
 
-            public TextureVertice() : base() { }
+            public TextureVector() : base() { }
 
-            public TextureVertice(float u, float v, float w) : base(u, v, w) { }
+            public TextureVector(float u, float v, float w) : base(u, v, w) { }
 
-            public TextureVertice(Vector4 vector) : base(vector) { }
+            public TextureVector(Vector3 vector) : base(vector) { }
         }
 
         public sealed class NormalVertice : Vector
@@ -119,28 +102,7 @@ namespace _3DGraphics.Classes
 
             public NormalVertice(float i, float j, float k) : base(i, j, k) { }
 
-            public NormalVertice(Vector4 vector) : base(vector) { }
-        }
-
-        public struct Point3DF
-        {
-            public float X { get; set; }
-            public float Y { get; set; }
-            public float Z { get; set; }
-
-            public Point3DF(float x, float y, float z)
-            {
-                X = x;
-                Y = y;
-                Z = z;
-            }
-
-            public Point3DF(PointF p, float z)
-            {
-                X = p.X;
-                Y = p.Y;
-                Z = z;
-            }
+            public NormalVertice(Vector3 vector) : base(vector) { }
         }
     }
 }

@@ -41,16 +41,6 @@ namespace _3DGraphics
 
             var timerCallback = new TimerCallback(UpdateFPS);
             timerFPS = new System.Threading.Timer(timerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
-
-/*            var points = new BaseGraphisStructs.Point3DF[3];
-
-            points[0] = new BaseGraphisStructs.Point3DF(-100,0,100);
-            points[1] = new BaseGraphisStructs.Point3DF(100, 0, 100);
-            points[2] = new BaseGraphisStructs.Point3DF(0, -100, -100);
-
-            Camera.Light = new Vector3(0,0,200);
-
-            var a = Triangles.GetTriangleLight(points);*/
         }
 
         private void UpdateFPS(object state)
@@ -102,7 +92,7 @@ namespace _3DGraphics
 
             if (modelDataPaint != null)
             {
-                DrawingModel.Draw(bitmap, modelDataPaint.GeometricVertexCoordinates, modelDataPaint.GeometricVertexIndexs);
+                DrawingModel.Draw(bitmap, modelDataPaint);
 
                 lock (lockFrameCount)
                 {

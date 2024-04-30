@@ -10,8 +10,8 @@ namespace _3DGraphics.Classes
 
         public class ModelData
         {
-            public GeometricVertex[] GeometricVertexCoordinates { get; set; }
-            public TextureVertice[] TextureVertexCoordinates { get; set; }
+            public CoordinateVector[] GeometricVertexCoordinates { get; set; }
+            public TextureVector[] TextureVertexCoordinates { get; set; }
             public NormalVertice[] NormalVertexCoordinates { get; set; }
             public int[][] GeometricVertexIndexs { get; set; }
             public int[][] TextureVertexIndexs { get; set; }
@@ -24,18 +24,18 @@ namespace _3DGraphics.Classes
 
             public ModelData(ModelData modelData)
             {
-                GeometricVertexCoordinates = new GeometricVertex[modelData.GeometricVertexCoordinates.Length];
-                TextureVertexCoordinates = new TextureVertice[modelData.TextureVertexCoordinates.Length];
+                GeometricVertexCoordinates = new CoordinateVector[modelData.GeometricVertexCoordinates.Length];
+                TextureVertexCoordinates = new TextureVector[modelData.TextureVertexCoordinates.Length];
                 NormalVertexCoordinates = new NormalVertice[modelData.NormalVertexCoordinates.Length];
 
-                Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
+                Parallel.For(0, modelData.GeometricVertexCoordinates.Length, (Action<int>)(i =>
                 {
-                    GeometricVertexCoordinates[i] = new GeometricVertex(modelData.GeometricVertexCoordinates[i].Coordinates);
-                });
+                    GeometricVertexCoordinates[i] = new CoordinateVector(modelData.GeometricVertexCoordinates[i].Coordinates);
+                }));
 
                 Parallel.For(0, modelData.TextureVertexCoordinates.Length, i =>
                 {
-                    TextureVertexCoordinates[i] = new TextureVertice(modelData.TextureVertexCoordinates[i].Coordinates);
+                    TextureVertexCoordinates[i] = new TextureVector(modelData.TextureVertexCoordinates[i].Coordinates);
                 });
 
                 Parallel.For(0, modelData.NormalVertexCoordinates.Length, i =>
@@ -71,8 +71,8 @@ namespace _3DGraphics.Classes
         {
             var fileStrs = File.ReadAllLines(str);
 
-            var geometricVertexsList = new List<GeometricVertex>(VERTEXS_COUNT);
-            var textureVerticesList = new List<TextureVertice>(VERTEXS_COUNT);
+            var geometricVertexsList = new List<CoordinateVector>(VERTEXS_COUNT);
+            var textureVerticesList = new List<TextureVector>(VERTEXS_COUNT);
             var normalVerticesList = new List<NormalVertice>(VERTEXS_COUNT);
             var geometricVertexIndexsList = new List<int[]>(VERTEX_INDEXS_COUNT);
             var textureVertexIndexsList = new List<int[]>(VERTEX_INDEXS_COUNT);
@@ -88,10 +88,10 @@ namespace _3DGraphics.Classes
                     switch (parametersStr.Length)
                     {
                         case 4:
-                            geometricVertexsList.Add(new GeometricVertex(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3]), 1));
+                            geometricVertexsList.Add(new CoordinateVector(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
                             break;
                         case 5:
-                            geometricVertexsList.Add(new GeometricVertex(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3]), float.Parse(parametersStr[4])));
+                            geometricVertexsList.Add(new CoordinateVector(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
                             break;
                     }
                 }
@@ -102,13 +102,13 @@ namespace _3DGraphics.Classes
                     switch (parametersStr.Length)
                     {
                         case 2:
-                            textureVerticesList.Add(new TextureVertice(float.Parse(parametersStr[1]), 0, 0));
+                            textureVerticesList.Add(new TextureVector(float.Parse(parametersStr[1]), 0, 0));
                             break;
                         case 3:
-                            textureVerticesList.Add(new TextureVertice(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), 0));
+                            textureVerticesList.Add(new TextureVector(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), 0));
                             break;
                         case 4:
-                            textureVerticesList.Add(new TextureVertice(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
+                            textureVerticesList.Add(new TextureVector(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
                             break;
                     }
                 }
@@ -116,7 +116,7 @@ namespace _3DGraphics.Classes
                 // Координаты текстурных вершин
                 if (line.Length > 0 && line[0] == 'v' && line[1] == 'n')
                 {
-                    textureVerticesList.Add(new TextureVertice(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
+                    textureVerticesList.Add(new TextureVector(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
                 }
 
                 if (line.Length > 0 && line[0] == 'f' && line[1] == ' ')
