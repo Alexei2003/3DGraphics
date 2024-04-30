@@ -13,7 +13,7 @@ namespace _3DGraphics.Classes
             });
         }
 
-        public static void GetFinalVectors(CoordinateVector[] GeometricVertexCoordinates)
+        public static void GetFinalVectors(ObjFileReader.ModelData modelData)
         {
             // Создаем матрицу масштабирования
             var scaleMatrix = Matrix4x4.CreateScale(Camera.Scale);
@@ -37,15 +37,15 @@ namespace _3DGraphics.Classes
             var viewportMatrix = Matrix4x4.CreateViewport(0, 0, Camera.Size.Width, Camera.Size.Height, Camera.ZNear, Camera.ZFar);
 
             // Комбинирование матриц
-            var finalMatrix = worldMatrix * viewMatrix * projectionMatrix * viewportMatrix;
+            var finalMatrix = worldMatrix * viewMatrix; //* projectionMatrix * viewportMatrix;
             
             // Преобразование координат вершин
-            Parallel.For(0, GeometricVertexCoordinates.Length, i =>
+            Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
             {
-                var vect = new Vector4(GeometricVertexCoordinates[i].Coordinates, 1);
+                var vect = new Vector4(modelData.GeometricVertexCoordinates[i].Coordinates, 1);
                 vect = Vector4.Transform(vect, finalMatrix);
-                vect = Vector4.Divide(vect, vect.W);
-                GeometricVertexCoordinates[i] = new BaseGraphisStructs.CoordinateVector(vect.X,vect.Y,vect.Z);
+                //vect = Vector4.Divide(vect, vect.W);
+                modelData.GeometricVertexCoordinates[i] = new BaseGraphisStructs.CoordinateVector(vect.X,vect.Y,vect.Z);
             });
         }
     }

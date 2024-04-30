@@ -1,5 +1,6 @@
 ﻿using _3DGraphics.Classes;
 using System.Numerics;
+using static _3DGraphics.Classes.ObjFileReader;
 
 namespace _3DGraphics.Drawing
 {
@@ -179,48 +180,37 @@ namespace _3DGraphics.Drawing
         {
             var cos = CalculateCos(@params);
 
-            if (cos >= 0)
+            if (cos <= 0)
             {
-                if (cos > 1)
-                {
-                    return Color.FromArgb(255, 255, 255, 255).ToArgb();
-                }
                 var light = Convert.ToInt32(255 * cos);
                 return Color.FromArgb(255, int.Abs(light), int.Abs(light), int.Abs(light)).ToArgb();
             }
             else
             {
+
                 return null;
             }
         }
 
         private static float CalculateCos(DrawingParams @params)
         {
+            float cos = 0;
 
-            // Вычисление вектора от точки к полигону
-            var vector = @params.Coordinate[0].Coordinates - Camera.Light;
-            var normalizedVector = Vector3.Normalize(vector);
-
-            // Вычисление скалярного произведения нормализованного вектора и нормали полигона
-            var norm = @params.Normal[0].Coordinates;
-            var normalizedNorm = Vector3.Normalize(norm);
-
-            var cosAngle = Vector3.Dot(normalizedVector, normalizedNorm);
-
-            if (cosAngle > 1)
+            for (var i = 0; i < @params.Coordinate.Length;i++)
             {
+                // Вычисление вектора от точки к полигону
+                var vector = @params.Coordinate[i].Coordinates - Camera.Eye;//Camera.Light;
+                var normalizedVector = Vector3.Normalize(vector);
 
+                // Вычисление скалярного произведения нормализованного вектора и нормали полигона
+                var norm = @params.Normal[i].Coordinates;
+                var normalizedNorm = Vector3.Normalize(norm);
+
+                cos += Vector3.Dot(normalizedVector, normalizedNorm);
             }
+            cos /= @params.Coordinate.Length;
 
-            return cosAngle;
+            return cos;
         }
-
-/*        private static Vector3 GetPolygonNormal(Vector3[] polygon)
-        {
-            var side1 = polygon[1] - polygon[0];
-            var side2 = polygon[2] - polygon[0];
-            return Vector3.Cross(side1, side2);
-        }*/
-
     }
 }

@@ -138,7 +138,7 @@ namespace _3DGraphics
             if (modelData != null)
             {
                 modelDataPaint.SetCopyValue(modelData);
-                CoordinateTransformations.GetFinalVectors(modelDataPaint.GeometricVertexCoordinates);
+                CoordinateTransformations.GetFinalVectors(modelDataPaint);
             }
         }
 
