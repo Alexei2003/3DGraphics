@@ -64,10 +64,10 @@ namespace _3DGraphics.Classes
 
         public static void IncEyeDistance(int change)
         {
-            if (Math.Abs(Math.Pow(Math.Pow(Eye.X + change, 2) + Math.Pow(Eye.Y + change, 2) + Math.Pow(Eye.Z + change, 2), 0.5f)) > 5)
+            if (Vector3.Distance(new Vector3(0, 0, 0), Vector3.Add(Camera.Eye,new Vector3(0,0,change))) > 10)
             {
-/*                Eye.Y += change;
-                Eye.X += change;*/
+                /*                Eye.Y += change;
+                                Eye.X += change;*/
                 Eye.Z += change;
             }
         }

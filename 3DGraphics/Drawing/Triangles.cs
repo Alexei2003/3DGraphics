@@ -79,16 +79,8 @@ namespace _3DGraphics.Drawing
             if (tmpColourInt != null)
             {
                 @params.ColorInt = tmpColourInt.Value;
-                float z = 0;
-                for(var i = 0; i < @params.Coordinate.Length; i++)
-                {
-                    var dist = Vector3.Distance(@params.CoordinateToNormal[i].Coordinates, Camera.Eye);
-                    z += @params.Coordinate[i].Z - dist;
-                }
-                z /= @params.Coordinate.Length;
                 for (var i = 0; i < tmpPoints.Length - 2; i++)
                 {
-                    @params.P1 = new BaseGraphisStructs.CoordinateVector(0, 0, z);
                     @params.Coordinate = [tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]];
                     DrawTriangle(@params);
                 }
@@ -117,7 +109,8 @@ namespace _3DGraphics.Drawing
 
             float x1 = @params.Coordinate[0].X;
             float x2;
-            float z1 = @params.Coordinate[0].Z;
+            const float scaleFactor = 1f;
+            float z1 = - Vector3.Distance(@params.CoordinateToNormal[0].Coordinates,Camera.Eye) * scaleFactor;
             float z2;
             float XIncrement1;
             float XIncrement2;
@@ -135,7 +128,7 @@ namespace _3DGraphics.Drawing
                 float dz1 = @params.Coordinate[0].Z - @params.Coordinate[2].Z;
                 float dz2 = @params.Coordinate[1].Z - @params.Coordinate[2].Z;
 
-                z2 = @params.Coordinate[1].Z;
+                z2 =  - Vector3.Distance(@params.CoordinateToNormal[1].Coordinates, Camera.Eye) * scaleFactor;
                 ZIncrement1 = -dz1 / steps;
                 ZIncrement2 = -dz2 / steps;
             }
@@ -151,7 +144,7 @@ namespace _3DGraphics.Drawing
                 float dz1 = @params.Coordinate[1].Z - @params.Coordinate[0].Z;
                 float dz2 = @params.Coordinate[2].Z - @params.Coordinate[0].Z;
 
-                z2 = @params.Coordinate[2].Z;
+                z2 =  - Vector3.Distance(@params.CoordinateToNormal[2].Coordinates, Camera.Eye) * scaleFactor;
                 ZIncrement1 = dz1 / steps;
                 ZIncrement2 = dz2 / steps;
 
@@ -160,20 +153,16 @@ namespace _3DGraphics.Drawing
             var p1Line = new BaseGraphisStructs.CoordinateVector();
             var p2Line = new BaseGraphisStructs.CoordinateVector();
 
-            var z = @params.P1.Z;
-
             for (var i = 0; i <= steps; i++)
             {
                 p1Line.X = x1;
                 p1Line.Y = y;
-                //p1Line.Z = z1;
-                p1Line.Z = z;
+                p1Line.Z = z1;
 
 
                 p2Line.X = x2;
                 p2Line.Y = y;
-                //p2Line.Z = z2;
-                p2Line.Z = z;
+                p2Line.Z = z2;
 
                 @params.P1 = p1Line;
                 @params.P2 = p2Line;
@@ -182,8 +171,8 @@ namespace _3DGraphics.Drawing
                 x1 += XIncrement1;
                 x2 += XIncrement2;
                 y += YIncrement;
-                //z1 += ZIncrement1;
-                //z2 += ZIncrement2;
+                z1 += ZIncrement1;
+                z2 += ZIncrement2;
 
             }
         }

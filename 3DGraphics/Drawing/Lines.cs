@@ -47,7 +47,7 @@
                 {
                     x += XIncrement;
                     y += YIncrement;
-                    //z += ZIncrement;
+                    z += ZIncrement;
                     continue;
                 }
 
@@ -60,7 +60,7 @@
 
                 x += XIncrement;
                 y += YIncrement;
-                //z += ZIncrement;
+                z += ZIncrement;
             }
         }
     }
