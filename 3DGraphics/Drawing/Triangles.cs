@@ -1,6 +1,5 @@
 ﻿using _3DGraphics.Classes;
 using System.Numerics;
-using static _3DGraphics.Classes.ObjFileReader;
 
 namespace _3DGraphics.Drawing
 {
@@ -80,8 +79,16 @@ namespace _3DGraphics.Drawing
             if (tmpColourInt != null)
             {
                 @params.ColorInt = tmpColourInt.Value;
+                float z = 0;
+                for(var i = 0; i < @params.Coordinate.Length; i++)
+                {
+                    var dist = Vector3.Distance(@params.CoordinateToNormal[i].Coordinates, Camera.Eye);
+                    z += @params.Coordinate[i].Z - dist;
+                }
+                z /= @params.Coordinate.Length;
                 for (var i = 0; i < tmpPoints.Length - 2; i++)
                 {
+                    @params.P1 = new BaseGraphisStructs.CoordinateVector(0, 0, z);
                     @params.Coordinate = [tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]];
                     DrawTriangle(@params);
                 }
@@ -144,7 +151,7 @@ namespace _3DGraphics.Drawing
                 float dz1 = @params.Coordinate[1].Z - @params.Coordinate[0].Z;
                 float dz2 = @params.Coordinate[2].Z - @params.Coordinate[0].Z;
 
-                z2 = @params.Coordinate[0].Z;
+                z2 = @params.Coordinate[2].Z;
                 ZIncrement1 = dz1 / steps;
                 ZIncrement2 = dz2 / steps;
 
@@ -153,15 +160,20 @@ namespace _3DGraphics.Drawing
             var p1Line = new BaseGraphisStructs.CoordinateVector();
             var p2Line = new BaseGraphisStructs.CoordinateVector();
 
+            var z = @params.P1.Z;
+
             for (var i = 0; i <= steps; i++)
             {
                 p1Line.X = x1;
                 p1Line.Y = y;
-                p1Line.Z = z1;
+                //p1Line.Z = z1;
+                p1Line.Z = z;
+
 
                 p2Line.X = x2;
                 p2Line.Y = y;
-                p2Line.Z = z2;
+                //p2Line.Z = z2;
+                p2Line.Z = z;
 
                 @params.P1 = p1Line;
                 @params.P2 = p2Line;
@@ -170,8 +182,8 @@ namespace _3DGraphics.Drawing
                 x1 += XIncrement1;
                 x2 += XIncrement2;
                 y += YIncrement;
-                z1 += ZIncrement1;
-                z2 += ZIncrement2;
+                //z1 += ZIncrement1;
+                //z2 += ZIncrement2;
 
             }
         }
@@ -182,8 +194,8 @@ namespace _3DGraphics.Drawing
 
             if (cos <= 0)
             {
-                var light = Convert.ToInt32(255 * cos);
-                return Color.FromArgb(255, int.Abs(light), int.Abs(light), int.Abs(light)).ToArgb();
+                var light = int.Abs(Convert.ToInt32(255 * cos));
+                return Color.FromArgb(255, light, light, light).ToArgb();
             }
             else
             {
@@ -195,7 +207,7 @@ namespace _3DGraphics.Drawing
         {
             float cos = 0;
 
-            for (var i = 0; i < @params.Coordinate.Length;i++)
+            for (var i = 0; i < @params.Coordinate.Length; i++)
             {
                 // Вычисление вектора от точки к полигону
                 var vector = @params.CoordinateToNormal[i].Coordinates - Camera.Eye;

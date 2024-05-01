@@ -1,5 +1,6 @@
 using _3DGraphics.Classes;
 using _3DGraphics.Drawing;
+using System.Drawing;
 using System.Numerics;
 using Windows.Perception.People;
 using Windows.UI.WebUI;
@@ -107,6 +108,12 @@ namespace _3DGraphics
         {
             var modelFilePath = opfdModelFile.FileName;
             modelData = Read(modelFilePath);
+
+            if (modelData.NormalVertexCoordinates.Length == 0)
+            {
+                modelData = null;
+                return;
+            }
 
             CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new CoordinateVector(
                 -(modelData.GeometricVertexCoordinates.Max(v => v.X) + modelData.GeometricVertexCoordinates.Min(v => v.X)) / 2,
@@ -281,13 +288,10 @@ namespace _3DGraphics
         {
             if (modelData != null)
             {
-                /*const int COUNT_RAND = 10;
-                const float SHIFT_AXIS = (float)Math.PI / 1000;
-                Camera.AngelsRotate.X += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
-                Camera.AngelsRotate.Y += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
-                Camera.AngelsRotate.Z += SHIFT_AXIS * (1 + rand.Next(COUNT_RAND));
+                const float angelRotate = (float)Math.PI / 10;
+                CoordinateTransformations.RotateCamera(new Vector3(0,angelRotate, 0));
                 CreateModelDataPaint();
-*/            }
+            }
         }
     }
 }

@@ -27,8 +27,8 @@
             var dy = @params.P2.Y - @params.P1.Y;
             var steps = Math.Max(Math.Abs(dx), Math.Abs(dy));
 
-            var XIncrement = dx / (float)steps;
-            var YIncrement = dy / (float)steps;
+            float XIncrement = dx / (float)steps;
+            float YIncrement = dy / (float)steps;
 
             float x = @params.P1.X;
             float y = @params.P1.Y;
@@ -37,7 +37,7 @@
             var strideInt = @params.Stride / 4;
 
             var dz = @params.P2.Z - @params.P1.Z;
-            var ZIncrement = dz / (float)steps;
+            float ZIncrement = dz / (float)steps;
 
             var z = @params.P1.Z;
 
@@ -47,11 +47,11 @@
                 {
                     x += XIncrement;
                     y += YIncrement;
-                    z += ZIncrement;
+                    //z += ZIncrement;
                     continue;
                 }
 
-                if (ZBuffer.CheckAndSetDistance((int)Math.Round(x), (int)Math.Round(y), z))
+                if (ZBuffer.CheckAndSetDepth((int)Math.Round(x), (int)Math.Round(y), z))
                 {
                     index = (int)Math.Round(x) + (int)Math.Round(y) * strideInt;
 
@@ -60,7 +60,7 @@
 
                 x += XIncrement;
                 y += YIncrement;
-                z += ZIncrement;
+                //z += ZIncrement;
             }
         }
     }
