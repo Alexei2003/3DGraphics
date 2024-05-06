@@ -59,8 +59,8 @@ namespace _3DGraphics.Drawing
 
             for (var j = 0; j < drawObjectFuncs.Count; j++)
             {
-                for(var index = 0; index< modelData.GeometricVertexIndexs.Length; index++) 
-                //Parallel.For(0, modelData.GeometricVertexIndexs.Length, index =>
+                //for(var index = 0; index< modelData.GeometricVertexIndexs.Length; index++) 
+                Parallel.For(0, modelData.GeometricVertexIndexs.Length, index =>
                 {
                     var geometricPoints = new BaseGraphisStructs.CoordinateVector[modelData.GeometricVertexIndexs[index].Length];
                     var geometricToNormalPoints = new BaseGraphisStructs.CoordinateVector[modelData.GeometricVertexIndexs[index].Length];
@@ -92,8 +92,8 @@ namespace _3DGraphics.Drawing
                             HeightZone = heightZone,
                         });
                     }
-                //});
-                }
+                });
+                //}
             }
 
             bitmap.UnlockBits(bitmapData);

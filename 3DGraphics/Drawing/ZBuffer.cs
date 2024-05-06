@@ -49,8 +49,6 @@ namespace _3DGraphics.Drawing
             return false;
         }
 
-
-
         public static void Clear()
         {
             zBuffer = (float[,])originaZBuffer.Clone();

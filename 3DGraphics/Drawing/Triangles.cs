@@ -110,7 +110,7 @@ namespace _3DGraphics.Drawing
             float x1 = @params.Coordinate[0].X;
             float x2;
             const float scaleFactor = 1f;
-            float z1 = - Vector3.Distance(@params.CoordinateToNormal[0].Coordinates,Camera.Eye) * scaleFactor;
+            float z1 = -Vector3.Distance(@params.CoordinateToNormal[0].Coordinates, Camera.Eye) * scaleFactor;
             float z2;
             float XIncrement1;
             float XIncrement2;
@@ -128,7 +128,7 @@ namespace _3DGraphics.Drawing
                 float dz1 = @params.Coordinate[0].Z - @params.Coordinate[2].Z;
                 float dz2 = @params.Coordinate[1].Z - @params.Coordinate[2].Z;
 
-                z2 =  - Vector3.Distance(@params.CoordinateToNormal[1].Coordinates, Camera.Eye) * scaleFactor;
+                z2 = -Vector3.Distance(@params.CoordinateToNormal[1].Coordinates, Camera.Eye) * scaleFactor;
                 ZIncrement1 = -dz1 / steps;
                 ZIncrement2 = -dz2 / steps;
             }
@@ -144,7 +144,7 @@ namespace _3DGraphics.Drawing
                 float dz1 = @params.Coordinate[1].Z - @params.Coordinate[0].Z;
                 float dz2 = @params.Coordinate[2].Z - @params.Coordinate[0].Z;
 
-                z2 =  - Vector3.Distance(@params.CoordinateToNormal[2].Coordinates, Camera.Eye) * scaleFactor;
+                z2 = -Vector3.Distance(@params.CoordinateToNormal[2].Coordinates, Camera.Eye) * scaleFactor;
                 ZIncrement1 = dz1 / steps;
                 ZIncrement2 = dz2 / steps;
 
@@ -179,27 +179,51 @@ namespace _3DGraphics.Drawing
 
         private static int? GetTriangleLight(DrawingParams @params)
         {
-            var cos = CalculateCos(@params);
+            var light = 0;
 
-            if (cos <= 0)
-            {
-                var light = int.Abs(Convert.ToInt32(255 * cos));
-                return Color.FromArgb(255, light, light, light).ToArgb();
-            }
-            else
+            var cosEye = CalculateCos(@params, Camera.Eye);
+
+            if (cosEye <= 0)
             {
                 return null;
             }
+
+
+            //Diffuse
+            var cosLight = CalculateCos(@params, Camera.Light);
+            var diffuseLight = Convert.ToInt32(255 * cosLight) < 0 ? 0 : Convert.ToInt32(255 * cosLight);
+            light = diffuseLight - 100 < 0 ? 0 : diffuseLight - 100;
+
+            //Ambient
+            var ambientLight = 50;
+            //var ambientLight = 0;
+
+            //Specular
+            int specularLight;
+            if (diffuseLight != 0)
+            {
+                var cosSpecular = CalculateSpecularCos(@params);
+                specularLight = Convert.ToInt32(255 * cosSpecular) < 0 ? 0 : Convert.ToInt32(255 * cosSpecular);
+            }
+            else
+            {
+                specularLight = 0;
+            }
+
+            //Finish
+            light = light + ambientLight + specularLight > 255 ? 255 : light + ambientLight + specularLight;
+
+            return Color.FromArgb(255, specularLight > 255 ? 255 : specularLight, specularLight > 255 ? 255 : specularLight, light).ToArgb();
         }
 
-        private static float CalculateCos(DrawingParams @params)
+        private static float CalculateCos(DrawingParams @params, Vector3 pointObject)
         {
             float cos = 0;
 
             for (var i = 0; i < @params.Coordinate.Length; i++)
             {
                 // Вычисление вектора от точки к полигону
-                var vector = @params.CoordinateToNormal[i].Coordinates - Camera.Eye;
+                var vector = @params.CoordinateToNormal[i].Coordinates - pointObject;
                 var normalizedVector = Vector3.Normalize(vector);
 
                 // Вычисление скалярного произведения нормализованного вектора и нормали полигона
@@ -208,6 +232,39 @@ namespace _3DGraphics.Drawing
 
                 cos += Vector3.Dot(normalizedVector, normalizedNorm);
             }
+            cos /= @params.Coordinate.Length;
+
+            return -cos;
+        }
+
+        private static float CalculateSpecularCos(DrawingParams @params)
+        {
+            float cos = 0;
+
+            for (var i = 0; i < @params.Coordinate.Length; i++)
+            {
+                //Свет
+                var vectorLight = @params.CoordinateToNormal[i].Coordinates - Camera.Light;
+                var normalizedVectorLight = Vector3.Normalize(vectorLight);
+
+                //Нормаль
+                var norm = @params.Normal[i].Coordinates;
+                var normalizedNorm = Vector3.Normalize(norm);
+
+                //Отражение
+                var vectorSpecular = normalizedNorm - 2 * (normalizedVectorLight * normalizedNorm) * normalizedNorm;
+                var normalizedVectorSpecular = Vector3.Normalize(vectorSpecular);
+
+                //Камера 
+                var vectorCamera = @params.CoordinateToNormal[i].Coordinates - Camera.Eye;
+                var normalizedVectorCamera = Vector3.Normalize(vectorCamera);
+
+                var cosSpeg = Vector3.Dot(normalizedVectorSpecular, normalizedVectorCamera);
+                cosSpeg = float.Pow(cosSpeg, 100);
+
+                cos += cosSpeg;
+            }
+
             cos /= @params.Coordinate.Length;
 
             return cos;
