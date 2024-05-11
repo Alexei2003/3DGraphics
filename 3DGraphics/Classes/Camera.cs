@@ -65,12 +65,19 @@ namespace _3DGraphics.Classes
 
         public static void IncEyeDistance(int change)
         {
-            if (Vector3.Distance(new Vector3(0, 0, 0), Vector3.Add(Camera.Eye,new Vector3(0,0,change))) > 10)
+            if (change < 0 && Vector3.Distance(new Vector3(0, 0, 0), Vector3.Add(Camera.Eye, new Vector3(0, 0, change))) < 10)
             {
-                /*                Eye.Y += change;
-                                Eye.X += change;*/
-                Eye.Z += change;
+                return;
             }
+            var sum = float.Abs(Camera.Eye.X) + float.Abs(Camera.Eye.Y) + float.Abs(Camera.Eye.Z);
+
+            var xPart = Camera.Eye.X / sum;
+            var yPart = Camera.Eye.Y / sum;
+            var zPart = Camera.Eye.Z / sum;
+
+            Eye.X += change * xPart;
+            Eye.Y += change * yPart;
+            Eye.Z += change * zPart;
         }
     }
 }
