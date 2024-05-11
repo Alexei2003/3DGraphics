@@ -98,8 +98,6 @@ namespace _3DGraphics.Drawing
                 specularLight = 0;
             }
 
-            specularLight = 0;
-
             //Finish
             light = light + ambientLight + specularLight > 255 ? 255 : light + ambientLight + specularLight;
 
