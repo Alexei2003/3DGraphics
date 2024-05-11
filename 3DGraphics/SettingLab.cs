@@ -6,5 +6,7 @@
 
         //DrawModelType.Lines
         public static DrawModelType DrawModel = DrawModelType.Triangles;
+
+        public static bool LightModelFullPolygon = false;
     }
 }

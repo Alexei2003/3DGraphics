@@ -14,11 +14,13 @@ namespace _3DGraphics.Drawing
             var widthZone = bitmap.Width - 1;
             var heightZone = bitmap.Height - 1;
 
-            var widthMaxReder = bitmap.Width * 2;
-            var heightMaxReder = bitmap.Height * 2;
+            const int RENDER_ARRAY_OUT_WINDOW = 5;
 
-            var widthMinReder = -bitmap.Width;
-            var heightMinReder = -bitmap.Height;
+            var widthMaxReder = bitmap.Width + bitmap.Width / RENDER_ARRAY_OUT_WINDOW;
+            var heightMaxReder = bitmap.Height + bitmap.Height / RENDER_ARRAY_OUT_WINDOW;
+
+            var widthMinReder = -bitmap.Width / RENDER_ARRAY_OUT_WINDOW;
+            var heightMinReder = -bitmap.Height / RENDER_ARRAY_OUT_WINDOW;
 
 
             var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
@@ -59,8 +61,8 @@ namespace _3DGraphics.Drawing
 
             for (var j = 0; j < drawObjectFuncs.Count; j++)
             {
-                //for(var index = 0; index< modelData.GeometricVertexIndexs.Length; index++) 
-                Parallel.For(0, modelData.GeometricVertexIndexs.Length, index =>
+                for(var index = 0; index< modelData.GeometricVertexIndexs.Length; index++) 
+                //Parallel.For(0, modelData.GeometricVertexIndexs.Length, index =>
                 {
                     var geometricPoints = new BaseGraphisStructs.CoordinateVector[modelData.GeometricVertexIndexs[index].Length];
                     var geometricToNormalPoints = new BaseGraphisStructs.CoordinateVector[modelData.GeometricVertexIndexs[index].Length];
@@ -92,8 +94,8 @@ namespace _3DGraphics.Drawing
                             HeightZone = heightZone,
                         });
                     }
-                });
-                //}
+                //});
+                }
             }
 
             bitmap.UnlockBits(bitmapData);

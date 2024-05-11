@@ -9,11 +9,13 @@ namespace _3DGraphics.Drawing
         {
             var points = new BaseGraphisStructs.CoordinateVector[@params.Coordinate.Length];
             @params.Coordinate.CopyTo(points, 0);
+            @params.CoordinateOriginal  = new BaseGraphisStructs.CoordinateVector[@params.Coordinate.Length];
+            @params.Coordinate.CopyTo(@params.CoordinateOriginal, 0);
 
             Array.Sort(points, (p1, p2) => p1.X.CompareTo(p2.X));
             Array.Sort(points, (p1, p2) => p1.Y.CompareTo(p2.Y));
 
-            var listPoints = new List<BaseGraphisStructs.CoordinateVector>();
+            var listPointsCoordinate = new List<BaseGraphisStructs.CoordinateVector>();
 
             int up;
             int down;
@@ -22,14 +24,14 @@ namespace _3DGraphics.Drawing
             {
                 if ((i + 1 != points.Length) && (points[i].Y == points[i + 1].Y))
                 {
-                    listPoints.Add(points[i]);
-                    listPoints.Add(points[i + 1]);
+                    listPointsCoordinate.Add(points[i]);
+                    listPointsCoordinate.Add(points[i + 1]);
 
                     i += 2;
                 }
                 else
                 {
-                    listPoints.Add(points[i]);
+                    listPointsCoordinate.Add(points[i]);
                     if (i != 0 && i != points.Length - 1)
                     {
                         up = 0;
@@ -59,32 +61,70 @@ namespace _3DGraphics.Drawing
                         }
 
 
-                        listPoints.Add(new BaseGraphisStructs.CoordinateVector(
+                        listPointsCoordinate.Add(new BaseGraphisStructs.CoordinateVector(
                             (@params.Coordinate[down].X + ((@params.Coordinate[up].X - @params.Coordinate[down].X) / (@params.Coordinate[up].Y - @params.Coordinate[down].Y) * (points[i].Y - @params.Coordinate[down].Y))),
                             points[i].Y,
                             @params.Coordinate[down].Z + ((@params.Coordinate[up].Z != @params.Coordinate[down].Z) ? ((@params.Coordinate[up].Z - @params.Coordinate[down].Z) / (@params.Coordinate[up].Z - @params.Coordinate[down].Z) * (points[i].Z - @params.Coordinate[down].Z)) : 0)
                             ));
-
                     }
                     i++;
                 }
             }
 
-            var tmpPoints = listPoints.ToArray();
+            var tmpPoints = listPointsCoordinate.ToArray();
 
             Array.Sort(tmpPoints, (p1, p2) => p1.X.CompareTo(p2.X));
             Array.Sort(tmpPoints, (p1, p2) => p1.Y.CompareTo(p2.Y));
 
-            var tmpColourInt = GetTriangleLight(@params);
-            if (tmpColourInt != null)
+            if (SettingLab.LightModelFullPolygon)
             {
-                @params.ColorInt = tmpColourInt.Value;
+                var tmpColourInt = GetPolygonLight(@params);
+                if (tmpColourInt != null)
+                {
+                    @params.ColorInt = tmpColourInt.Value;
+                    for (var i = 0; i < tmpPoints.Length - 2; i++)
+                    {
+                        @params.Coordinate = [tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]];
+                        DrawTriangle(@params);
+                    }
+                }
+            }
+            else
+            {
+                var cosEye = CalculateCosForKillPolygon(@params, Camera.Eye);
+                if (cosEye <= 0)
+                {
+                    return;
+                }
+
                 for (var i = 0; i < tmpPoints.Length - 2; i++)
                 {
                     @params.Coordinate = [tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]];
                     DrawTriangle(@params);
                 }
+
             }
+        }
+
+        private static float CalculateCosForKillPolygon(DrawingParams @params, Vector3 pointObject)
+        {
+            float cos = 0;
+
+            for (var i = 0; i < @params.Normal.Length; i++)
+            {
+                // Вычисление вектора от точки к полигону
+                var vector = @params.CoordinateToNormal[i].Coordinates - pointObject;
+                var normalizedVector = Vector3.Normalize(vector);
+
+                // Вычисление скалярного произведения нормализованного вектора и нормали полигона
+                var norm = @params.Normal[i].Coordinates;
+                var normalizedNorm = Vector3.Normalize(norm);
+
+                cos += Vector3.Dot(normalizedVector, normalizedNorm);
+            }
+            cos /= @params.Normal.Length;
+
+            return -cos;
         }
 
         public static void DrawRGB(DrawingParams @params)
@@ -109,8 +149,7 @@ namespace _3DGraphics.Drawing
 
             float x1 = @params.Coordinate[0].X;
             float x2;
-            const float scaleFactor = 1f;
-            float z1 = -Vector3.Distance(@params.CoordinateToNormal[0].Coordinates, Camera.Eye) * scaleFactor;
+            float z1 = @params.Coordinate[0].Z;
             float z2;
             float XIncrement1;
             float XIncrement2;
@@ -128,7 +167,7 @@ namespace _3DGraphics.Drawing
                 float dz1 = @params.Coordinate[0].Z - @params.Coordinate[2].Z;
                 float dz2 = @params.Coordinate[1].Z - @params.Coordinate[2].Z;
 
-                z2 = -Vector3.Distance(@params.CoordinateToNormal[1].Coordinates, Camera.Eye) * scaleFactor;
+                z2 = @params.Coordinate[1].Z;
                 ZIncrement1 = -dz1 / steps;
                 ZIncrement2 = -dz2 / steps;
             }
@@ -144,7 +183,7 @@ namespace _3DGraphics.Drawing
                 float dz1 = @params.Coordinate[1].Z - @params.Coordinate[0].Z;
                 float dz2 = @params.Coordinate[2].Z - @params.Coordinate[0].Z;
 
-                z2 = -Vector3.Distance(@params.CoordinateToNormal[2].Coordinates, Camera.Eye) * scaleFactor;
+                z2 = @params.Coordinate[2].Z;
                 ZIncrement1 = dz1 / steps;
                 ZIncrement2 = dz2 / steps;
 
@@ -177,7 +216,7 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        private static int? GetTriangleLight(DrawingParams @params)
+        private static int? GetPolygonLight(DrawingParams @params)
         {
             var light = 0;
 
@@ -220,7 +259,7 @@ namespace _3DGraphics.Drawing
         {
             float cos = 0;
 
-            for (var i = 0; i < @params.Coordinate.Length; i++)
+            for (var i = 0; i < @params.Normal.Length; i++)
             {
                 // Вычисление вектора от точки к полигону
                 var vector = @params.CoordinateToNormal[i].Coordinates - pointObject;
@@ -232,7 +271,7 @@ namespace _3DGraphics.Drawing
 
                 cos += Vector3.Dot(normalizedVector, normalizedNorm);
             }
-            cos /= @params.Coordinate.Length;
+            cos /= @params.Normal.Length;
 
             return -cos;
         }
@@ -241,7 +280,7 @@ namespace _3DGraphics.Drawing
         {
             float cos = 0;
 
-            for (var i = 0; i < @params.Coordinate.Length; i++)
+            for (var i = 0; i < @params.Normal.Length; i++)
             {
                 //Свет
                 var vectorLight = @params.CoordinateToNormal[i].Coordinates - Camera.Light;
@@ -265,7 +304,7 @@ namespace _3DGraphics.Drawing
                 cos += cosSpeg;
             }
 
-            cos /= @params.Coordinate.Length;
+            cos /= @params.Normal.Length;
 
             return cos;
         }
