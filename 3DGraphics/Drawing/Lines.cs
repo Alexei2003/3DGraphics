@@ -48,9 +48,9 @@ namespace _3DGraphics.Drawing
 
             int tmpColorInt;
 
-            if(steps > 1)
+            if (steps > 1)
             {
-                steps ++;
+                steps++;
             }
 
             for (var i = 0; i <= steps; i++)
@@ -63,7 +63,15 @@ namespace _3DGraphics.Drawing
                     continue;
                 }
 
-                tmpColorInt = SettingLab.GetColorPointFunc(@params, new Vector3(x, y, z));
+                try
+                {
+                    tmpColorInt = SettingLab.GetColorPointFunc(@params, new BaseGraphisStructs.CoordinateVector(x, y, z));
+                }
+                catch
+                {
+                    tmpColorInt = 0;
+                }
+
 
                 if (ZBuffer.CheckAndSetDepth((int)Math.Round(x), (int)Math.Round(y), z))
                 {
@@ -78,14 +86,14 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        public static int GetPointLightUseInterpolation(DrawingParams @params, Vector3 point)
+        public static int GetPointLightUseInterpolation(DrawingParams @params, BaseGraphisStructs.CoordinateVector point)
         {
             int light;
 
-            var wNormal = GetWNormal(@params.CoordinatePolygonOriginal, point);
+            var normal = InterpolateNormal(point, @params.CoordinatePolygonOriginal[0], @params.CoordinatePolygonOriginal[1], @params.CoordinatePolygonOriginal[2], @params.Normal[0], @params.Normal[1], @params.Normal[2]);
 
             //Diffuse
-            var cosLight = CalculateCos(@params, Camera.Light, wNormal);
+            var cosLight = CalculateCos(point, normal, Camera.Light);
             var diffuseLight = Convert.ToInt32(255 * cosLight) < 0 ? 0 : Convert.ToInt32(255 * cosLight);
             light = diffuseLight - 100 < 0 ? 0 : diffuseLight - 100;
             //light = diffuseLight - 50 < 0 ? 0 : diffuseLight - 50;
@@ -98,7 +106,7 @@ namespace _3DGraphics.Drawing
             int specularLight;
             if (diffuseLight != 0)
             {
-                var cosSpecular = CalculateSpecularCos(@params, wNormal);
+                var cosSpecular = CalculateSpecularCos(point, normal);
                 //var cosSpecular = 0;
                 specularLight = Convert.ToInt32(255 * cosSpecular) < 0 ? 0 : Convert.ToInt32(255 * cosSpecular);
             }
@@ -113,92 +121,73 @@ namespace _3DGraphics.Drawing
             return Color.FromArgb(255, specularLight > 255 ? 255 : specularLight, specularLight > 255 ? 255 : specularLight, light).ToArgb();
         }
 
-        public static int GetPointLightUseOneColourForPolygon(DrawingParams @params, Vector3 point)
+        public static int GetPointLightUseOneColourForPolygon(DrawingParams @params, BaseGraphisStructs.CoordinateVector point)
         {
             return @params.ColorInt;
         }
 
-        public static float[] GetWNormal(BaseGraphisStructs.CoordinateVector[] points, Vector3 pointObject)
+        private static float CalculateCos(BaseGraphisStructs.CoordinateVector pointModel, BaseGraphisStructs.NormalVector normalModel, Vector3 pointObject)
         {
-            var wNormal = new float[points.Length];
+            // Вычисление вектора от точки к полигону
+            var vector = pointModel.Coordinates - pointObject;
+            var normalizedVector = Vector3.Normalize(vector);
 
-            float pointDistance;
-            float sumWNormal = 0;
-            for (var i = 0; i < wNormal.Length; i++)
-            {
-                pointDistance = Vector3.Distance(points[i].Coordinates, pointObject);
-                if (pointDistance == 0)
-                {
-                    Array.Clear(wNormal, 0, wNormal.Length);
-                    wNormal[i] = 1;
-                    return wNormal;
-                }
-                else
-                {
-                    wNormal[i] = 1 / pointDistance;
-                }
-            }
+            // Вычисление скалярного произведения нормализованного вектора и нормали полигона
+            var normalizedNorm = Vector3.Normalize(normalModel.Coordinates);
 
-            for (var i = 0; i < wNormal.Length; i++)
-            {
-                sumWNormal += wNormal[i];
-            }
-
-            for (var i = 0; i < wNormal.Length; i++)
-            {
-                wNormal[i] /= sumWNormal;
-            }
-
-            return wNormal;
+            return Vector3.Dot(normalizedVector, normalizedNorm);
         }
 
-        private static float CalculateCos(DrawingParams @params, Vector3 pointObject, float[] WNormal)
+        private static float CalculateSpecularCos(BaseGraphisStructs.CoordinateVector pointModel, BaseGraphisStructs.NormalVector normalModel)
         {
-            float cos = 0;
+            //Свет
+            var vectorLight = pointModel.Coordinates - Camera.Light;
+            var normalizedVectorLight = Vector3.Normalize(vectorLight);
 
-            for (var i = 0; i < @params.Normal.Length; i++)
-            {
-                // Вычисление вектора от точки к полигону
-                var vector = @params.CoordinateToNormal[i].Coordinates - pointObject;
-                var normalizedVector = Vector3.Normalize(vector);
+            //Нормаль
+            var normalizedNorm = Vector3.Normalize(normalModel.Coordinates);
 
-                // Вычисление скалярного произведения нормализованного вектора и нормали полигона
-                var norm = @params.Normal[i].Coordinates;
-                var normalizedNorm = Vector3.Normalize(norm);
+            //Отражение
+            var vectorSpecular = normalizedNorm - 2 * (normalizedVectorLight * normalizedNorm) * normalizedNorm;
+            var normalizedVectorSpecular = Vector3.Normalize(vectorSpecular);
 
-                cos += Vector3.Dot(normalizedVector, normalizedNorm) * WNormal[i];
-            }
-            return -cos;
+            //Камера 
+            var vectorCamera = pointModel.Coordinates - Camera.Eye;
+            var normalizedVectorCamera = Vector3.Normalize(vectorCamera);
+
+            var cosSpeg = Vector3.Dot(normalizedVectorSpecular, normalizedVectorCamera);
+            cosSpeg = float.Pow(cosSpeg, 50);
+
+            return cosSpeg;
         }
 
-        private static float CalculateSpecularCos(DrawingParams @params, float[] WNormal)
+        public static BaseGraphisStructs.NormalVector InterpolateNormal(BaseGraphisStructs.CoordinateVector point, BaseGraphisStructs.CoordinateVector a, BaseGraphisStructs.CoordinateVector b, BaseGraphisStructs.CoordinateVector c, BaseGraphisStructs.NormalVector normalA, BaseGraphisStructs.NormalVector normalB, BaseGraphisStructs.NormalVector normalC)
         {
-            float cos = 0;
+            // Вычисляем вектора
+            Vector3 v0 = b.Coordinates - a.Coordinates;
+            Vector3 v1 = c.Coordinates - a.Coordinates;
+            Vector3 v2 = point.Coordinates - a.Coordinates;
 
-            for (var i = 0; i < @params.Normal.Length; i++)
-            {
-                //Свет
-                var vectorLight = @params.CoordinateToNormal[i].Coordinates - Camera.Light;
-                var normalizedVectorLight = Vector3.Normalize(vectorLight);
+            // Вычисляем скалярные произведения
+            float d00 = Vector3.Dot(v0, v0);
+            float d01 = Vector3.Dot(v0, v1);
+            float d11 = Vector3.Dot(v1, v1);
+            float d20 = Vector3.Dot(v2, v0);
+            float d21 = Vector3.Dot(v2, v1);
 
-                //Нормаль
-                var norm = @params.Normal[i].Coordinates;
-                var normalizedNorm = Vector3.Normalize(norm);
+            // Вычисляем барицентрические координаты
+            float denom = d00 * d11 - d01 * d01;
+            float v = (d11 * d20 - d01 * d21) / denom;
+            float w = (d00 * d21 - d01 * d20) / denom;
+            float u = 1.0f - v - w;
 
-                //Отражение
-                var vectorSpecular = normalizedNorm - 2 * (normalizedVectorLight * normalizedNorm) * normalizedNorm;
-                var normalizedVectorSpecular = Vector3.Normalize(vectorSpecular);
+            // Интерполируем нормали
+            Vector3 normal = u * normalA.Coordinates + v * normalB.Coordinates + w * normalC.Coordinates;
 
-                //Камера 
-                var vectorCamera = @params.CoordinateToNormal[i].Coordinates - Camera.Eye;
-                var normalizedVectorCamera = Vector3.Normalize(vectorCamera);
+            // Нормализуем результирующую нормаль
+            normal = Vector3.Normalize(normal);
 
-                var cosSpeg = Vector3.Dot(normalizedVectorSpecular, normalizedVectorCamera);
-                cosSpeg = float.Pow(cosSpeg, 50) * WNormal[i];
-
-                cos += cosSpeg;
-            }
-            return cos;
+            return new BaseGraphisStructs.NormalVector(normal);
         }
     }
 }

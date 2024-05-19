@@ -1,4 +1,5 @@
-﻿using _3DGraphics.Drawing;
+﻿using _3DGraphics.Classes;
+using _3DGraphics.Drawing;
 using System.Numerics;
 
 namespace _3DGraphics
@@ -11,7 +12,7 @@ namespace _3DGraphics
         public static List<DrawObjectDelegate> DrawModelFuncList = [Triangles.Draw];
 
 
-        public delegate int GetColorPointDelegate(DrawingParams @params, Vector3 point);
+        public delegate int GetColorPointDelegate(DrawingParams @params, BaseGraphisStructs.CoordinateVector point);
 
         private static GetColorPointDelegate[] GetColorPointFuncs = [Lines.GetPointLightUseOneColourForPolygon, Lines.GetPointLightUseInterpolation];
         public static GetColorPointDelegate GetColorPointFunc = Lines.GetPointLightUseInterpolation;
