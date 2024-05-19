@@ -75,7 +75,7 @@ namespace _3DGraphics.Drawing
 
         public static int GetPointLightUseInterpolation(DrawingParams @params, Vector3 point)
         {
-            var light = 0;
+            int light;
 
             var wNormal = GetWNormal(@params.CoordinateOriginal, point);
 

@@ -203,7 +203,6 @@ namespace _3DGraphics.Drawing
 
             //Ambient
             var ambientLight = 50;
-            //var ambientLight = 0;
 
             //Specular
             int specularLight;
