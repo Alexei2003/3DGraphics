@@ -14,7 +14,7 @@ namespace _3DGraphics.Drawing
             var widthZone = bitmap.Width - 1;
             var heightZone = bitmap.Height - 1;
 
-            const int RENDER_ARRAY_OUT_WINDOW = 5;
+            const int RENDER_ARRAY_OUT_WINDOW = 10;
 
             var widthMaxReder = bitmap.Width + bitmap.Width / RENDER_ARRAY_OUT_WINDOW;
             var heightMaxReder = bitmap.Height + bitmap.Height / RENDER_ARRAY_OUT_WINDOW;
@@ -64,7 +64,7 @@ namespace _3DGraphics.Drawing
                             HeightZone = heightZone,
                         });
                     }
-                    //});
+                //    });
                 }
             }
 

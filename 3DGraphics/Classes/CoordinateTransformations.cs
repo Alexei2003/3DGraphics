@@ -45,31 +45,18 @@ namespace _3DGraphics.Classes
             // Создание матрицы вида экрана (Viewport Matrix)
             var viewportMatrix = Matrix4x4.CreateViewport(0, 0, Camera.Size.Width, Camera.Size.Height, Camera.ZNear, Camera.ZFar);
 
-            // Комбинирование матриц
-            var finalMatrix = worldMatrix; // * viewMatrix//* projectionMatrix * viewportMatrix;
+            var finalMatrix = viewMatrix * projectionMatrix * viewportMatrix;
 
             // Преобразование координат вершин
             Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
             {
                 var vect = new Vector4(modelData.GeometricVertexCoordinates[i].Coordinates, 1);
-                vect = Vector4.Transform(vect, finalMatrix);
-                //vect = Vector4.Divide(vect, vect.W);
+                vect = Vector4.Transform(vect, worldMatrix);
                 modelData.GeometricVertexCoordinates[i] = new BaseGraphisStructs.CoordinateVector(vect.X, vect.Y, vect.Z);
-            });
 
-            modelData.GeometricVertexToNormalCoordinates = new CoordinateVector[modelData.GeometricVertexCoordinates.Length];
+                modelData.GeometricVertexToNormalCoordinates[i] = modelData.GeometricVertexCoordinates[i];
 
-            for (var i = 0; i < modelData.GeometricVertexCoordinates.Length; i++)
-            {
-                modelData.GeometricVertexToNormalCoordinates[i] = new BaseGraphisStructs.CoordinateVector(modelData.GeometricVertexCoordinates[i].Coordinates);
-            }
-
-            finalMatrix = viewMatrix * projectionMatrix * viewportMatrix;
-
-            // Преобразование координат вершин
-            Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
-            {
-                var vect = new Vector4(modelData.GeometricVertexCoordinates[i].Coordinates, 1);
+                vect = new Vector4(modelData.GeometricVertexCoordinates[i].Coordinates, 1);
                 vect = Vector4.Transform(vect, finalMatrix);
                 vect = Vector4.Divide(vect, vect.W);
                 modelData.GeometricVertexCoordinates[i] = new BaseGraphisStructs.CoordinateVector(vect.X, vect.Y, vect.Z);

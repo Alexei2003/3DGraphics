@@ -1,4 +1,5 @@
 ﻿using static _3DGraphics.Classes.BaseGraphisStructs;
+using static _3DGraphics.Classes.ObjFileReader;
 
 namespace _3DGraphics.Classes
 {
@@ -28,6 +29,7 @@ namespace _3DGraphics.Classes
                 GeometricVertexCoordinates = new CoordinateVector[modelData.GeometricVertexCoordinates.Length];
                 TextureVertexCoordinates = new TextureVector[modelData.TextureVertexCoordinates.Length];
                 NormalVertexCoordinates = new NormalVector[modelData.NormalVertexCoordinates.Length];
+                GeometricVertexToNormalCoordinates = new CoordinateVector[modelData.GeometricVertexCoordinates.Length];
 
                 Parallel.For(0, modelData.GeometricVertexCoordinates.Length, (Action<int>)(i =>
                 {
@@ -162,6 +164,8 @@ namespace _3DGraphics.Classes
                 TextureVertexIndexs = [.. textureVertexIndexsList],
                 NormalVertexIndexs = [.. normalVertexIndexsList]
             };
+
+            result.GeometricVertexToNormalCoordinates = new CoordinateVector[result.GeometricVertexCoordinates.Length];
 
             return result;
         }

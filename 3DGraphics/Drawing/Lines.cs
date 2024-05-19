@@ -35,8 +35,8 @@ namespace _3DGraphics.Drawing
             float XIncrement = dx / (float)steps;
             float YIncrement = dy / (float)steps;
 
-            float x = @params.P1.X;
-            float y = @params.P1.Y;
+            float x = (int)@params.P1.X;
+            float y = (int)@params.P1.Y;
             int index;
 
             var strideInt = @params.Stride / 4;
@@ -48,10 +48,13 @@ namespace _3DGraphics.Drawing
 
             int tmpColorInt;
 
+            if(steps > 1)
+            {
+                steps ++;
+            }
+
             for (var i = 0; i <= steps; i++)
             {
-                tmpColorInt = SettingLab.GetColorPointFunc(@params, new Vector3(x, y, z));
-
                 if (x > @params.WidthZone || x < 0 || y > @params.HeightZone || y < 0)
                 {
                     x += XIncrement;
@@ -59,6 +62,8 @@ namespace _3DGraphics.Drawing
                     z += ZIncrement;
                     continue;
                 }
+
+                tmpColorInt = SettingLab.GetColorPointFunc(@params, new Vector3(x, y, z));
 
                 if (ZBuffer.CheckAndSetDepth((int)Math.Round(x), (int)Math.Round(y), z))
                 {
@@ -77,7 +82,7 @@ namespace _3DGraphics.Drawing
         {
             int light;
 
-            var wNormal = GetWNormal(@params.CoordinateOriginal, point);
+            var wNormal = GetWNormal(@params.CoordinatePolygonOriginal, point);
 
             //Diffuse
             var cosLight = CalculateCos(@params, Camera.Light, wNormal);

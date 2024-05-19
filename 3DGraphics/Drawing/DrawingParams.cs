@@ -12,7 +12,7 @@ namespace _3DGraphics.Drawing
     {
         public BaseGraphisStructs.CoordinateVector[] Coordinate { get; set; } = null;
         public BaseGraphisStructs.CoordinateVector[] CoordinateToNormal { get; set; } = null;
-        public BaseGraphisStructs.CoordinateVector[] CoordinateOriginal{ get; set; } = null;
+        public BaseGraphisStructs.CoordinateVector[] CoordinatePolygonOriginal{ get; set; } = null;
         public BaseGraphisStructs.TextureVector[] Texture { get; set; } = null;
         public BaseGraphisStructs.NormalVector[] Normal { get; set; } = null;
 

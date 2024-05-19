@@ -13,90 +13,22 @@ namespace _3DGraphics.Drawing
                 return;
             }
 
-            var points = new BaseGraphisStructs.CoordinateVector[@params.Coordinate.Length];
-            @params.Coordinate.CopyTo(points, 0);
-            @params.CoordinateOriginal = new BaseGraphisStructs.CoordinateVector[@params.Coordinate.Length];
-            @params.Coordinate.CopyTo(@params.CoordinateOriginal, 0);
-
-            Array.Sort(points, (p1, p2) => p1.X.CompareTo(p2.X));
-            Array.Sort(points, (p1, p2) => p1.Y.CompareTo(p2.Y));
-
-            var listPointsCoordinate = new List<BaseGraphisStructs.CoordinateVector>();
-
-            int up;
-            int down;
-
-            for (int i = 0; i < points.Length;)
-            {
-                if ((i + 1 != points.Length) && (points[i].Y == points[i + 1].Y))
-                {
-                    listPointsCoordinate.Add(points[i]);
-                    listPointsCoordinate.Add(points[i + 1]);
-
-                    i += 2;
-                }
-                else
-                {
-                    listPointsCoordinate.Add(points[i]);
-                    if (i != 0 && i != points.Length - 1)
-                    {
-                        up = 0;
-                        down = 0;
-                        for (var j = 0; j < @params.Coordinate.Length - 1; j++)
-                        {
-                            if (@params.Coordinate[j].Y > points[i].Y && @params.Coordinate[j + 1].Y < points[i].Y)
-                            {
-                                up = j;
-                                down = j + 1;
-                            }
-                            if (@params.Coordinate[j + 1].Y > points[i].Y && @params.Coordinate[j].Y < points[i].Y)
-                            {
-                                up = j + 1;
-                                down = j;
-                            }
-                        }
-                        if (@params.Coordinate[@params.Coordinate.Length - 1].Y > points[i].Y && @params.Coordinate[0].Y < points[i].Y)
-                        {
-                            up = @params.Coordinate.Length - 1;
-                            down = 0;
-                        }
-                        if (@params.Coordinate[0].Y > points[i].Y && @params.Coordinate[@params.Coordinate.Length - 1].Y < points[i].Y)
-                        {
-                            up = 0;
-                            down = @params.Coordinate.Length - 1;
-                        }
-
-
-                        listPointsCoordinate.Add(new BaseGraphisStructs.CoordinateVector(
-                            (@params.Coordinate[down].X + ((@params.Coordinate[up].X - @params.Coordinate[down].X) / (@params.Coordinate[up].Y - @params.Coordinate[down].Y) * (points[i].Y - @params.Coordinate[down].Y))),
-                            points[i].Y,
-                            @params.Coordinate[down].Z + ((@params.Coordinate[up].Z != @params.Coordinate[down].Z) ? ((@params.Coordinate[up].Z - @params.Coordinate[down].Z) / (@params.Coordinate[up].Z - @params.Coordinate[down].Z) * (points[i].Z - @params.Coordinate[down].Z)) : 0)
-                            ));
-                    }
-                    i++;
-                }
-            }
-
-            var tmpPoints = listPointsCoordinate.ToArray();
-
-            Array.Sort(tmpPoints, (p1, p2) => p1.X.CompareTo(p2.X));
-            Array.Sort(tmpPoints, (p1, p2) => p1.Y.CompareTo(p2.Y));
+            @params.CoordinatePolygonOriginal = @params.Coordinate;
 
             if (SettingLab.GetColorPointFunc == Lines.GetPointLightUseOneColourForPolygon)
             {
                 @params.ColorInt = GetPolygonLight(@params);
-                for (var i = 0; i < tmpPoints.Length - 2; i++)
+                for (var i = 1; i < @params.CoordinatePolygonOriginal.Length - 1; i++)
                 {
-                    @params.Coordinate = [tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]];
+                    @params.Coordinate = [@params.CoordinatePolygonOriginal[0], @params.CoordinatePolygonOriginal[i], @params.CoordinatePolygonOriginal[i + 1]];
                     DrawTriangle(@params);
                 }
-
             }
             else
             {
-                for (var i = 0; i < tmpPoints.Length - 2; i++)
+                for (var i = 1; i < @params.CoordinatePolygonOriginal.Length - 1; i++)
                 {
-                    @params.Coordinate = [tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]];
+                    @params.Coordinate = [@params.CoordinatePolygonOriginal[0], @params.CoordinatePolygonOriginal[i], @params.CoordinatePolygonOriginal[i + 1]];
                     DrawTriangle(@params);
                 }
 
@@ -113,67 +45,55 @@ namespace _3DGraphics.Drawing
         {
             const int YIncrement = 1;
 
-            var steps1 = Math.Abs(Convert.ToInt32(@params.Coordinate[0].Y - @params.Coordinate[1].Y));
-            var steps2 = Math.Abs(Convert.ToInt32(@params.Coordinate[0].Y - @params.Coordinate[2].Y));
+            Array.Sort(@params.Coordinate, (p1, p2) => p1.X.CompareTo(p2.X));
+            Array.Sort(@params.Coordinate, (p1, p2) => p1.Y.CompareTo(p2.Y));
 
-            steps1 = steps1 == 0 ? 1 : steps1;
-            steps2 = steps2 == 0 ? 1 : steps2;
+            var steps1 = Math.Abs(@params.Coordinate[0].Y - @params.Coordinate[1].Y);
+            var steps2 = Math.Abs(@params.Coordinate[0].Y - @params.Coordinate[2].Y);
+
+            if (steps1 < 1)
+            {
+                steps1 = 1;
+            }
+
+            if (steps2 < 1)
+            {
+                steps2 = 1;
+            }
 
             var steps = steps1 > steps2 ? steps1 : steps2;
 
             float y = @params.Coordinate[0].Y;
-
             float x1 = @params.Coordinate[0].X;
-            float x2;
+            float x2 = @params.Coordinate[0].X;
             float z1 = @params.Coordinate[0].Z;
-            float z2;
+            float z2 = @params.Coordinate[0].Z;
             float XIncrement1;
             float XIncrement2;
             float ZIncrement1;
             float ZIncrement2;
-            if (@params.Coordinate[0].Y == @params.Coordinate[1].Y)
-            {
-                float dx1 = @params.Coordinate[0].X - @params.Coordinate[2].X;
-                float dx2 = @params.Coordinate[1].X - @params.Coordinate[2].X;
 
-                x2 = @params.Coordinate[1].X;
-                XIncrement1 = -dx1 / steps;
-                XIncrement2 = -dx2 / steps;
+            XIncrement1 = (@params.Coordinate[1].X - @params.Coordinate[0].X) / steps1;
+            XIncrement2 = (@params.Coordinate[2].X - @params.Coordinate[0].X) / steps;
 
-                float dz1 = @params.Coordinate[0].Z - @params.Coordinate[2].Z;
-                float dz2 = @params.Coordinate[1].Z - @params.Coordinate[2].Z;
-
-                z2 = @params.Coordinate[1].Z;
-                ZIncrement1 = -dz1 / steps;
-                ZIncrement2 = -dz2 / steps;
-            }
-            else
-            {
-                float dx1 = @params.Coordinate[1].X - @params.Coordinate[0].X;
-                float dx2 = @params.Coordinate[2].X - @params.Coordinate[0].X;
-
-                x2 = @params.Coordinate[0].X;
-                XIncrement1 = dx1 / steps;
-                XIncrement2 = dx2 / steps;
-
-                float dz1 = @params.Coordinate[1].Z - @params.Coordinate[0].Z;
-                float dz2 = @params.Coordinate[2].Z - @params.Coordinate[0].Z;
-
-                z2 = @params.Coordinate[2].Z;
-                ZIncrement1 = dz1 / steps;
-                ZIncrement2 = dz2 / steps;
-
-            }
+            ZIncrement1 = (@params.Coordinate[1].Z - @params.Coordinate[0].Z) / steps1;
+            ZIncrement2 = (@params.Coordinate[2].Z - @params.Coordinate[0].Z) / steps;
 
             var p1Line = new BaseGraphisStructs.CoordinateVector();
             var p2Line = new BaseGraphisStructs.CoordinateVector();
+
+            bool change = false;
+
+            if (steps > 1)
+            {
+                steps++;
+            }
 
             for (var i = 0; i <= steps; i++)
             {
                 p1Line.X = x1;
                 p1Line.Y = y;
                 p1Line.Z = z1;
-
 
                 p2Line.X = x2;
                 p2Line.Y = y;
@@ -183,12 +103,22 @@ namespace _3DGraphics.Drawing
                 @params.P2 = p2Line;
                 Lines.DrawLineWithZBuffer(@params);
 
+                if (!change && @params.Coordinate[1].Y - y < 0)
+                {
+                    change = true;
+                    var tmpSteps = steps - steps1;
+                    if (tmpSteps != 0)
+                    {
+                        XIncrement1 = (@params.Coordinate[2].X - @params.Coordinate[1].X) / tmpSteps;
+                        ZIncrement1 = (@params.Coordinate[2].Z - @params.Coordinate[1].Z) / tmpSteps;
+                    }
+                }
+
                 x1 += XIncrement1;
                 x2 += XIncrement2;
                 y += YIncrement;
                 z1 += ZIncrement1;
                 z2 += ZIncrement2;
-
             }
         }
 

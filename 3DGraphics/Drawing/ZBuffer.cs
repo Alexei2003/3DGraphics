@@ -7,8 +7,6 @@ namespace _3DGraphics.Drawing
     {
         private static float[,] zBuffer = new float[1, 1];
         private static float[,] originaZBuffer = new float[1, 1];
-        private static int width;
-        private static int height;
 
         public static void Resaze(int width, int height)
         {
@@ -21,8 +19,6 @@ namespace _3DGraphics.Drawing
                     originaZBuffer[i, j] = -10000;
                 }
             }
-            ZBuffer.width = width;
-            ZBuffer.height = height;
         }
 
         public static bool CheckAndSetDepth(int x, int y, float value)

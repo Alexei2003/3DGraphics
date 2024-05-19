@@ -283,7 +283,6 @@ namespace _3DGraphics
             pInfo.Visible = !pInfo.Visible;
         }
 
-        private readonly Random rand = new();
         private void AutoRotate()
         {
             if (modelData != null)
