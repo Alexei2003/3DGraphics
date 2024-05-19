@@ -163,8 +163,6 @@ namespace _3DGraphics.Drawing
 
                 cos += Vector3.Dot(normalizedVector, normalizedNorm) * WNormal[i];
             }
-            cos /= @params.Normal.Length;
-
             return -cos;
         }
 
@@ -195,8 +193,6 @@ namespace _3DGraphics.Drawing
 
                 cos += cosSpeg;
             }
-            cos /= @params.Normal.Length;
-
             return cos;
         }
     }
