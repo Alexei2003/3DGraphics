@@ -156,7 +156,7 @@ namespace _3DGraphics
             {
                 const float angelRotate = (float)Math.PI / 10;
                 const float cahngeAngelFov = 1f;
-                var scale = new Vector3(1.1f, 1.1f, 1.1f);
+                var scale = new Vector3(1.05f, 1.05f, 1.05f);
                 const int translate = 1;
                 const int near = 5;
 

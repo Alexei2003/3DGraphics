@@ -80,17 +80,19 @@ namespace _3DGraphics.Drawing
             //Diffuse
             var cosLight = CalculateCos(@params, Camera.Light, wNormal);
             var diffuseLight = Convert.ToInt32(255 * cosLight) < 0 ? 0 : Convert.ToInt32(255 * cosLight);
-            light = diffuseLight - 100 < 0 ? 0 : diffuseLight - 100;
+            //light = diffuseLight - 100 < 0 ? 0 : diffuseLight - 100;
+            //light = diffuseLight - 50 < 0 ? 0 : diffuseLight - 50;
 
             //Ambient
-            var ambientLight = 50;
-            //var ambientLight = 0;
+            //var ambientLight = 50;
+            var ambientLight = 0;
 
             //Specular
             int specularLight;
             if (diffuseLight != 0)
             {
                 var cosSpecular = CalculateSpecularCos(@params, wNormal);
+                //var cosSpecular = 0;
                 specularLight = Convert.ToInt32(255 * cosSpecular) < 0 ? 0 : Convert.ToInt32(255 * cosSpecular);
             }
             else
@@ -108,15 +110,31 @@ namespace _3DGraphics.Drawing
         {
             var wNormal = new float[points.Length];
 
-            float distFull = 0;
+            float pointDistance;
+            float sumWNormal = 0;
             for (var i = 0; i < wNormal.Length; i++)
             {
-                distFull += Vector3.Distance(points[i].Coordinates, pointObject);
+                pointDistance = Vector3.Distance(points[i].Coordinates, pointObject);
+                if (pointDistance == 0)
+                {
+                    Array.Clear(wNormal, 0, wNormal.Length);
+                    wNormal[i] = 1;
+                    return wNormal;
+                }
+                else
+                {
+                    wNormal[i] = 1 / pointDistance;
+                }
+            }
+
+            for (var i = 0; i < wNormal.Length; i++) for (var i = 0; i < wNormal.Length; i++)
+            {
+                sumWNormal += wNormal[i];
             }
 
             for (var i = 0; i < wNormal.Length; i++)
             {
-                wNormal[i] = (distFull - Vector3.Distance(points[i].Coordinates, pointObject)) / distFull;
+                wNormal[i] /= sumWNormal;
             }
 
             return wNormal;
@@ -166,7 +184,7 @@ namespace _3DGraphics.Drawing
                 var normalizedVectorCamera = Vector3.Normalize(vectorCamera);
 
                 var cosSpeg = Vector3.Dot(normalizedVectorSpecular, normalizedVectorCamera);
-                cosSpeg = float.Pow(cosSpeg, 100) * WNormal[i];
+                cosSpeg = float.Pow(cosSpeg, 50) * WNormal[i];
 
                 cos += cosSpeg;
             }
