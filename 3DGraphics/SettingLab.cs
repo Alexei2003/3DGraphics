@@ -1,12 +1,20 @@
-﻿namespace _3DGraphics
+﻿using _3DGraphics.Drawing;
+using System.Numerics;
+
+namespace _3DGraphics
 {
     internal static class SettingLab
     {
-        public enum DrawModelType { Lines, LinesRGB, Triangles, TrianglesRGB, TrianglesLines }
+        public  delegate void DrawObjectDelegate(DrawingParams @params);
 
-        //DrawModelType.Lines
-        public static DrawModelType DrawModel = DrawModelType.Triangles;
+        private static DrawObjectDelegate[] drawObjectFuncs = [Lines.Draw, Lines.DrawRGB, Triangles.Draw, Triangles.DrawRGB];
+        public static List<DrawObjectDelegate> DrawModelFuncList = [Triangles.Draw];
 
-        public static bool LightModelFullPolygon = false;
+
+        public delegate int GetColorPointDelegate(DrawingParams @params, Vector3 point);
+
+        private static GetColorPointDelegate[] GetColorPointFuncs = [Lines.GetPointLightUseOneColourForPolygon, Lines.GetPointLightUseInterpolation];
+        public static GetColorPointDelegate GetColorPointFunc = Lines.GetPointLightUseOneColourForPolygon;
+
     }
 }

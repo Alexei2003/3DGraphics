@@ -5,7 +5,7 @@ namespace _3DGraphics.Drawing
 {
     internal static class DrawingModel
     {
-        public delegate void DrawObject(DrawingParams @params);
+        private static List<int> colorInts = [Color.White.ToArgb(), Color.Red.ToArgb()];
 
         public static unsafe void Draw(Bitmap bitmap, ObjFileReader.ModelData modelData)
         {
@@ -28,41 +28,10 @@ namespace _3DGraphics.Drawing
 
             var rgbBitmap = (int*)ptr;
 
-            // Цвет в int
-            var colorInts = new List<int>();
-
-            var drawObjectFuncs = new List<DrawObject>();
-            switch (SettingLab.DrawModel)
-            {
-                case SettingLab.DrawModelType.Lines:
-                    drawObjectFuncs.Add(Lines.Draw);
-                    colorInts.Add(Color.White.ToArgb());
-                    break;
-                case SettingLab.DrawModelType.LinesRGB:
-                    drawObjectFuncs.Add(Lines.DrawRGB);
-                    colorInts.Add(Color.White.ToArgb());
-                    break;
-                case SettingLab.DrawModelType.Triangles:
-                    drawObjectFuncs.Add(Triangles.Draw);
-                    colorInts.Add(Color.White.ToArgb());
-                    break;
-                case SettingLab.DrawModelType.TrianglesRGB:
-                    drawObjectFuncs.Add(Triangles.DrawRGB);
-                    colorInts.Add(Color.White.ToArgb());
-                    break;
-                case SettingLab.DrawModelType.TrianglesLines:
-                    drawObjectFuncs.Add(Triangles.Draw);
-                    colorInts.Add(Color.White.ToArgb());
-                    drawObjectFuncs.Add(Lines.Draw);
-                    colorInts.Add(Color.Red.ToArgb());
-                    break;
-
-            }
-
-            for (var j = 0; j < drawObjectFuncs.Count; j++)
+            for (var j = 0; j < SettingLab.DrawModelFuncList.Count; j++)
             {
 
-                for (var index = 0; index< modelData.GeometricVertexIndexs.Length; index++) 
+                for (var index = 0; index < modelData.GeometricVertexIndexs.Length; index++)
                 //Parallel.For(0, modelData.GeometricVertexIndexs.Length, index =>
                 {
                     var geometricPoints = new BaseGraphisStructs.CoordinateVector[modelData.GeometricVertexIndexs[index].Length];
@@ -83,7 +52,7 @@ namespace _3DGraphics.Drawing
 
                     if (geometricPoints != null)
                     {
-                        drawObjectFuncs[j](new DrawingParams()
+                        SettingLab.DrawModelFuncList[j](new DrawingParams()
                         {
                             Coordinate = geometricPoints,
                             CoordinateToNormal = geometricToNormalPoints,
@@ -95,7 +64,7 @@ namespace _3DGraphics.Drawing
                             HeightZone = heightZone,
                         });
                     }
-                //});
+                    //});
                 }
             }
 

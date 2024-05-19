@@ -7,9 +7,15 @@ namespace _3DGraphics.Drawing
     {
         public static void Draw(DrawingParams @params)
         {
+            var cosEye = CalculateCos(@params, Camera.Eye);
+            if (cosEye <= 0)
+            {
+                return;
+            }
+
             var points = new BaseGraphisStructs.CoordinateVector[@params.Coordinate.Length];
             @params.Coordinate.CopyTo(points, 0);
-            @params.CoordinateOriginal  = new BaseGraphisStructs.CoordinateVector[@params.Coordinate.Length];
+            @params.CoordinateOriginal = new BaseGraphisStructs.CoordinateVector[@params.Coordinate.Length];
             @params.Coordinate.CopyTo(@params.CoordinateOriginal, 0);
 
             Array.Sort(points, (p1, p2) => p1.X.CompareTo(p2.X));
@@ -76,27 +82,9 @@ namespace _3DGraphics.Drawing
             Array.Sort(tmpPoints, (p1, p2) => p1.X.CompareTo(p2.X));
             Array.Sort(tmpPoints, (p1, p2) => p1.Y.CompareTo(p2.Y));
 
-            if (SettingLab.LightModelFullPolygon)
+            if (SettingLab.GetColorPointFunc == Lines.GetPointLightUseOneColourForPolygon)
             {
-                var tmpColourInt = GetPolygonLight(@params);
-                if (tmpColourInt != null)
-                {
-                    @params.ColorInt = tmpColourInt.Value;
-                    for (var i = 0; i < tmpPoints.Length - 2; i++)
-                    {
-                        @params.Coordinate = [tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]];
-                        DrawTriangle(@params);
-                    }
-                }
-            }
-            else
-            {
-                var cosEye = CalculateCosForKillPolygon(@params, Camera.Eye);
-                if (cosEye <= 0)
-                {
-                    return;
-                }
-
+                @params.ColorInt = GetPolygonLight(@params);
                 for (var i = 0; i < tmpPoints.Length - 2; i++)
                 {
                     @params.Coordinate = [tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]];
@@ -104,27 +92,15 @@ namespace _3DGraphics.Drawing
                 }
 
             }
-        }
-
-        private static float CalculateCosForKillPolygon(DrawingParams @params, Vector3 pointObject)
-        {
-            float cos = 0;
-
-            for (var i = 0; i < @params.Normal.Length; i++)
+            else
             {
-                // Вычисление вектора от точки к полигону
-                var vector = @params.CoordinateToNormal[i].Coordinates - pointObject;
-                var normalizedVector = Vector3.Normalize(vector);
+                for (var i = 0; i < tmpPoints.Length - 2; i++)
+                {
+                    @params.Coordinate = [tmpPoints[i], tmpPoints[i + 1], tmpPoints[i + 2]];
+                    DrawTriangle(@params);
+                }
 
-                // Вычисление скалярного произведения нормализованного вектора и нормали полигона
-                var norm = @params.Normal[i].Coordinates;
-                var normalizedNorm = Vector3.Normalize(norm);
-
-                cos += Vector3.Dot(normalizedVector, normalizedNorm);
             }
-            cos /= @params.Normal.Length;
-
-            return -cos;
         }
 
         public static void DrawRGB(DrawingParams @params)
@@ -216,17 +192,9 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        private static int? GetPolygonLight(DrawingParams @params)
+        public static int GetPolygonLight(DrawingParams @params)
         {
-            var light = 0;
-
-            var cosEye = CalculateCos(@params, Camera.Eye);
-
-            if (cosEye <= 0)
-            {
-                return null;
-            }
-
+            int light;
 
             //Diffuse
             var cosLight = CalculateCos(@params, Camera.Light);

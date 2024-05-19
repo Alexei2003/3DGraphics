@@ -5,6 +5,8 @@ namespace _3DGraphics.Drawing
 {
     internal static class Lines
     {
+        private delegate int GetColorDelegate(DrawingParams @params, Vector3 point);
+
         public static void Draw(DrawingParams @params)
         {
             for (var i = 0; i < @params.Coordinate.Length - 1;)
@@ -44,11 +46,11 @@ namespace _3DGraphics.Drawing
 
             var z = @params.P1.Z;
 
-            int? tmpColorInt = @params.ColorInt;
+            int tmpColorInt;
 
             for (var i = 0; i <= steps; i++)
             {
-                tmpColorInt = GetPointLight(@params, new Vector3(x, y, z));
+                tmpColorInt = SettingLab.GetColorPointFunc(@params, new Vector3(x, y, z));
 
                 if (x > @params.WidthZone || x < 0 || y > @params.HeightZone || y < 0)
                 {
@@ -62,7 +64,7 @@ namespace _3DGraphics.Drawing
                 {
                     index = (int)Math.Round(x) + (int)Math.Round(y) * strideInt;
 
-                    @params.RgbBitmap[index] = tmpColorInt.Value;
+                    @params.RgbBitmap[index] = tmpColorInt;
                 }
 
                 x += XIncrement;
@@ -71,7 +73,7 @@ namespace _3DGraphics.Drawing
             }
         }
 
-        private static int? GetPointLight(DrawingParams @params, Vector3 point)
+        public static int GetPointLightUseInterpolation(DrawingParams @params, Vector3 point)
         {
             var light = 0;
 
@@ -80,12 +82,12 @@ namespace _3DGraphics.Drawing
             //Diffuse
             var cosLight = CalculateCos(@params, Camera.Light, wNormal);
             var diffuseLight = Convert.ToInt32(255 * cosLight) < 0 ? 0 : Convert.ToInt32(255 * cosLight);
-            //light = diffuseLight - 100 < 0 ? 0 : diffuseLight - 100;
+            light = diffuseLight - 100 < 0 ? 0 : diffuseLight - 100;
             //light = diffuseLight - 50 < 0 ? 0 : diffuseLight - 50;
 
             //Ambient
-            //var ambientLight = 50;
-            var ambientLight = 0;
+            var ambientLight = 50;
+            //var ambientLight = 0;
 
             //Specular
             int specularLight;
@@ -104,6 +106,11 @@ namespace _3DGraphics.Drawing
             light = light + ambientLight + specularLight > 255 ? 255 : light + ambientLight + specularLight;
 
             return Color.FromArgb(255, specularLight > 255 ? 255 : specularLight, specularLight > 255 ? 255 : specularLight, light).ToArgb();
+        }
+
+        public static int GetPointLightUseOneColourForPolygon(DrawingParams @params, Vector3 point)
+        {
+            return @params.ColorInt;
         }
 
         public static float[] GetWNormal(BaseGraphisStructs.CoordinateVector[] points, Vector3 pointObject)
@@ -127,7 +134,7 @@ namespace _3DGraphics.Drawing
                 }
             }
 
-            for (var i = 0; i < wNormal.Length; i++) for (var i = 0; i < wNormal.Length; i++)
+            for (var i = 0; i < wNormal.Length; i++)
             {
                 sumWNormal += wNormal[i];
             }
