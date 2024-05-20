@@ -1,9 +1,6 @@
 using _3DGraphics.Classes;
 using _3DGraphics.Drawing;
-using System.Drawing;
 using System.Numerics;
-using Windows.Perception.People;
-using Windows.UI.WebUI;
 using static _3DGraphics.Classes.BaseGraphisStructs;
 using static _3DGraphics.Classes.ObjFileReader;
 
@@ -165,27 +162,27 @@ namespace _3DGraphics
                     case Keys.X:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
                         {
-                            CoordinateTransformar.RotateCamera(new Vector3(-angelRotate,0,0));
+                            CoordinateTransformar.RotateCamera(new Vector3(-angelRotate, 0, 0));
                         }
                         else
                         {
-                            CoordinateTransformar.RotateCamera(new Vector3(angelRotate,0, 0));
+                            CoordinateTransformar.RotateCamera(new Vector3(angelRotate, 0, 0));
                         }
                         break;
                     case Keys.Y:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
                         {
-                            CoordinateTransformar.RotateCamera(new Vector3(0,-angelRotate, 0));
+                            CoordinateTransformar.RotateCamera(new Vector3(0, -angelRotate, 0));
                         }
                         else
                         {
-                            CoordinateTransformar.RotateCamera(new Vector3(0,angelRotate, 0));
+                            CoordinateTransformar.RotateCamera(new Vector3(0, angelRotate, 0));
                         }
                         break;
                     case Keys.Z:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
-                        { 
-                            CoordinateTransformar.RotateCamera(new Vector3(0,0,-angelRotate));
+                        {
+                            CoordinateTransformar.RotateCamera(new Vector3(0, 0, -angelRotate));
                         }
                         else
                         {
@@ -288,7 +285,7 @@ namespace _3DGraphics
             if (modelData != null)
             {
                 const float angelRotate = (float)Math.PI / 10;
-                CoordinateTransformar.RotateCamera(new Vector3(0,angelRotate, 0));
+                CoordinateTransformar.RotateCamera(new Vector3(0, angelRotate, 0));
                 CreateModelDataPaint();
             }
         }

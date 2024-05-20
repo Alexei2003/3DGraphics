@@ -5,10 +5,9 @@ namespace _3DGraphics.Classes
     internal static class Camera
     {
         public static Vector3 Scale = new(1, 1, 1);
-        //public static Vector3 AngelsRotate = new(0, 0, 0);
         public static Vector3 Translate = new(0, 0, 0);
 
-        public static Vector3 Light = new(-1000, 1000, 100);
+        public static Vector3 Light = new(0, 0, 100);
         public static Vector3 Eye = new(0, 0, 100);
         public static Vector3 Up = new(0, 1, 0);
         public static Vector3 Target = new(0, 0, 0);

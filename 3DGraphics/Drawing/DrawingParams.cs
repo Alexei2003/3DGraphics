@@ -1,10 +1,4 @@
 ﻿using _3DGraphics.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace _3DGraphics.Drawing
 {
@@ -12,7 +6,7 @@ namespace _3DGraphics.Drawing
     {
         public BaseGraphisStructs.CoordinateVector[] Coordinate { get; set; } = null;
         public BaseGraphisStructs.CoordinateVector[] CoordinateToNormal { get; set; } = null;
-        public BaseGraphisStructs.CoordinateVector[] CoordinatePolygonOriginal{ get; set; } = null;
+        public BaseGraphisStructs.CoordinateVector[] CoordinatePolygonOriginal { get; set; } = null;
         public BaseGraphisStructs.TextureVector[] Texture { get; set; } = null;
         public BaseGraphisStructs.NormalVector[] Normal { get; set; } = null;
 

@@ -1,7 +1,4 @@
-﻿using _3DGraphics.Classes;
-using System.Numerics;
-
-namespace _3DGraphics.Drawing
+﻿namespace _3DGraphics.Drawing
 {
     internal static class ZBuffer
     {

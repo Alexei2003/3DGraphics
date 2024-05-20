@@ -67,7 +67,7 @@ namespace _3DGraphics.Drawing
                 {
                     tmpColorInt = SettingLab.GetColorPointFunc(@params, new BaseGraphisStructs.CoordinateVector(x, y, z));
                 }
-                catch
+                catch (Exception ex)
                 {
                     tmpColorInt = 0;
                 }

@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using static _3DGraphics.Classes.BaseGraphisStructs;
-using static _3DGraphics.Classes.ObjFileReader;
 
 namespace _3DGraphics.Classes
 {
@@ -77,7 +76,7 @@ namespace _3DGraphics.Classes
 
         public static BaseGraphisStructs.CoordinateVector RevercePoint(BaseGraphisStructs.CoordinateVector vector)
         {
-            if(invertMatrix != null)
+            if (invertMatrix != null)
             {
                 var vect = new Vector4(vector.Coordinates, 1);
                 vect = Vector4.Transform(vect, invertMatrix.Value);

@@ -1,12 +1,11 @@
 ﻿using _3DGraphics.Classes;
 using _3DGraphics.Drawing;
-using System.Numerics;
 
 namespace _3DGraphics
 {
     internal static class SettingLab
     {
-        public  delegate void DrawObjectDelegate(DrawingParams @params);
+        public delegate void DrawObjectDelegate(DrawingParams @params);
 
         private static DrawObjectDelegate[] drawObjectFuncs = [Lines.Draw, Lines.DrawRGB, Triangles.Draw, Triangles.DrawRGB];
         public static List<DrawObjectDelegate> DrawModelFuncList = [Triangles.Draw];
