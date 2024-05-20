@@ -39,7 +39,7 @@ namespace _3DGraphics.Drawing
             float y = (int)@params.P1.Y;
             int index;
 
-            var strideInt = @params.Stride / 4;
+            var strideInt = @params.RgbStride;
 
             var dz = @params.P2.Z - @params.P1.Z;
             float ZIncrement = dz / (float)steps;
@@ -91,13 +91,60 @@ namespace _3DGraphics.Drawing
             }
         }
 
+        public static unsafe int GetPointLightUseMaps(DrawingParams @params, BaseGraphisStructs.CoordinateVector point)
+        {
+            point = CoordinateTransformar.RevercePoint(point);
+
+            var texture = InterpolateTexture(point, @params.CoordinateWorld[@params.IndexesPointTriangle[0]], @params.CoordinateWorld[@params.IndexesPointTriangle[1]], @params.CoordinateWorld[@params.IndexesPointTriangle[2]], @params.Texture[@params.IndexesPointTriangle[0]], @params.Texture[@params.IndexesPointTriangle[1]], @params.Texture[@params.IndexesPointTriangle[2]]);
+
+            int x = (int)Math.Round((texture.U % 1) * @params.TextureStride);
+            int y = (int)Math.Round((1 - (texture.V % 1)) * @params.TextureStride);
+
+            int index = x + y * @params.TextureStride;
+
+            if (index < 0)
+            {
+                return 0;
+            }
+
+            var color = @params.TextureBitmap[index];
+
+            return color;
+        }
+
+        public static BaseGraphisStructs.TextureVector InterpolateTexture(BaseGraphisStructs.CoordinateVector point, BaseGraphisStructs.CoordinateVector a, BaseGraphisStructs.CoordinateVector b, BaseGraphisStructs.CoordinateVector c, BaseGraphisStructs.TextureVector textureA, BaseGraphisStructs.TextureVector textureB, BaseGraphisStructs.TextureVector textureC)
+        {
+            // Вычисляем вектора
+            Vector3 v0 = b.Coordinates - a.Coordinates;
+            Vector3 v1 = c.Coordinates - a.Coordinates;
+            Vector3 v2 = point.Coordinates - a.Coordinates;
+
+            // Вычисляем скалярные произведения
+            float d00 = Vector3.Dot(v0, v0);
+            float d01 = Vector3.Dot(v0, v1);
+            float d11 = Vector3.Dot(v1, v1);
+            float d20 = Vector3.Dot(v2, v0);
+            float d21 = Vector3.Dot(v2, v1);
+
+            // Вычисляем барицентрические координаты
+            float denom = d00 * d11 - d01 * d01;
+            float v = (d11 * d20 - d01 * d21) / denom;
+            float w = (d00 * d21 - d01 * d20) / denom;
+            float u = 1.0f - v - w;
+
+            // Интерполируем нормали
+            Vector3 coordinates = u * textureA.Coordinates + v * textureB.Coordinates + w * textureC.Coordinates;
+
+            return new BaseGraphisStructs.TextureVector(coordinates);
+        }
+
         public static int GetPointLightUseInterpolation(DrawingParams @params, BaseGraphisStructs.CoordinateVector point)
         {
             int light;
 
             point = CoordinateTransformar.RevercePoint(point);
 
-            var normal = InterpolateNormal(point, @params.CoordinateToNormal[@params.IndexesPointTriangle[0]], @params.CoordinateToNormal[@params.IndexesPointTriangle[1]], @params.CoordinateToNormal[@params.IndexesPointTriangle[2]], @params.Normal[@params.IndexesPointTriangle[0]], @params.Normal[@params.IndexesPointTriangle[1]], @params.Normal[@params.IndexesPointTriangle[2]]);
+            var normal = InterpolateNormal(point, @params.CoordinateWorld[@params.IndexesPointTriangle[0]], @params.CoordinateWorld[@params.IndexesPointTriangle[1]], @params.CoordinateWorld[@params.IndexesPointTriangle[2]], @params.Normal[@params.IndexesPointTriangle[0]], @params.Normal[@params.IndexesPointTriangle[1]], @params.Normal[@params.IndexesPointTriangle[2]]);
 
             //Diffuse
             var cosLight = CalculateCos(point, normal, Camera.Light);
@@ -169,7 +216,7 @@ namespace _3DGraphics.Drawing
 
             // Проверяем, смотрит ли нормаль на источник света
             var dotProduct = Vector3.Dot(normalizedVectorLight, normalizedNorm);
-            if (dotProduct >= 0)
+            if (dotProduct > 0)
             {
                 return 0; // Если нормаль направлена от света, блик не учитываем
             }

@@ -23,10 +23,21 @@ namespace _3DGraphics.Drawing
             var heightMinReder = -bitmap.Height / RENDER_ARRAY_OUT_WINDOW;
 
 
-            var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
-            var ptr = bitmapData.Scan0;
-
+            var rgbBitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
+            var ptr = rgbBitmapData.Scan0;
             var rgbBitmap = (int*)ptr;
+
+            var textureBitmapData = modelData.TextureBitmap.LockBits(new Rectangle(0, 0, modelData.TextureBitmap.Width, modelData.TextureBitmap.Height), ImageLockMode.ReadOnly, modelData.TextureBitmap.PixelFormat);
+            ptr = textureBitmapData.Scan0;
+            var textureBitmap = (int*)ptr;
+
+            var normalBitmapData = modelData.NormalBitmap.LockBits(new Rectangle(0, 0, modelData.NormalBitmap.Width, modelData.NormalBitmap.Height), ImageLockMode.ReadOnly, modelData.NormalBitmap.PixelFormat);
+            ptr = normalBitmapData.Scan0;
+            var normalBitmap = (int*)ptr;
+
+            var mraoBitmapData = modelData.MraoBitmap.LockBits(new Rectangle(0, 0, modelData.MraoBitmap.Width, modelData.MraoBitmap.Height), ImageLockMode.ReadOnly, modelData.MraoBitmap.PixelFormat);
+            ptr = mraoBitmapData.Scan0;
+            var mraoBitmap = (int*)ptr;
 
             for (var j = 0; j < SettingLab.DrawModelFuncList.Count; j++)
             {
@@ -37,6 +48,7 @@ namespace _3DGraphics.Drawing
                     var geometricPoints = new BaseGraphisStructs.CoordinateVector[modelData.GeometricVertexIndexs[index].Length];
                     var geometricToNormalPoints = new BaseGraphisStructs.CoordinateVector[modelData.GeometricVertexIndexs[index].Length];
                     var normalPoints = new BaseGraphisStructs.NormalVector[modelData.NormalVertexIndexs[index].Length];
+                    var texturePoints = new BaseGraphisStructs.TextureVector[modelData.TextureVertexIndexs[index].Length];
                     for (var i = 0; i < modelData.GeometricVertexIndexs[index].Length; i++)
                     {
                         ref var geometricCoordinate = ref modelData.GeometricVertexCoordinates[modelData.GeometricVertexIndexs[index][i]];
@@ -46,8 +58,9 @@ namespace _3DGraphics.Drawing
                             break;
                         }
                         geometricPoints[i] = geometricCoordinate;
-                        geometricToNormalPoints[i] = modelData.GeometricVertexToNormalCoordinates[modelData.GeometricVertexIndexs[index][i]];
+                        geometricToNormalPoints[i] = modelData.GeometricVertexWorldCoordinates[modelData.GeometricVertexIndexs[index][i]];
                         normalPoints[i] = modelData.NormalVertexCoordinates[modelData.NormalVertexIndexs[index][i]];
+                        texturePoints[i] = modelData.TextureVertexCoordinates[modelData.TextureVertexIndexs[index][i]];
                     }
 
                     if (geometricPoints != null)
@@ -55,10 +68,21 @@ namespace _3DGraphics.Drawing
                         SettingLab.DrawModelFuncList[j](new DrawingParams()
                         {
                             Coordinate = geometricPoints,
-                            CoordinateToNormal = geometricToNormalPoints,
+                            CoordinateWorld = geometricToNormalPoints,
                             Normal = normalPoints,
+                            Texture = texturePoints,
+
+                            TextureBitmap = textureBitmap,
+                            TextureStride = textureBitmapData.Stride / 4,
+
+                            NormalBitmap = normalBitmap,
+                            NormalStride = normalBitmapData.Stride / 4,
+
+                            MraoBitmap = mraoBitmap,
+                            MraoStride = mraoBitmapData.Stride / 4,
+
                             RgbBitmap = rgbBitmap,
-                            Stride = bitmapData.Stride,
+                            RgbStride = rgbBitmapData.Stride / 4,
                             ColorInt = colorInts[j],
                             WidthZone = widthZone,
                             HeightZone = heightZone,
@@ -68,7 +92,10 @@ namespace _3DGraphics.Drawing
                 //}
             }
 
-            bitmap.UnlockBits(bitmapData);
+            modelData.MraoBitmap.UnlockBits(mraoBitmapData);
+            modelData.NormalBitmap.UnlockBits(normalBitmapData);
+            modelData.TextureBitmap.UnlockBits(textureBitmapData);
+            bitmap.UnlockBits(rgbBitmapData);
         }
 
         public static int GetRGBColor(BaseGraphisStructs.CoordinateVector[] points)

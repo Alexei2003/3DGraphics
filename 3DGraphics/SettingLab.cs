@@ -13,8 +13,8 @@ namespace _3DGraphics
 
         public delegate int GetColorPointDelegate(DrawingParams @params, BaseGraphisStructs.CoordinateVector point);
 
-        private static GetColorPointDelegate[] GetColorPointFuncs = [Lines.GetPointLightUseOneColourForPolygon, Lines.GetPointLightUseInterpolation];
-        public static GetColorPointDelegate GetColorPointFunc = Lines.GetPointLightUseInterpolation;
+        private static GetColorPointDelegate[] GetColorPointFuncs = [Lines.GetPointLightUseOneColourForPolygon, Lines.GetPointLightUseInterpolation, Lines.GetPointLightUseMaps];
+        public static GetColorPointDelegate GetColorPointFunc = Lines.GetPointLightUseMaps;
 
     }
 }

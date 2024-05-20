@@ -17,7 +17,7 @@
         public static bool CheckAndSetDepth(int x, int y, float value)
         {
             int index = y * width + x;
-            if (zBuffer[index]<value)
+            if (zBuffer[index] < value)
             {
                 zBuffer[index] = value;
                 return true;
@@ -27,7 +27,7 @@
 
         public static void Clear()
         {
-            Array.Fill(zBuffer,-10000);
+            Array.Fill(zBuffer, -10000);
         }
     }
 }

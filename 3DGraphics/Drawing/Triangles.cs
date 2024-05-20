@@ -14,8 +14,10 @@ namespace _3DGraphics.Drawing
             }
 
             @params.CoordinatePolygonOriginal = @params.Coordinate;
+            @params.TextureOriginal = @params.Texture;
 
             @params.Coordinate = new BaseGraphisStructs.CoordinateVector[3];
+
 
             if (SettingLab.GetColorPointFunc == Lines.GetPointLightUseOneColourForPolygon)
             {
@@ -32,6 +34,7 @@ namespace _3DGraphics.Drawing
             else
             {
                 @params.IndexesPointTriangle = new int[3];
+
                 for (var i = 1; i < @params.CoordinatePolygonOriginal.Length - 1; i++)
                 {
                     @params.IndexesPointTriangle[0] = 0;
@@ -44,7 +47,6 @@ namespace _3DGraphics.Drawing
 
                     DrawTriangle(@params);
                 }
-
             }
         }
 
@@ -172,7 +174,7 @@ namespace _3DGraphics.Drawing
             for (var i = 0; i < @params.Normal.Length; i++)
             {
                 // Вычисление вектора от точки к полигону
-                var vector = @params.CoordinateToNormal[i].Coordinates - pointObject;
+                var vector = @params.CoordinateWorld[i].Coordinates - pointObject;
                 var normalizedVector = Vector3.Normalize(vector);
 
                 // Вычисление скалярного произведения нормализованного вектора и нормали полигона
@@ -193,7 +195,7 @@ namespace _3DGraphics.Drawing
             for (var i = 0; i < @params.Normal.Length; i++)
             {
                 //Свет
-                var vectorLight = @params.CoordinateToNormal[i].Coordinates - Camera.Light;
+                var vectorLight = @params.CoordinateWorld[i].Coordinates - Camera.Light;
                 var normalizedVectorLight = Vector3.Normalize(vectorLight);
 
                 //Нормаль
@@ -205,7 +207,7 @@ namespace _3DGraphics.Drawing
                 var normalizedVectorSpecular = Vector3.Normalize(vectorSpecular);
 
                 //Камера 
-                var vectorCamera = @params.CoordinateToNormal[i].Coordinates - Camera.Eye;
+                var vectorCamera = @params.CoordinateWorld[i].Coordinates - Camera.Eye;
                 var normalizedVectorCamera = Vector3.Normalize(vectorCamera);
 
                 var cosSpeg = Vector3.Dot(normalizedVectorSpecular, normalizedVectorCamera);

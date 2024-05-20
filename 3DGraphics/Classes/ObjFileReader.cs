@@ -1,4 +1,5 @@
-﻿using static _3DGraphics.Classes.BaseGraphisStructs;
+﻿using _3DGraphics.Drawing;
+using static _3DGraphics.Classes.BaseGraphisStructs;
 
 namespace _3DGraphics.Classes
 {
@@ -11,12 +12,16 @@ namespace _3DGraphics.Classes
         public class ModelData
         {
             public CoordinateVector[] GeometricVertexCoordinates { get; set; }
-            public CoordinateVector[] GeometricVertexToNormalCoordinates { get; set; }
+            public CoordinateVector[] GeometricVertexWorldCoordinates { get; set; }
             public TextureVector[] TextureVertexCoordinates { get; set; }
             public NormalVector[] NormalVertexCoordinates { get; set; }
             public int[][] GeometricVertexIndexs { get; set; }
             public int[][] TextureVertexIndexs { get; set; }
             public int[][] NormalVertexIndexs { get; set; }
+
+            public Bitmap TextureBitmap { get; set; } = new Bitmap(1, 1);
+            public Bitmap NormalBitmap { get; set; } = new Bitmap(1, 1);
+            public Bitmap MraoBitmap { get; set; } = new Bitmap(1, 1);
 
             public ModelData()
             {
@@ -28,7 +33,7 @@ namespace _3DGraphics.Classes
                 GeometricVertexCoordinates = new CoordinateVector[modelData.GeometricVertexCoordinates.Length];
                 TextureVertexCoordinates = new TextureVector[modelData.TextureVertexCoordinates.Length];
                 NormalVertexCoordinates = new NormalVector[modelData.NormalVertexCoordinates.Length];
-                GeometricVertexToNormalCoordinates = new CoordinateVector[modelData.GeometricVertexCoordinates.Length];
+                GeometricVertexWorldCoordinates = new CoordinateVector[modelData.GeometricVertexCoordinates.Length];
 
                 Parallel.For(0, modelData.GeometricVertexCoordinates.Length, (Action<int>)(i =>
                 {
@@ -48,6 +53,10 @@ namespace _3DGraphics.Classes
                 GeometricVertexIndexs = (int[][])modelData.GeometricVertexIndexs.Clone();
                 TextureVertexIndexs = (int[][])modelData.TextureVertexIndexs.Clone();
                 NormalVertexIndexs = (int[][])modelData.NormalVertexIndexs.Clone();
+
+                TextureBitmap = modelData.TextureBitmap;
+                NormalBitmap = modelData.NormalBitmap;
+                MraoBitmap = modelData.MraoBitmap;
             }
 
             public void SetCopyValue(ModelData modelData)
@@ -154,17 +163,37 @@ namespace _3DGraphics.Classes
                 }
             }
 
-            var result = new ModelData
-            {
-                GeometricVertexCoordinates = [.. geometricVertexsList],
-                TextureVertexCoordinates = [.. textureVerticesList],
-                NormalVertexCoordinates = [.. normalVerticesList],
-                GeometricVertexIndexs = [.. geometricVertexIndexsList],
-                TextureVertexIndexs = [.. textureVertexIndexsList],
-                NormalVertexIndexs = [.. normalVertexIndexsList]
-            };
+            ModelData result;
 
-            result.GeometricVertexToNormalCoordinates = new CoordinateVector[result.GeometricVertexCoordinates.Length];
+            if (SettingLab.GetColorPointFunc == Lines.GetPointLightUseMaps)
+            {
+                result = new ModelData
+                {
+                    GeometricVertexCoordinates = [.. geometricVertexsList],
+                    TextureVertexCoordinates = [.. textureVerticesList],
+                    NormalVertexCoordinates = [.. normalVerticesList],
+                    GeometricVertexIndexs = [.. geometricVertexIndexsList],
+                    TextureVertexIndexs = [.. textureVertexIndexsList],
+                    NormalVertexIndexs = [.. normalVertexIndexsList],
+                    GeometricVertexWorldCoordinates = new CoordinateVector[geometricVertexsList.Count],
+                    TextureBitmap = new Bitmap("D:\\ALL_DOWNLOAD\\.Model\\Shovel Knight\\shovel_diffuse.png"),
+                    NormalBitmap = new Bitmap("D:\\ALL_DOWNLOAD\\.Model\\Shovel Knight\\shovel_normal_map.png"),
+                    MraoBitmap = new Bitmap("D:\\ALL_DOWNLOAD\\.Model\\Shovel Knight\\shovel_mrao.png")
+                };
+            }
+            else
+            {
+                result = new ModelData
+                {
+                    GeometricVertexCoordinates = [.. geometricVertexsList],
+                    TextureVertexCoordinates = [.. textureVerticesList],
+                    NormalVertexCoordinates = [.. normalVerticesList],
+                    GeometricVertexIndexs = [.. geometricVertexIndexsList],
+                    TextureVertexIndexs = [.. textureVertexIndexsList],
+                    NormalVertexIndexs = [.. normalVertexIndexsList],
+                    GeometricVertexWorldCoordinates = new CoordinateVector[geometricVertexsList.Count],
+                };
+            }
 
             return result;
         }

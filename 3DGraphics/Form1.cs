@@ -77,28 +77,34 @@ namespace _3DGraphics
         private readonly object lockFrameCount = new();
         private int frameCount = 0;
 
+
         private void MainWindow_Paint(object sender, PaintEventArgs e)
         {
-            //AutoRotate();
-
-            var bitmap = new Bitmap(Width, Height);
-
-            using (var g = Graphics.FromImage(bitmap))
+            try
             {
-                using var brush = new SolidBrush(Color.Black);
-                g.FillRectangle(brush, 0, 0, bitmap.Width, bitmap.Height);
-            }
+                var bitmap = new Bitmap(Width, Height);
 
-            if (modelDataPaint != null)
-            {
-                DrawingModel.Draw(bitmap, modelDataPaint);
-
-                lock (lockFrameCount)
+                using (var g = Graphics.FromImage(bitmap))
                 {
-                    frameCount++;
+                    using var brush = new SolidBrush(Color.Black);
+                    g.FillRectangle(brush, 0, 0, bitmap.Width, bitmap.Height);
                 }
+
+                if (modelDataPaint != null)
+                {
+                    DrawingModel.Draw(bitmap, modelDataPaint);
+
+                    lock (lockFrameCount)
+                    {
+                        frameCount++;
+                    }
+                }
+                BackgroundImage = bitmap;
             }
-            BackgroundImage = bitmap;
+            catch
+            {
+                return;
+            }
         }
 
         private void opfdModelFile_FileOk(object sender, System.ComponentModel.CancelEventArgs e)

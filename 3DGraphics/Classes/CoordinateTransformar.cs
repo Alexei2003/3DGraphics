@@ -56,7 +56,7 @@ namespace _3DGraphics.Classes
                 vect = Vector4.Transform(vect, finalMatrix1);
                 modelData.GeometricVertexCoordinates[i] = new BaseGraphisStructs.CoordinateVector(vect.X, vect.Y, vect.Z);
 
-                modelData.GeometricVertexToNormalCoordinates[i] = modelData.GeometricVertexCoordinates[i];
+                modelData.GeometricVertexWorldCoordinates[i] = modelData.GeometricVertexCoordinates[i];
 
                 vect = new Vector4(modelData.GeometricVertexCoordinates[i].Coordinates, 1);
                 vect = Vector4.Transform(vect, finalMatrix2);
