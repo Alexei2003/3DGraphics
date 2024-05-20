@@ -116,25 +116,18 @@ namespace _3DGraphics.Drawing
 
             //Specular
             int specularLight;
-            if (light != 0)
+            var cosSpecular = CalculateSpecularCos(point, normal);
+            specularLight = Convert.ToInt32(255 * cosSpecular);
+            if (specularLight < 0)
             {
-                var cosSpecular = CalculateSpecularCos(point, normal);
-                specularLight = Convert.ToInt32(255 * cosSpecular);
-                if (specularLight < 0)
-                {
-                    specularLight = 0;
-                }
-                else
-                {
-                    if (specularLight > 255)
-                    {
-                        specularLight = 255;
-                    }
-                }
+                specularLight = 0;
             }
             else
             {
-                specularLight = 0;
+                if (specularLight > 255)
+                {
+                    specularLight = 255;
+                }
             }
 
             //Finish
@@ -173,6 +166,13 @@ namespace _3DGraphics.Drawing
 
             //Нормаль
             var normalizedNorm = Vector3.Normalize(normalModel.Coordinates);
+
+            // Проверяем, смотрит ли нормаль на источник света
+            var dotProduct = Vector3.Dot(normalizedVectorLight, normalizedNorm);
+            if (dotProduct >= 0)
+            {
+                return 0; // Если нормаль направлена от света, блик не учитываем
+            }
 
             //Отражение
             var vectorSpecular = normalizedNorm - 2 * (normalizedVectorLight * normalizedNorm) * normalizedNorm;
