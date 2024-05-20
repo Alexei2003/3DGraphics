@@ -39,8 +39,6 @@ namespace _3DGraphics.Drawing
             float y = (int)@params.P1.Y;
             int index;
 
-            var strideInt = @params.RgbStride;
-
             var dz = @params.P2.Z - @params.P1.Z;
             float ZIncrement = dz / (float)steps;
 
@@ -71,16 +69,9 @@ namespace _3DGraphics.Drawing
 
                 if (ZBuffer.CheckAndSetDepth(xRound, yRound, z))
                 {
-                    index = xRound + yRound * strideInt;
+                    index = xRound + yRound * @params.RgbStride;
 
-                    try
-                    {
-                        tmpColorInt = SettingLab.GetColorPointFunc(@params, new BaseGraphisStructs.CoordinateVector(x, y, z));
-                    }
-                    catch
-                    {
-                        tmpColorInt = 0;
-                    }
+                    tmpColorInt = SettingLab.GetColorPointFunc(@params, new BaseGraphisStructs.CoordinateVector(x, y, z));
 
                     @params.RgbBitmap[index] = tmpColorInt;
                 }
@@ -91,8 +82,11 @@ namespace _3DGraphics.Drawing
             }
         }
 
+        private const int MAX_SIZE_ARRAY = 4096 * 4096;
+
         public static unsafe int GetPointLightUseMaps(DrawingParams @params, BaseGraphisStructs.CoordinateVector point)
         {
+            int light;
             point = CoordinateTransformar.RevercePoint(point);
 
             var texture = InterpolateTexture(point, @params.CoordinateWorld[@params.IndexesPointTriangle[0]], @params.CoordinateWorld[@params.IndexesPointTriangle[1]], @params.CoordinateWorld[@params.IndexesPointTriangle[2]], @params.Texture[@params.IndexesPointTriangle[0]], @params.Texture[@params.IndexesPointTriangle[1]], @params.Texture[@params.IndexesPointTriangle[2]]);
@@ -102,14 +96,46 @@ namespace _3DGraphics.Drawing
 
             int index = x + y * @params.TextureStride;
 
-            if (index < 0)
+            if (index < 0 || index >= MAX_SIZE_ARRAY)
             {
                 return 0;
             }
 
-            var color = @params.TextureBitmap[index];
+            // texture
+            var textureInt = @params.TextureBitmap[index];
 
-            return color;
+            var textureColor = Color.FromArgb(textureInt);
+
+            // light
+
+            var normalInt = @params.NormalBitmap[index];
+
+            var normalColor = Color.FromArgb(normalInt);
+
+            var normal = new Vector3(normalColor.R / 255f, normalColor.G / 255f, normalColor.B / 255f);
+            normal = normal * 2 - Vector3.One;
+
+            // deffuce
+            var cosDeffuceLight = CalculateCos(point, new BaseGraphisStructs.NormalVector(normal), Camera.Light);
+            cosDeffuceLight -= 0.2f;
+            if (cosDeffuceLight < 0)
+            {
+                cosDeffuceLight = 0;
+            }
+
+            // ambient
+            var cosAmbientLight = 0.1f;
+
+
+            // final light
+            var cosLight = cosAmbientLight + cosDeffuceLight;
+            if (cosLight > 1)
+            {
+                cosLight = 1;
+            }
+
+            light = Color.FromArgb(255, (int)(cosLight * textureColor.R), (int)(cosLight * textureColor.G), (int)(cosLight * textureColor.B)).ToArgb();
+            return light;
         }
 
         public static BaseGraphisStructs.TextureVector InterpolateTexture(BaseGraphisStructs.CoordinateVector point, BaseGraphisStructs.CoordinateVector a, BaseGraphisStructs.CoordinateVector b, BaseGraphisStructs.CoordinateVector c, BaseGraphisStructs.TextureVector textureA, BaseGraphisStructs.TextureVector textureB, BaseGraphisStructs.TextureVector textureC)
@@ -196,8 +222,7 @@ namespace _3DGraphics.Drawing
         private static float CalculateCos(BaseGraphisStructs.CoordinateVector pointModel, BaseGraphisStructs.NormalVector normalModel, Vector3 pointObject)
         {
             // Вычисление вектора от точки к полигону
-            var vector = pointModel.Coordinates - pointObject;
-            var normalizedVector = Vector3.Normalize(vector);
+            var normalizedVector = CanculateVectBeetmeen2Point(pointModel.Coordinates, pointObject);
 
             // Вычисление скалярного произведения нормализованного вектора и нормали полигона
             var normalizedNorm = Vector3.Normalize(normalModel.Coordinates);
@@ -208,8 +233,7 @@ namespace _3DGraphics.Drawing
         private static float CalculateSpecularCos(BaseGraphisStructs.CoordinateVector pointModel, BaseGraphisStructs.NormalVector normalModel)
         {
             //Свет
-            var vectorLight = pointModel.Coordinates - Camera.Light;
-            var normalizedVectorLight = Vector3.Normalize(vectorLight);
+            var normalizedVectorLight = CanculateVectBeetmeen2Point(pointModel.Coordinates, Camera.Light);
 
             //Нормаль
             var normalizedNorm = Vector3.Normalize(normalModel.Coordinates);
@@ -226,8 +250,7 @@ namespace _3DGraphics.Drawing
             var normalizedVectorSpecular = Vector3.Normalize(vectorSpecular);
 
             //Камера 
-            var vectorCamera = pointModel.Coordinates - Camera.Eye;
-            var normalizedVectorCamera = Vector3.Normalize(vectorCamera);
+            var normalizedVectorCamera = CanculateVectBeetmeen2Point(pointModel.Coordinates, Camera.Eye);
 
             var cosSpeg = Vector3.Dot(normalizedVectorSpecular, normalizedVectorCamera);
             cosSpeg = float.Pow(cosSpeg, 50);
@@ -235,6 +258,12 @@ namespace _3DGraphics.Drawing
             return cosSpeg;
         }
 
+        private static Vector3 CanculateVectBeetmeen2Point(Vector3 a, Vector3 b)
+        {
+            // Вычисление вектора от точки к полигону
+            var vector = a - b;
+            return Vector3.Normalize(vector);
+        }
         public static BaseGraphisStructs.NormalVector InterpolateNormal(BaseGraphisStructs.CoordinateVector point, BaseGraphisStructs.CoordinateVector a, BaseGraphisStructs.CoordinateVector b, BaseGraphisStructs.CoordinateVector c, BaseGraphisStructs.NormalVector normalA, BaseGraphisStructs.NormalVector normalB, BaseGraphisStructs.NormalVector normalC)
         {
             // Вычисляем вектора
