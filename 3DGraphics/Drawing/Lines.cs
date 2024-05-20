@@ -53,6 +53,9 @@ namespace _3DGraphics.Drawing
                 steps++;
             }
 
+            int xRound;
+            int yRound;
+
             for (var i = 0; i <= steps; i++)
             {
                 if (x > @params.WidthZone || x < 0 || y > @params.HeightZone || y < 0)
@@ -63,19 +66,21 @@ namespace _3DGraphics.Drawing
                     continue;
                 }
 
-                try
-                {
-                    tmpColorInt = SettingLab.GetColorPointFunc(@params, new BaseGraphisStructs.CoordinateVector(x, y, z));
-                }
-                catch (Exception ex)
-                {
-                    tmpColorInt = 0;
-                }
+                xRound = (int)Math.Round(x);
+                yRound = (int)Math.Round(y);
 
-
-                if (ZBuffer.CheckAndSetDepth((int)Math.Round(x), (int)Math.Round(y), z))
+                if (ZBuffer.CheckAndSetDepth(xRound, yRound, z))
                 {
-                    index = (int)Math.Round(x) + (int)Math.Round(y) * strideInt;
+                    index = xRound + yRound * strideInt;
+
+                    try
+                    {
+                        tmpColorInt = SettingLab.GetColorPointFunc(@params, new BaseGraphisStructs.CoordinateVector(x, y, z));
+                    }
+                    catch
+                    {
+                        tmpColorInt = 0;
+                    }
 
                     @params.RgbBitmap[index] = tmpColorInt;
                 }
@@ -96,21 +101,36 @@ namespace _3DGraphics.Drawing
 
             //Diffuse
             var cosLight = CalculateCos(point, normal, Camera.Light);
-            var diffuseLight = Convert.ToInt32(255 * cosLight) < 0 ? 0 : Convert.ToInt32(255 * cosLight);
-            light = diffuseLight - 100 < 0 ? 0 : diffuseLight - 100;
-            //light = diffuseLight - 50 < 0 ? 0 : diffuseLight - 50;
+            int diffuseLight = Convert.ToInt32(255 * cosLight) - 100;
+            if (diffuseLight < 0)
+            {
+                light = 0;
+            }
+            else
+            {
+                light = diffuseLight;
+            }
 
             //Ambient
             var ambientLight = 50;
-            //var ambientLight = 0;
 
             //Specular
             int specularLight;
-            if (diffuseLight != 0)
+            if (light != 0)
             {
                 var cosSpecular = CalculateSpecularCos(point, normal);
-                //var cosSpecular = 0;
-                specularLight = Convert.ToInt32(255 * cosSpecular) < 0 ? 0 : Convert.ToInt32(255 * cosSpecular);
+                specularLight = Convert.ToInt32(255 * cosSpecular);
+                if (specularLight < 0)
+                {
+                    specularLight = 0;
+                }
+                else
+                {
+                    if (specularLight > 255)
+                    {
+                        specularLight = 255;
+                    }
+                }
             }
             else
             {
@@ -118,9 +138,14 @@ namespace _3DGraphics.Drawing
             }
 
             //Finish
-            light = light + ambientLight + specularLight > 255 ? 255 : light + ambientLight + specularLight;
+            light = light + ambientLight + specularLight;
 
-            return Color.FromArgb(255, specularLight > 255 ? 255 : specularLight, specularLight > 255 ? 255 : specularLight, light).ToArgb();
+            if (light > 255)
+            {
+                light = 255;
+            }
+
+            return Color.FromArgb(255, specularLight, specularLight, light).ToArgb();
         }
 
         public static int GetPointLightUseOneColourForPolygon(DrawingParams @params, BaseGraphisStructs.CoordinateVector point)

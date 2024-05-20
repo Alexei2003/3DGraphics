@@ -15,21 +15,33 @@ namespace _3DGraphics.Drawing
 
             @params.CoordinatePolygonOriginal = @params.Coordinate;
 
+            @params.Coordinate = new BaseGraphisStructs.CoordinateVector[3];
+
             if (SettingLab.GetColorPointFunc == Lines.GetPointLightUseOneColourForPolygon)
             {
                 @params.ColorInt = GetPolygonLight(@params);
                 for (var i = 1; i < @params.CoordinatePolygonOriginal.Length - 1; i++)
                 {
-                    @params.Coordinate = [@params.CoordinatePolygonOriginal[0], @params.CoordinatePolygonOriginal[i], @params.CoordinatePolygonOriginal[i + 1]];
+                    @params.Coordinate[0] = @params.CoordinatePolygonOriginal[0];
+                    @params.Coordinate[1] = @params.CoordinatePolygonOriginal[i];
+                    @params.Coordinate[2] = @params.CoordinatePolygonOriginal[i + 1];
+
                     DrawTriangle(@params);
                 }
             }
             else
             {
+                @params.IndexesPointTriangle = new int[3];
                 for (var i = 1; i < @params.CoordinatePolygonOriginal.Length - 1; i++)
                 {
-                    @params.IndexesPointTriangle = [0, i, i + 1];
-                    @params.Coordinate = [@params.CoordinatePolygonOriginal[0], @params.CoordinatePolygonOriginal[i], @params.CoordinatePolygonOriginal[i + 1]];
+                    @params.IndexesPointTriangle[0] = 0;
+                    @params.IndexesPointTriangle[1] = i;
+                    @params.IndexesPointTriangle[2] = i + 1;
+
+                    @params.Coordinate[0] = @params.CoordinatePolygonOriginal[0];
+                    @params.Coordinate[1] = @params.CoordinatePolygonOriginal[i];
+                    @params.Coordinate[2] = @params.CoordinatePolygonOriginal[i + 1];
+
                     DrawTriangle(@params);
                 }
 

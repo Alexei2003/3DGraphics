@@ -2,41 +2,24 @@
 {
     internal static class ZBuffer
     {
-        private static float[,] zBuffer = new float[1, 1];
-        private static float[,] originaZBuffer = new float[1, 1];
+        private static float[] zBuffer = new float[1];
+        private static int width;
+        private static int height;
 
-        public static void Resaze(int width, int height)
+        public static void Resize(int newWidth, int newHeight)
         {
-            originaZBuffer = new float[width, height];
-
-            for (int i = 0; i < width; i++)
-            {
-                for (var j = 0; j < height; j++)
-                {
-                    originaZBuffer[i, j] = -10000;
-                }
-            }
+            width = newWidth;
+            height = newHeight;
+            zBuffer = new float[width * height];
+            Clear();
         }
 
         public static bool CheckAndSetDepth(int x, int y, float value)
         {
-            if (CanAddDepth(x, y, value))
+            int index = y * width + x;
+            if (zBuffer[index]<value)
             {
-                SetDepth(x, y, value);
-                return true;
-            }
-            return false;
-        }
-
-        public static void SetDepth(int x, int y, float value)
-        {
-            zBuffer[x, y] = value;
-        }
-
-        public static bool CanAddDepth(int x, int y, float value)
-        {
-            if (zBuffer[x, y] < value)
-            {
+                zBuffer[index] = value;
                 return true;
             }
             return false;
@@ -44,7 +27,7 @@
 
         public static void Clear()
         {
-            zBuffer = (float[,])originaZBuffer.Clone();
+            Array.Fill(zBuffer,-10000);
         }
     }
 }

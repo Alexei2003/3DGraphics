@@ -34,7 +34,7 @@ namespace _3DGraphics
             opfdModelFile.RestoreDirectory = true;
 
             ControlResize();
-            ZBuffer.Resaze(WIDTH, Height);
+            ZBuffer.Resize(WIDTH, Height);
 
             Camera.Resize(Width, Height);
 
@@ -131,7 +131,7 @@ namespace _3DGraphics
         {
             ControlResize();
 
-            ZBuffer.Resaze(Width, Height);
+            ZBuffer.Resize(Width, Height);
 
             Camera.Size = Size;
             CreateModelDataPaint();
