@@ -4,8 +4,10 @@ using static _3DGraphics.Classes.ObjFileReader;
 
 namespace _3DGraphics.Classes
 {
-    internal static class CoordinateTransformations
+    internal static class CoordinateTransformar
     {
+        private static Matrix4x4? invertMatrix = null;
+
         public static void TranslateVectors(CoordinateVector[] vectors, CoordinateVector translation)
         {
             Parallel.For(0, vectors.Length, i =>
@@ -45,22 +47,44 @@ namespace _3DGraphics.Classes
             // Создание матрицы вида экрана (Viewport Matrix)
             var viewportMatrix = Matrix4x4.CreateViewport(0, 0, Camera.Size.Width, Camera.Size.Height, Camera.ZNear, Camera.ZFar);
 
-            var finalMatrix = viewMatrix * projectionMatrix * viewportMatrix;
+            var finalMatrix1 = worldMatrix;
+            var finalMatrix2 = viewMatrix * projectionMatrix * viewportMatrix;
 
             // Преобразование координат вершин
             Parallel.For(0, modelData.GeometricVertexCoordinates.Length, i =>
             {
                 var vect = new Vector4(modelData.GeometricVertexCoordinates[i].Coordinates, 1);
-                vect = Vector4.Transform(vect, worldMatrix);
+                vect = Vector4.Transform(vect, finalMatrix1);
                 modelData.GeometricVertexCoordinates[i] = new BaseGraphisStructs.CoordinateVector(vect.X, vect.Y, vect.Z);
 
                 modelData.GeometricVertexToNormalCoordinates[i] = modelData.GeometricVertexCoordinates[i];
 
                 vect = new Vector4(modelData.GeometricVertexCoordinates[i].Coordinates, 1);
-                vect = Vector4.Transform(vect, finalMatrix);
+                vect = Vector4.Transform(vect, finalMatrix2);
                 vect = Vector4.Divide(vect, vect.W);
                 modelData.GeometricVertexCoordinates[i] = new BaseGraphisStructs.CoordinateVector(vect.X, vect.Y, vect.Z);
             });
+
+            Matrix4x4.Invert(viewportMatrix, out Matrix4x4 invViewportMatrix);
+
+            Matrix4x4.Invert(projectionMatrix, out Matrix4x4 invProjectionMatrix);
+
+            Matrix4x4.Invert(viewMatrix, out Matrix4x4 invViewMatrix);
+
+            // Получаем обратную матрицу для исходной составной матрицы
+            invertMatrix = invViewportMatrix * invProjectionMatrix * invViewMatrix;
+        }
+
+        public static BaseGraphisStructs.CoordinateVector RevercePoint(BaseGraphisStructs.CoordinateVector vector)
+        {
+            if(invertMatrix != null)
+            {
+                var vect = new Vector4(vector.Coordinates, 1);
+                vect = Vector4.Transform(vect, invertMatrix.Value);
+                vect = Vector4.Divide(vect, vect.W);
+                return new BaseGraphisStructs.CoordinateVector(vect.X, vect.Y, vect.Z);
+            }
+            return vector;
         }
     }
 }

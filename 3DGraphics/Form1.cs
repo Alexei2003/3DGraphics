@@ -115,7 +115,7 @@ namespace _3DGraphics
                 return;
             }
 
-            CoordinateTransformations.TranslateVectors(modelData.GeometricVertexCoordinates, new CoordinateVector(
+            CoordinateTransformar.TranslateVectors(modelData.GeometricVertexCoordinates, new CoordinateVector(
                 -(modelData.GeometricVertexCoordinates.Max(v => v.X) + modelData.GeometricVertexCoordinates.Min(v => v.X)) / 2,
                 -(modelData.GeometricVertexCoordinates.Max(v => v.Y) + modelData.GeometricVertexCoordinates.Min(v => v.Y)) / 2,
                 -(modelData.GeometricVertexCoordinates.Max(v => v.Z) + modelData.GeometricVertexCoordinates.Min(v => v.Z)) / 2));
@@ -146,7 +146,7 @@ namespace _3DGraphics
             if (modelData != null)
             {
                 modelDataPaint.SetCopyValue(modelData);
-                CoordinateTransformations.GetFinalVectors(modelDataPaint);
+                CoordinateTransformar.GetFinalVectors(modelDataPaint);
             }
         }
 
@@ -165,31 +165,31 @@ namespace _3DGraphics
                     case Keys.X:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
                         {
-                            CoordinateTransformations.RotateCamera(new Vector3(-angelRotate,0,0));
+                            CoordinateTransformar.RotateCamera(new Vector3(-angelRotate,0,0));
                         }
                         else
                         {
-                            CoordinateTransformations.RotateCamera(new Vector3(angelRotate,0, 0));
+                            CoordinateTransformar.RotateCamera(new Vector3(angelRotate,0, 0));
                         }
                         break;
                     case Keys.Y:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
                         {
-                            CoordinateTransformations.RotateCamera(new Vector3(0,-angelRotate, 0));
+                            CoordinateTransformar.RotateCamera(new Vector3(0,-angelRotate, 0));
                         }
                         else
                         {
-                            CoordinateTransformations.RotateCamera(new Vector3(0,angelRotate, 0));
+                            CoordinateTransformar.RotateCamera(new Vector3(0,angelRotate, 0));
                         }
                         break;
                     case Keys.Z:
                         if ((Control.ModifierKeys & Keys.Shift) != 0)
                         { 
-                            CoordinateTransformations.RotateCamera(new Vector3(0,0,-angelRotate));
+                            CoordinateTransformar.RotateCamera(new Vector3(0,0,-angelRotate));
                         }
                         else
                         {
-                            CoordinateTransformations.RotateCamera(new Vector3(0, 0, angelRotate));
+                            CoordinateTransformar.RotateCamera(new Vector3(0, 0, angelRotate));
                         }
                         break;
                     case Keys.Oemplus:
@@ -288,7 +288,7 @@ namespace _3DGraphics
             if (modelData != null)
             {
                 const float angelRotate = (float)Math.PI / 10;
-                CoordinateTransformations.RotateCamera(new Vector3(0,angelRotate, 0));
+                CoordinateTransformar.RotateCamera(new Vector3(0,angelRotate, 0));
                 CreateModelDataPaint();
             }
         }

@@ -90,7 +90,9 @@ namespace _3DGraphics.Drawing
         {
             int light;
 
-            var normal = InterpolateNormal(point, @params.CoordinatePolygonOriginal[0], @params.CoordinatePolygonOriginal[1], @params.CoordinatePolygonOriginal[2], @params.Normal[0], @params.Normal[1], @params.Normal[2]);
+            point = CoordinateTransformar.RevercePoint(point);
+
+            var normal = InterpolateNormal(point, @params.CoordinateToNormal[@params.IndexesPointTriangle[0]], @params.CoordinateToNormal[@params.IndexesPointTriangle[1]], @params.CoordinateToNormal[@params.IndexesPointTriangle[2]], @params.Normal[@params.IndexesPointTriangle[0]], @params.Normal[@params.IndexesPointTriangle[1]], @params.Normal[@params.IndexesPointTriangle[2]]);
 
             //Diffuse
             var cosLight = CalculateCos(point, normal, Camera.Light);
@@ -135,7 +137,7 @@ namespace _3DGraphics.Drawing
             // Вычисление скалярного произведения нормализованного вектора и нормали полигона
             var normalizedNorm = Vector3.Normalize(normalModel.Coordinates);
 
-            return Vector3.Dot(normalizedVector, normalizedNorm);
+            return -Vector3.Dot(normalizedVector, normalizedNorm);
         }
 
         private static float CalculateSpecularCos(BaseGraphisStructs.CoordinateVector pointModel, BaseGraphisStructs.NormalVector normalModel)

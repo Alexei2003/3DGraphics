@@ -31,5 +31,7 @@ namespace _3DGraphics.Drawing
         public BaseGraphisStructs.CoordinateVector P2 { get; set; } = null;
 
         public BaseGraphisStructs.CoordinateVector[] WNormal { get; set; } = null;
+
+        public int[] IndexesPointTriangle = null;
     }
 }

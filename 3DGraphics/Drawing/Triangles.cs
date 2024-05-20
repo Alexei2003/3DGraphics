@@ -28,6 +28,7 @@ namespace _3DGraphics.Drawing
             {
                 for (var i = 1; i < @params.CoordinatePolygonOriginal.Length - 1; i++)
                 {
+                    @params.IndexesPointTriangle = [0, i, i + 1];
                     @params.Coordinate = [@params.CoordinatePolygonOriginal[0], @params.CoordinatePolygonOriginal[i], @params.CoordinatePolygonOriginal[i + 1]];
                     DrawTriangle(@params);
                 }
