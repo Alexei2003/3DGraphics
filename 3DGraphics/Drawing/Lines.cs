@@ -117,7 +117,7 @@ namespace _3DGraphics.Drawing
 
             // deffuce
             var cosDeffuceLight = CalculateCos(point, new BaseGraphisStructs.NormalVector(normal), Camera.Light);
-            cosDeffuceLight -= 0.2f;
+            cosDeffuceLight -= 0.3f;
             if (cosDeffuceLight < 0)
             {
                 cosDeffuceLight = 0;
@@ -126,9 +126,22 @@ namespace _3DGraphics.Drawing
             // ambient
             var cosAmbientLight = 0.1f;
 
+            //Specular
+
+            var specularInt = @params.NormalBitmap[index];
+
+            var specularColor = Color.FromArgb(specularInt);
+
+
+            var cosSpecular = CalculateSpecularCos(point, new BaseGraphisStructs.NormalVector(normal));
+            cosSpecular *= specularColor.A / 255;
+            if (cosSpecular < 0)
+            {
+                cosSpecular = 0;
+            }
 
             // final light
-            var cosLight = cosAmbientLight + cosDeffuceLight;
+            var cosLight = cosAmbientLight + cosDeffuceLight + cosSpecular;
             if (cosLight > 1)
             {
                 cosLight = 1;
@@ -238,13 +251,6 @@ namespace _3DGraphics.Drawing
             //Нормаль
             var normalizedNorm = Vector3.Normalize(normalModel.Coordinates);
 
-            // Проверяем, смотрит ли нормаль на источник света
-            var dotProduct = Vector3.Dot(normalizedVectorLight, normalizedNorm);
-            if (dotProduct > 0)
-            {
-                return 0; // Если нормаль направлена от света, блик не учитываем
-            }
-
             //Отражение
             var vectorSpecular = normalizedNorm - 2 * (normalizedVectorLight * normalizedNorm) * normalizedNorm;
             var normalizedVectorSpecular = Vector3.Normalize(vectorSpecular);
@@ -255,7 +261,18 @@ namespace _3DGraphics.Drawing
             var cosSpeg = Vector3.Dot(normalizedVectorSpecular, normalizedVectorCamera);
             cosSpeg = float.Pow(cosSpeg, 50);
 
-            return cosSpeg;
+
+            // Проверяем, смотрит ли нормаль на источник света
+            var dotProduct = Vector3.Dot(normalizedVectorLight, normalizedNorm);
+            if (dotProduct >0)
+            {
+                return cosSpeg * dotProduct;
+            }
+            else
+            {
+                return cosSpeg;
+            }
+
         }
 
         private static Vector3 CanculateVectBeetmeen2Point(Vector3 a, Vector3 b)
