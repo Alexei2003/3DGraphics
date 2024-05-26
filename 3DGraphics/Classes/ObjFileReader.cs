@@ -176,9 +176,11 @@ namespace _3DGraphics.Classes
                     TextureVertexIndexs = [.. textureVertexIndexsList],
                     NormalVertexIndexs = [.. normalVertexIndexsList],
                     GeometricVertexWorldCoordinates = new CoordinateVector[geometricVertexsList.Count],
+
                     TextureBitmap = new Bitmap("D:\\ALL_DOWNLOAD\\.Model\\Shovel Knight\\shovel_diffuse.png"),
                     NormalBitmap = new Bitmap("D:\\ALL_DOWNLOAD\\.Model\\Shovel Knight\\shovel_normal_map.png"),
                     MraoBitmap = new Bitmap("D:\\ALL_DOWNLOAD\\.Model\\Shovel Knight\\shovel_mrao.png")
+
                 };
             }
             else

@@ -84,12 +84,15 @@ namespace _3DGraphics.Drawing
 
         private const int MAX_SIZE_ARRAY = 4096 * 4096;
 
+        //private const int MAX_SIZE_ARRAY = 512 * 512;
+
         public static unsafe int GetPointLightUseMaps(DrawingParams @params, BaseGraphisStructs.CoordinateVector point)
         {
             int light;
+
             point = CoordinateTransformar.RevercePoint(point);
 
-            var texture = InterpolateTexture(point, @params.CoordinateWorld[@params.IndexesPointTriangle[0]], @params.CoordinateWorld[@params.IndexesPointTriangle[1]], @params.CoordinateWorld[@params.IndexesPointTriangle[2]], @params.Texture[@params.IndexesPointTriangle[0]], @params.Texture[@params.IndexesPointTriangle[1]], @params.Texture[@params.IndexesPointTriangle[2]]);
+            var texture = LinerInterpolateTexture(point, @params.CoordinateWorld[@params.IndexesPointTriangle[0]], @params.CoordinateWorld[@params.IndexesPointTriangle[1]], @params.CoordinateWorld[@params.IndexesPointTriangle[2]], @params.Texture[@params.IndexesPointTriangle[0]], @params.Texture[@params.IndexesPointTriangle[1]], @params.Texture[@params.IndexesPointTriangle[2]]);
 
             int x = (int)Math.Round((texture.U % 1) * @params.TextureStride);
             int y = (int)Math.Round((1 - (texture.V % 1)) * @params.TextureStride);
@@ -128,7 +131,7 @@ namespace _3DGraphics.Drawing
 
             //Specular
 
-            var specularInt = @params.NormalBitmap[index];
+            var specularInt = @params.MraoBitmap[index];
 
             var specularColor = Color.FromArgb(specularInt);
 
@@ -151,7 +154,13 @@ namespace _3DGraphics.Drawing
             return light;
         }
 
-        public static BaseGraphisStructs.TextureVector InterpolateTexture(BaseGraphisStructs.CoordinateVector point, BaseGraphisStructs.CoordinateVector a, BaseGraphisStructs.CoordinateVector b, BaseGraphisStructs.CoordinateVector c, BaseGraphisStructs.TextureVector textureA, BaseGraphisStructs.TextureVector textureB, BaseGraphisStructs.TextureVector textureC)
+        public static BaseGraphisStructs.TextureVector LinerInterpolateTexture(BaseGraphisStructs.CoordinateVector point,
+                                                                               BaseGraphisStructs.CoordinateVector a,
+                                                                               BaseGraphisStructs.CoordinateVector b,
+                                                                               BaseGraphisStructs.CoordinateVector c,
+                                                                               BaseGraphisStructs.TextureVector textureA,
+                                                                               BaseGraphisStructs.TextureVector textureB,
+                                                                               BaseGraphisStructs.TextureVector textureC)
         {
             // Вычисляем вектора
             Vector3 v0 = b.Coordinates - a.Coordinates;
@@ -177,13 +186,61 @@ namespace _3DGraphics.Drawing
             return new BaseGraphisStructs.TextureVector(coordinates);
         }
 
+        public static BaseGraphisStructs.TextureVector PerspectiveInterpolateTexture(BaseGraphisStructs.CoordinateVector point,
+                                                                                     BaseGraphisStructs.CoordinateVector a,
+                                                                                     BaseGraphisStructs.CoordinateVector b,
+                                                                                     BaseGraphisStructs.CoordinateVector c,
+                                                                                     BaseGraphisStructs.TextureVector textureA,
+                                                                                     BaseGraphisStructs.TextureVector textureB,
+                                                                                     BaseGraphisStructs.TextureVector textureC)
+        {
+            // Перспективное деление для получения экранных координат
+            float invZa = 1.0f / a.Z;
+            float invZb = 1.0f / b.Z;
+            float invZc = 1.0f / c.Z;
+
+            // Перспективно-корректированные текстурные координаты
+            float uA = textureA.U * invZa;
+            float vA = textureA.V * invZa;
+            float uB = textureB.U * invZb;
+            float vB = textureB.V * invZb;
+            float uC = textureC.U * invZc;
+            float vC = textureC.V * invZc;
+
+            // Векторные операции для вычисления барицентрических координат
+            Vector3 v0 = b.Coordinates - a.Coordinates;
+            Vector3 v1 = c.Coordinates - a.Coordinates;
+            Vector3 v2 = point.Coordinates - a.Coordinates;
+
+            // Скалярные произведения для вычисления барицентрических координат
+            float d00 = Vector3.Dot(v0, v0);
+            float d01 = Vector3.Dot(v0, v1);
+            float d11 = Vector3.Dot(v1, v1);
+            float d20 = Vector3.Dot(v2, v0);
+            float d21 = Vector3.Dot(v2, v1);
+
+            // Вычисляем барицентрические координаты
+            float denom = d00 * d11 - d01 * d01;
+            float v = (d11 * d20 - d01 * d21) / denom;
+            float w = (d00 * d21 - d01 * d20) / denom;
+            float u = 1.0f - v - w;
+
+            // Перспективно-корректированное интерполированное значение
+            float interpolatedInvZ = u * invZa + v * invZb + w * invZc;
+            float interpolatedU = (u * uA + v * uB + w * uC) / interpolatedInvZ;
+            float interpolatedV = (u * vA + v * vB + w * vC) / interpolatedInvZ;
+
+            return new BaseGraphisStructs.TextureVector(interpolatedU, interpolatedV,0);
+        }
+
+
         public static int GetPointLightUseInterpolation(DrawingParams @params, BaseGraphisStructs.CoordinateVector point)
         {
             int light;
 
             point = CoordinateTransformar.RevercePoint(point);
 
-            var normal = InterpolateNormal(point, @params.CoordinateWorld[@params.IndexesPointTriangle[0]], @params.CoordinateWorld[@params.IndexesPointTriangle[1]], @params.CoordinateWorld[@params.IndexesPointTriangle[2]], @params.Normal[@params.IndexesPointTriangle[0]], @params.Normal[@params.IndexesPointTriangle[1]], @params.Normal[@params.IndexesPointTriangle[2]]);
+            var normal = LinerInterpolateNormal(point, @params.CoordinateWorld[@params.IndexesPointTriangle[0]], @params.CoordinateWorld[@params.IndexesPointTriangle[1]], @params.CoordinateWorld[@params.IndexesPointTriangle[2]], @params.Normal[@params.IndexesPointTriangle[0]], @params.Normal[@params.IndexesPointTriangle[1]], @params.Normal[@params.IndexesPointTriangle[2]]);
 
             //Diffuse
             var cosLight = CalculateCos(point, normal, Camera.Light);
@@ -256,17 +313,17 @@ namespace _3DGraphics.Drawing
             var normalizedVectorSpecular = Vector3.Normalize(vectorSpecular);
 
             //Камера 
-            var normalizedVectorCamera = CanculateVectBeetmeen2Point(pointModel.Coordinates, Camera.Eye);
+            var normalizedVectorCamera = CanculateVectBeetmeen2Point(pointModel.Coordinates, Camera.Light);
 
             var cosSpeg = Vector3.Dot(normalizedVectorSpecular, normalizedVectorCamera);
-            cosSpeg = float.Pow(cosSpeg, 50);
+            cosSpeg = float.Pow(cosSpeg, 100);
 
 
             // Проверяем, смотрит ли нормаль на источник света
             var dotProduct = Vector3.Dot(normalizedVectorLight, normalizedNorm);
-            if (dotProduct >0)
+            if (dotProduct > 0)
             {
-                return cosSpeg * dotProduct;
+                return 0;
             }
             else
             {
@@ -281,7 +338,7 @@ namespace _3DGraphics.Drawing
             var vector = a - b;
             return Vector3.Normalize(vector);
         }
-        public static BaseGraphisStructs.NormalVector InterpolateNormal(BaseGraphisStructs.CoordinateVector point, BaseGraphisStructs.CoordinateVector a, BaseGraphisStructs.CoordinateVector b, BaseGraphisStructs.CoordinateVector c, BaseGraphisStructs.NormalVector normalA, BaseGraphisStructs.NormalVector normalB, BaseGraphisStructs.NormalVector normalC)
+        public static BaseGraphisStructs.NormalVector LinerInterpolateNormal(BaseGraphisStructs.CoordinateVector point, BaseGraphisStructs.CoordinateVector a, BaseGraphisStructs.CoordinateVector b, BaseGraphisStructs.CoordinateVector c, BaseGraphisStructs.NormalVector normalA, BaseGraphisStructs.NormalVector normalB, BaseGraphisStructs.NormalVector normalC)
         {
             // Вычисляем вектора
             Vector3 v0 = b.Coordinates - a.Coordinates;
