@@ -91,8 +91,14 @@ namespace _3DGraphics.Classes
 
             foreach (var line in fileStrs)
             {
+                if (line == "")
+                {
+                    continue;
+                }
+
                 var tmpStr = line.Replace('.', ',');
-                var parametersStr = tmpStr.Split(' ');
+                var parametersStr = tmpStr.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
                 // Координаты геометрических вершин
                 if (line.Length > 0 && line[0] == 'v' && line[1] == ' ')
                 {
@@ -116,7 +122,7 @@ namespace _3DGraphics.Classes
                     }
                 }
 
-                // Координаты текстурных вершин
+                // Координаты нормалей вершин
                 if (line.Length > 0 && line[0] == 'v' && line[1] == 'n')
                 {
                     normalVerticesList.Add(new NormalVector(float.Parse(parametersStr[1]), float.Parse(parametersStr[2]), float.Parse(parametersStr[3])));
@@ -131,7 +137,7 @@ namespace _3DGraphics.Classes
 
                     for (var i = 1; i < parametersStr.Length; i++)
                     {
-                        var indexStr = parametersStr[i].Split('/');
+                        var indexStr = parametersStr[i].Split('/',StringSplitOptions.RemoveEmptyEntries);
                         switch (indexStr.Length)
                         {
                             case 3:

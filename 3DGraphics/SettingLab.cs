@@ -8,13 +8,13 @@ namespace _3DGraphics
         public delegate void DrawObjectDelegate(DrawingParams @params);
 
         private static DrawObjectDelegate[] drawObjectFuncs = [Lines.Draw, Lines.DrawRGB, Triangles.Draw, Triangles.DrawRGB];
-        public static List<DrawObjectDelegate> DrawModelFuncList = [Triangles.Draw];
+        public static List<DrawObjectDelegate> DrawModelFuncList = [Lines.Draw];
 
 
         public delegate int GetColorPointDelegate(DrawingParams @params, BaseGraphisStructs.CoordinateVector point);
 
         private static GetColorPointDelegate[] GetColorPointFuncs = [Lines.GetPointLightUseOneColourForPolygon, Lines.GetPointLightUseInterpolation, Lines.GetPointLightUseMaps];
-        public static GetColorPointDelegate GetColorPointFunc = Lines.GetPointLightUseMaps;
+        public static GetColorPointDelegate GetColorPointFunc = Lines.GetPointLightUseOneColourForPolygon;
 
     }
 }

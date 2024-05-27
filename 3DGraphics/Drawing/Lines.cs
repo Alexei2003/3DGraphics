@@ -84,8 +84,6 @@ namespace _3DGraphics.Drawing
 
         private const int MAX_SIZE_ARRAY = 4096 * 4096;
 
-        //private const int MAX_SIZE_ARRAY = 512 * 512;
-
         public static unsafe int GetPointLightUseMaps(DrawingParams @params, BaseGraphisStructs.CoordinateVector point)
         {
             int light;

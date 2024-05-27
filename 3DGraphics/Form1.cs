@@ -101,7 +101,7 @@ namespace _3DGraphics
                 }
                 BackgroundImage = bitmap;
             }
-            catch
+            catch (Exception ex)
             {
                 return;
             }
@@ -112,7 +112,7 @@ namespace _3DGraphics
             var modelFilePath = opfdModelFile.FileName;
             modelData = Read(modelFilePath);
 
-            if (modelData.NormalVertexCoordinates.Length == 0)
+            if (modelData.GeometricVertexCoordinates.Length == 0)
             {
                 modelData = null;
                 return;

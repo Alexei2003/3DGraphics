@@ -42,13 +42,29 @@ namespace _3DGraphics.Drawing
             for (var j = 0; j < SettingLab.DrawModelFuncList.Count; j++)
             {
 
-                //for (var index = 0; index < modelData.GeometricVertexIndexs.Length; index++)
-                Parallel.For(0, modelData.GeometricVertexIndexs.Length, index =>
+                for (var index = 0; index < modelData.GeometricVertexIndexs.Length; index++)
+                //Parallel.For(0, modelData.GeometricVertexIndexs.Length, index =>
                 {
                     var geometricPoints = new BaseGraphisStructs.CoordinateVector[modelData.GeometricVertexIndexs[index].Length];
                     var geometricToNormalPoints = new BaseGraphisStructs.CoordinateVector[modelData.GeometricVertexIndexs[index].Length];
-                    var normalPoints = new BaseGraphisStructs.NormalVector[modelData.NormalVertexIndexs[index].Length];
-                    var texturePoints = new BaseGraphisStructs.TextureVector[modelData.TextureVertexIndexs[index].Length];
+                    BaseGraphisStructs.NormalVector[] normalPoints;
+                    if (modelData.NormalVertexIndexs.Length > 0)
+                    {
+                        normalPoints = new BaseGraphisStructs.NormalVector[modelData.NormalVertexIndexs[index].Length];
+                    }
+                    else
+                    {
+                        normalPoints = null;
+                    }
+                    BaseGraphisStructs.TextureVector[] texturePoints;
+                    if (modelData.TextureVertexIndexs.Length > 0)
+                    {
+                        texturePoints = new BaseGraphisStructs.TextureVector[modelData.TextureVertexIndexs[index].Length];
+                    }
+                    else
+                    {
+                        texturePoints = null;
+                    }
                     for (var i = 0; i < modelData.GeometricVertexIndexs[index].Length; i++)
                     {
                         ref var geometricCoordinate = ref modelData.GeometricVertexCoordinates[modelData.GeometricVertexIndexs[index][i]];
@@ -59,8 +75,14 @@ namespace _3DGraphics.Drawing
                         }
                         geometricPoints[i] = geometricCoordinate;
                         geometricToNormalPoints[i] = modelData.GeometricVertexWorldCoordinates[modelData.GeometricVertexIndexs[index][i]];
-                        normalPoints[i] = modelData.NormalVertexCoordinates[modelData.NormalVertexIndexs[index][i]];
-                        texturePoints[i] = modelData.TextureVertexCoordinates[modelData.TextureVertexIndexs[index][i]];
+                        if (normalPoints != null)
+                        {
+                            normalPoints[i] = modelData.NormalVertexCoordinates[modelData.NormalVertexIndexs[index][i]];
+                        }
+                        if (texturePoints != null)
+                        {
+                            texturePoints[i] = modelData.TextureVertexCoordinates[modelData.TextureVertexIndexs[index][i]];
+                        }
                     }
 
                     if (geometricPoints != null)
@@ -88,8 +110,8 @@ namespace _3DGraphics.Drawing
                             HeightZone = heightZone,
                         });
                     }
-                });
-                //}
+                //});
+                }
             }
 
             modelData.MraoBitmap.UnlockBits(mraoBitmapData);
