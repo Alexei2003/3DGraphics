@@ -1,0 +1,12 @@
+# 3DGraphics
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Alexei2003_3DGraphics&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Alexei2003_3DGraphics)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Alexei2003_3DGraphics&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Alexei2003_3DGraphics)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=Alexei2003_3DGraphics&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=Alexei2003_3DGraphics)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Alexei2003_3DGraphics&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Alexei2003_3DGraphics)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Alexei2003_3DGraphics&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Alexei2003_3DGraphics)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=Alexei2003_3DGraphics&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=Alexei2003_3DGraphics)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Alexei2003_3DGraphics&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Alexei2003_3DGraphics)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Alexei2003_3DGraphics&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Alexei2003_3DGraphics)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Alexei2003_3DGraphics&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=Alexei2003_3DGraphics)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Alexei2003_3DGraphics&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Alexei2003_3DGraphics)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Alexei2003_3DGraphics&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Alexei2003_3DGraphics)
